@@ -1,0 +1,88 @@
+I"(function() {
+  var disable_submit, submit_edit;
+
+  submit_edit = null;
+
+  this.add_copy_button_event = function() {
+    return $('.copy-timeline-button').on('click', function() {
+      var modal, timeline;
+      timeline = $(this).data('timeline');
+      modal = $('#copy-timeline-modal');
+      modal.find('#timeline_title').val(timeline.title);
+      modal.find('#timeline_comment').val(timeline.comment);
+      if (timeline.visibility === 'public') {
+        modal.find('#timeline_visibility_public').prop('checked', true);
+      } else if (timeline.visibility === 'private') {
+        modal.find('#timeline_visibility_private').prop('checked', true);
+      } else {
+        modal.find('#timeline_visibility_private-with-token').prop('checked', true);
+      }
+      modal.find('#old_timeline_id').val(timeline.id);
+      modal.find('#token').val(timeline.access_token);
+      modal.find('#copy-timeline-submit').prop("disabled", false);
+      modal.find('#copy-timeline-submit-edit').prop("disabled", false);
+      modal.find('#timeline_title').parent().removeClass('has-error');
+      modal.find('#title_error').hide();
+      return modal.modal('show');
+    });
+  };
+
+  $('#copy-timeline-submit-edit').on('click', function() {
+    return submit_edit = true;
+  });
+
+  $('#copy-timeline-form').submit(function() {
+    var modal;
+    modal = $('#copy-timeline-modal');
+    if (modal.find('#timeline_title').val()) {
+      disable_submit();
+      return true;
+    } else {
+      modal.find('#title_error').show();
+      modal.find('#timeline_title').parent().addClass('has-error');
+    }
+    return false;
+  });
+
+  disable_submit = function() {
+    var modal;
+    modal = $('#copy-timeline-modal');
+    modal.find('#copy-timeline-submit').prop("disabled", true);
+    return modal.find('#copy-timeline-submit-edit').prop("disabled", true);
+  };
+
+  $('#copy-timeline-form').bind('ajax:success', function(event, data, status, xhr) {
+    if (data.errors) {
+      return console.log(data.errors.title[0]);
+    } else {
+      if (submit_edit) {
+        return window.location.href = data.path;
+      } else {
+        if ($('#with_refresh').val()) {
+          return location.reload();
+        }
+      }
+    }
+  }).bind('ajax:error', function(e, xhr, status, error) {
+    return console.log(xhr.responseJSON.errors);
+  });
+
+  $('input[name="timeline[visibility]"]').on('click', function() {
+    var new_text, new_val;
+    new_val = $(this).val();
+    new_text = $('.human_friendly_visibility_' + new_val).attr('title');
+    $('.visibility-help-text').text(new_text);
+    if (new_val === 'private') {
+      return $('#timeline_lti_share').hide();
+    } else {
+      return $('#timeline_lti_share').show();
+    }
+  });
+
+  $('.mejs-form-alert').on('close.bs.alert', function(e) {
+    e.preventDefault();
+    return $(this).slideUp();
+  });
+
+}).call(this);
+:ET

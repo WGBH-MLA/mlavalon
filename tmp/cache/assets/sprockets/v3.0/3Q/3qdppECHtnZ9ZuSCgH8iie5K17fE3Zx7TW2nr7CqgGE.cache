@@ -1,0 +1,15 @@
+I"­(function() {
+  $(document).ajaxStop(function() {
+    $("#bookmarks_selectall").prop("checked", $("input.toggle_bookmark:not(:checked)").size() === 0);
+  });
+
+  $("#bookmarks_selectall").on("change", function(e) {
+    if (this.checked) {
+      $("label.toggle_bookmark:not(.checked) input.toggle_bookmark").click();
+    } else {
+      $("label.toggle_bookmark.checked input.toggle_bookmark").click();
+    }
+  });
+
+}).call(this);
+:ET

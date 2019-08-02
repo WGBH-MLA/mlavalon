@@ -1,0 +1,46 @@
+I"‡(function() {
+  var enable_bib_btn;
+
+  $(function() {
+    var form, import_button_html;
+    form = $('div.import-button').closest('form').prop('id');
+    import_button_html = '<div class="input-group-btn"><button id="media_object_bibliographic_id_btn" type="submit" name="media_object[import_bib_record]" class="btn btn-success" value="yes" >Import</button></div>';
+    $('div.import-button').append(import_button_html);
+    enable_bib_btn();
+    $('#media_object_bibliographic_id').keyup(function() {
+      return enable_bib_btn();
+    });
+    if ($('input#media_object_title').val() !== '') {
+      $(document).on('click', '#cancel_bibimport', function() {
+        $('#media_object_bibliographic_id_btn').popover('hide');
+        return true;
+      });
+      return $('#media_object_bibliographic_id_btn').popover({
+        trigger: 'manual',
+        html: true,
+        placement: 'top',
+        container: 'body',
+        content: function() {
+          var button;
+          button = '<button id="media_object_bibliographic_id_confirm_btn" class="btn btn-xs btn-danger btn-confirm" type="submit" name="media_object[import_bib_record]" value="yes" data-original-title="" title="" form="' + form + '" >Import</button>';
+          return '<p>Note: this will replace all metadata except for Other Identifiers</p> ' + button + ' <button id=\'cancel_bibimport\' class=\'btn btn-xs btn-primary\'>No, Cancel</button>';
+        }
+      }).click(function() {
+        $('.btn-confirmation').popover('hide');
+        $(this).popover('show');
+        form_attribute_fix('#media_object_bibliographic_id_confirm_btn');
+        return false;
+      });
+    }
+  });
+
+  enable_bib_btn = function() {
+    if ($('#media_object_bibliographic_id').val() === "") {
+      $('#media_object_bibliographic_id_btn').prop('disabled', true);
+    } else {
+      $('#media_object_bibliographic_id_btn').prop('disabled', false);
+    }
+  };
+
+}).call(this);
+:ET

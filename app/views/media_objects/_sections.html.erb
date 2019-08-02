@@ -1,0 +1,117 @@
+<%#
+Copyright 2011-2019, The Trustees of Indiana University and Northwestern
+  University.  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+  under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+  CONDITIONS OF ANY KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations under the License.
+---  END LICENSE_HEADER BLOCK  ---
+%>
+<% show_progress = sections.any? { |s| s.status_code != 'COMPLETED' } %>
+<% unless hide_sections?(sections) and not show_progress %>
+
+<div class="panel-group media-show-page" id="accordion" role="tablist" aria-multiselectable="true">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="sections_heading" style="border-bottom: 1px solid #ddd;">
+      <h4 class="panel-title">
+        <span id="section-label">Sections</span>
+        <% if current_ability.can? :create, Playlist %>
+          <button type="button" title="Add all sections to playlist" aria-label="Add all sections to playlist" class="structure_add_to_playlist outline_on btn btn-primary" data-scope="media_object"></button>
+        <% end %>
+	      <button class="btn btn-primary btn-xs" id="expand_button">Expand All</button>
+	      <button class="btn btn-primary btn-xs hidden" id="collapse_button">Collapse All</button>
+        <br class="clear"/>
+      </h4>
+    </div>
+
+<% show_all_sections = can? :edit, @media_object %>
+<% sections.each_with_index do |section,i| %>
+<%   unless show_all_sections %>
+<%     next if section.derivatives.empty? %>
+<%   end %>
+<%=  structure_html(section,i,show_progress).html_safe %>
+<% end %>
+
+  </div>
+</div>
+
+<!-- add_to_playlist modal form ---->
+<div class="modal fade" id="add-to-playlist-modal" tabindex="-1" role="dialog"></div>
+
+<% content_for :page_scripts do %>
+<script>
+  if ($('.fa-plus-square').length + $('.fa-minus-square').length <= 2){
+    $('#collapse_button').addClass('hidden');
+    $('#expand_button').addClass('hidden');
+  } else {
+    <!-- $('.panel-title #section-label').addClass('hidden'); -->
+    $('#accordion.panel-group .panel-collapse').on('shown.bs.collapse', function() {
+      if($('#accordion.panel-group .panel-collapse').length == $('#accordion.panel-group .panel-collapse.in').length) {
+        $('#expand_button').addClass('hidden');
+        $('#collapse_button').removeClass('hidden');
+      }
+    });
+    $('#accordion.panel-group .panel-collapse').on('hidden.bs.collapse', function() {
+      $('#expand_button').removeClass('hidden');
+      $('#collapse_button').addClass('hidden');
+    });
+  }
+  $('#expand_button').on('click', function() {
+    $('#accordion.panel-group .panel-collapse').collapse('show');
+    $('#accordion.panel-group .panel-title .fa-plus-square').addClass('hidden');
+    $('#accordion.panel-group .panel-title .fa-minus-square').removeClass('hidden');
+  });
+  $('#collapse_button').on('click', function() {
+    $('#accordion.panel-group .panel-collapse').collapse('hide');
+    $('#accordion.panel-group .panel-title .fa-plus-square').removeClass('hidden');
+    $('#accordion.panel-group .panel-title .fa-minus-square').addClass('hidden');
+  });
+  $('#accordion.panel-group .panel-title .fa-plus-square').on('click', function() {
+    $(this).toggleClass('hidden');
+    $(this).closest('.panel-title').find('.fa-minus-square').toggleClass('hidden');
+  });
+  $('#accordion.panel-group .panel-title .fa-minus-square').on('click', function() {
+    $(this).toggleClass('hidden');
+    $(this).closest('.panel-title').find('.fa-plus-square').toggleClass('hidden');
+  });
+  $('.panel-title a').on('click',function(){
+    var panelheader = $(this).closest('.panel-title');
+    var sectiondiv = $(panelheader.find('.fa-plus-square').data('target'));
+    if (!sectiondiv.hasClass('in')) panelheader.find('.fa-plus-square').click();
+  });
+  $('.structure_add_to_playlist').on('click',function(){
+    $.ajax({
+        type: "GET",
+        url: "<%= add_to_playlist_form_media_object_path(@media_object) %>",
+        data: {
+          masterfile_id: $(this).data('masterfileId'),
+          scope: $(this).data('scope')
+         },
+        success: function(result) {
+          modal = $('#add-to-playlist-modal')
+          modal.html(result);
+          modal.find('#playlistitem_submit').on('click', function(){
+              $(this).button('loading')
+          })
+          modal.find('#add_to_playlist_form').on('ajax:success', function(e, data, status, xhr){
+            $('#add-to-playlist-modal .modal-body').html(data["message"]);
+          }).on('ajax:error',function(e, xhr, status, error){
+            $('#add-to-playlist-modal .modal-body').html(error);
+          });
+          modal.modal('show');
+        },
+        error: function(result) {
+            alert('error');
+        }
+    });
+  });
+
+</script>
+<% end %>
+<% end %>

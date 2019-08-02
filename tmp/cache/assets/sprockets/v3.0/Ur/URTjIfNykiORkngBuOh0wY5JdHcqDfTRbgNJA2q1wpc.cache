@@ -1,0 +1,125 @@
+I"€(function() {
+  var AvalonProgress;
+
+  AvalonProgress = (function() {
+    var setActive, updateBar;
+
+    function AvalonProgress() {}
+
+    setActive = function(target, active) {
+      if (active) {
+        return target.addClass('progress-striped active');
+      } else {
+        return target.removeClass('progress-striped active');
+      }
+    };
+
+    updateBar = function(bar, attrs) {
+      var percent, results, target, type;
+      results = [];
+      for (type in attrs) {
+        percent = attrs[type];
+        target = $(".progress-bar.progress-bar-" + type, bar);
+        results.push(target.css('width', percent + "%"));
+      }
+      return results;
+    };
+
+    AvalonProgress.prototype.retrieve = function(auto) {
+      if (auto == null) {
+        auto = false;
+      }
+      return $.ajax($('#progress').data('progress-url'), {
+        dataType: 'json',
+        success: (function(_this) {
+          return function(data) {
+            _this.data = data;
+            if (_this.update() && auto) {
+              return setTimeout(function() {
+                return _this.retrieve(auto);
+              }, 10000);
+            }
+          };
+        })(this)
+      });
+    };
+
+    AvalonProgress.prototype.data = {};
+
+    AvalonProgress.prototype.update = function() {
+      var info, sections;
+      sections = $('a[data-segment]');
+      sections.each((function(_this) {
+        return function(i, sec) {
+          var bar, id, info, info_box, section_node;
+          id = $(sec).data('segment');
+          section_node = $(sec).closest('.panel-title');
+          bar = section_node.find('span.progress');
+          info_box = section_node.find('div.alert');
+          info = _this.data[id];
+          if (info != null) {
+            setActive(bar, info.complete < 100 && (info.status === 'RUNNING' || info.status === 'WAITING'));
+            if (info.operation != null) {
+              info_box.html(info.operation);
+            }
+            if (info.complete === 100) {
+              info_box.html(info.status);
+            }
+            updateBar(bar, {
+              success: info.success,
+              danger: info.error
+            });
+            if (info.status === 'FAILED') {
+              info_box.html("ERROR: " + info.message);
+              info_box.addClass('alert-error');
+              info_box.show();
+            }
+            return bar.data('status', info);
+          }
+        };
+      })(this));
+      info = this.data['overall'];
+      setActive($('#overall'), info.success + info.error < 100);
+      updateBar($('#overall'), {
+        success: info.success,
+        danger: info.error
+      });
+      $('#overall').data('status', info);
+      if (info.success === 100) {
+        location.reload();
+      }
+      return info.success + info.error < 100;
+    };
+
+    AvalonProgress.prototype.click_section = function(section_id) {
+      var data;
+      data = this.data[section_id];
+      if (data.status !== 'COMPLETED' || data.complete < 100) {
+        window.currentPlayer = null;
+        return $('.avalon-player').html('<div id="nojs"></div>');
+      }
+    };
+
+    return AvalonProgress;
+
+  })();
+
+  $(document).ready(function() {
+    var progress_controller;
+    if ($('.progress-bar').size() === 0) {
+      return;
+    }
+    progress_controller = new AvalonProgress();
+    $('.progress-indented').prepend('<span class="progress progress-inline"> <div class="progress-bar progress-bar-success" style="width:0%"></div> <div class="progress-bar progress-bar-danger" style="width:0%"></div> <div class="progress-bar progress-bar-warning" style="width:0%"></div> </span>');
+    $('.status-detail').hide();
+    progress_controller.retrieve(true);
+    $('.progress-inline').click(function() {
+      return $(this).nextAll('.status-detail').slideToggle();
+    });
+    return $('a[data-segment]').bind('streamswitch', function() {
+      return progress_controller.click_section($(this).data('segment'));
+    });
+  });
+
+}).call(this);
+:ET

@@ -1,0 +1,44 @@
+import { Collection } from './Util';
+import { Node } from './Node';
+import { GetSet, IRect } from './types';
+export declare abstract class Container extends Node {
+    children: Collection<Node>;
+    getChildren(filterFunc?: (item: Node) => boolean): Collection<Node>;
+    hasChildren(): boolean;
+    removeChildren(): this;
+    destroyChildren(): this;
+    abstract _validateAdd(node: Node): void;
+    add(child: any): this;
+    destroy(): this;
+    find(selector: any): Collection<Node>;
+    get(selector: any): Collection<Node>;
+    findOne(selector: any): Node;
+    _generalFind(selector: any, findOne: any): Collection<Node>;
+    _findByString(selector: any): any[];
+    _findByFunction(fn: any, findOne: any): any[];
+    _getNodeById(key: any): any;
+    _getNodesByName(key: any): any[];
+    _get(selector: any): any;
+    toObject(): any;
+    _getDescendants(arr: any): any[];
+    isAncestorOf(node: any): boolean;
+    clone(obj: any): any;
+    getAllIntersections(pos: any): any[];
+    _setChildrenIndices(): void;
+    drawScene(can: any, top: any, caching: any): this;
+    drawHit(can: any, top: any, caching: any): this;
+    _drawChildren(canvas: any, drawMethod: any, top: any, caching?: any, skipBuffer?: any, skipComposition?: any): void;
+    shouldDrawHit(canvas?: any): any;
+    getClientRect(attrs: any): {
+        x: any;
+        y: any;
+        width: number;
+        height: number;
+    };
+    clip: GetSet<IRect, this>;
+    clipX: GetSet<number, this>;
+    clipY: GetSet<number, this>;
+    clipWidth: GetSet<number, this>;
+    clipHeight: GetSet<number, this>;
+    clipFunc: GetSet<(ctx: CanvasRenderingContext2D, shape: this) => void, this>;
+}
