@@ -15,6 +15,14 @@
 class ApplicationController < ActionController::Base
   before_action :store_location, unless: :devise_controller?
 
+  def default_url_options
+    if Rails.env.production?
+      {:host => "avalon.wgbh.org"}
+    else  
+      {}
+    end
+  end
+
   # Adds a few additional behaviors into the application controller
   include Blacklight::Controller
   include Hydra::Controller::ControllerBehavior
