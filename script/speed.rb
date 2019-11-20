@@ -53,7 +53,7 @@ params = {
   headers: {
     content_type: :json,
     accept: :json,
-    :'Avalon-Api-Key' => '5f16f284d4cae8e24522b1c7865cf9c37ddb169a290c1374d8e9db28f1ff8f1c9219de54b860f4d99f5cb30679f26ba05d502da95eb199646bbb74306e2ed045'
+    :'Avalon-Api-Key' => ENV['AVALON_API_KEY']
   },
   verify_ssl: false,
   timeout: 15
