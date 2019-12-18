@@ -90,6 +90,9 @@ gem 'redis-rails'
 gem 'resque', '~> 2.0'
 gem 'resque-scheduler', '~> 4.4'
 
+# rest-client for speed testing
+gem 'rest-client', '~> 1.8'
+
 # Coding Patterns
 gem 'config'
 gem 'hooks'
