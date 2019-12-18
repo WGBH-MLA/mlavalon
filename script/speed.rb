@@ -4,6 +4,7 @@ require 'rest-client'
 
 # Fetch params from ENV; set defaults if empty.
 trials = ENV.fetch('TRIALS', 10).to_i
+collection_id = ENV.fetch('COLLECTION_ID')
 timestamp = Time.now.strftime('%Y%m%d-%H%M%S')
 output_file = ENV.fetch('OUTPUT_FILE', "./benchmark_results/#{timestamp}.#{trials}_generic_works.csv")
 
@@ -15,7 +16,7 @@ payload = {
     title: 'Test Ingested Object',
     date_issued: DateTime.now
   },
-  collection_id: 'nz805z68q',
+  collection_id: collection_id,
   files: [
     {
       # file_location: '',
@@ -44,7 +45,7 @@ payload = {
   ]
 }
 
-port = '3000'
+port = '80'
 
 params = {
   method: :post,
