@@ -23,6 +23,5 @@ payloads.each do |payload|
     timeout: 15
   }
 
-
   resp = RestClient::Request.execute(params)
 end
