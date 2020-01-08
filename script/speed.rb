@@ -20,12 +20,12 @@ payload = {
   files: [
     {
       # file_location: '',
-      title: 'Test File for Media Object',
+      title: 'Baby Eleanor',
       files: [
         {
           label: 'quality-high',
           id: 'track-1',
-          url: "http://3.220.107.5:1935/avalon-vod-edge/_definst_/mp4:amazons3/anamorphTEST.mp4/playlist.m3u8",
+          url: "https://avalon.wgbh.org/hls/avalon/baby_eleanor.mp4/master.m3u8",
           # duration: "6315",
           # mime_type:  "video/mp4",
           # audio_bitrate: "127716.0",
