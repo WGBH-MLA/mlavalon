@@ -45,7 +45,7 @@ class CSVReader
           captions: media_object_data['File Caption Text'],
 
           # captions_type: 'text/vtt' (or 'text/srt')
-          captions_type: media_object_data['File Caption Type']
+          captions_type: media_object_data['File Caption Type'],
 
           # CI id or something I guess
           other_identifier: media_object_data['File Other Id'],
