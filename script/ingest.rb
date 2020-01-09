@@ -1,4 +1,4 @@
-require 'csv_reader'
+require_relative 'csv_reader'
 
 filename = ARGV[0]
 raise 'that aint right' unless filename
