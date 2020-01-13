@@ -1,5 +1,6 @@
 require 'csv'
 require 'rest-client'
+require_relative '../config/environment'
 
 class CSVReader
 
@@ -18,7 +19,7 @@ class CSVReader
         date_created: media_object_data['Date Created'],
         copyright_date: media_object_data['Copyright Date'],
         abstract: media_object_data['Abstract'],
-        note: media_object_data['Notes'], #multiple, requires paired note_type 
+        note: media_object_data['Notes'], #multiple, requires paired note_type
         format: media_object_data['Format'],
         resource_type: media_object_data['Resource Types'], #multiple
         contributor: media_object_data['Contributors'], #multiple
@@ -37,9 +38,9 @@ class CSVReader
         other_identifier: media_object_data['Other Identifiers'], #multiple
         comment: media_object_data['Comments'] #multiple
       },
-      
+
       collection_id: collection_id,
-      
+
       files: [
         {
           label: media_object_data['File Label'], #optional
@@ -66,7 +67,7 @@ class CSVReader
           display_aspect_ratio: media_object_data['File Aspect Ratio'],
           original_frame_size: media_object_data['File Frame Size'],
           file_format: media_object_data['File Format'],
-          
+
           # dont think we have this data
           # poster_offset: "0:02",
           # thumbnail_offset: "0:02",
@@ -130,7 +131,7 @@ class CSVReader
 
     collection = nil
 
-    CSV.read(filename, {headers: true}) do |csv_line|
+    CSV.read(filename, {headers: true}).each do |csv_line|
 
       # collection row
       if is_collection_row?(csv_line)
