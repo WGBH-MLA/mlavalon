@@ -143,6 +143,7 @@ class CSVReader
         collection.name = csv_line['Collection Name'] if csv_line['Collection Name']
         collection.description = csv_line['Collection Description'] if csv_line['Collection Description']
         collection.unit = csv_line['Unit Name'] if csv_line['Unit Name']
+        collection.managers = ["woo@foo.edu"]
         collection.save!
       else
         puts "Starting MediaObject Row..."
