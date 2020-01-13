@@ -1,5 +1,6 @@
 units:
  - Default Unit
+ - Nova
 identifier_types:
  local: Catalog Key
  oclc: OCLC
