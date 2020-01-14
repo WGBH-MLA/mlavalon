@@ -1,3 +1,4 @@
+require 'securerandom'
 require 'csv'
 require 'rest-client'
 require_relative '../config/environment'
@@ -140,7 +141,7 @@ class CSVReader
 
         raise "Couldnt find collection!!!" unless collection
         # update collection metadata if submitted
-        collection.name = csv_line['Collection Name'] if csv_line['Collection Name']
+        collection.name = csv_line['Collection Name'] + SecureRandom.hex.slice(0..10) if csv_line['Collection Name']
         collection.description = csv_line['Collection Description'] if csv_line['Collection Description']
         collection.unit = csv_line['Unit Name'] if csv_line['Unit Name']
         collection.managers = ["woo@foo.edu"]
