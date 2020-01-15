@@ -1,6 +1,8 @@
 units:
  - Default Unit
  - Nova
+ - Frontline
+ - Africans in America
 identifier_types:
  local: Catalog Key
  oclc: OCLC

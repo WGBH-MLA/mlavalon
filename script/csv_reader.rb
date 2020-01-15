@@ -1,9 +1,48 @@
 require 'securerandom'
 require 'csv'
 require 'rest-client'
-require_relative '../config/environment'
+require 'json'
+# require_relative '../config/environment'
 
 class CSVReader
+
+  def fetch_collection_json(collection_id)
+    port = '80'
+    params = {
+      method: :get,
+      url: "http://localhost:#{port}/admin/collections/#{collection_id}.json",
+      headers: {
+        content_type: :json,
+        accept: :json,
+        :'Avalon-Api-Key' => ENV['AVALON_API_KEY']
+      },
+      verify_ssl: false,
+      timeout: 15
+    }
+
+    send_request(params)
+  end
+
+  def fetch_all_collections_json
+    port = '80'
+    params = {
+      method: :get,
+      url: "http://localhost:#{port}/admin/collections.json?per_page=1000&page=1",
+      headers: {
+        content_type: :json,
+        accept: :json,
+        :'Avalon-Api-Key' => ENV['AVALON_API_KEY']
+      },
+      verify_ssl: false,
+      timeout: 15
+    }
+    send_request params
+  end
+
+  def fetch_collection_by_name(collection_name)
+    fetch_all_collections_json.select { |collection_json| collection_json['name'] == collection_name }.first
+  end
+
 
   def generate_payload(media_object_data, collection_id)
     puts "Generating Payload..."
@@ -98,7 +137,7 @@ class CSVReader
   end
 
   def is_collection_row?(row_data)
-    ['Collection Name','Collection Description','Unit Name','Collection ID',].any? { |field| row_data[field].present? }
+    ['Collection Name','Collection Description','Unit Name','Collection ID',].any? { |field| !row_data[field].nil? }
   end
 
   def ingest_one_record(collection_id, payload)
@@ -116,16 +155,53 @@ class CSVReader
       timeout: 15
     }
 
-    resp = RestClient::Request.execute(params)
-    puts resp
+    send_request params
+  end
+
+  def create_collection(row_data)
+    port = '80'
+    payload = { admin_collection: {} }
+    payload[:admin_collection][:name] = row_data['Collection Name'] + SecureRandom.hex.slice(0..10) if row_data['Collection Name']
+    payload[:admin_collection][:description] = row_data['Collection Description'] if row_data['Collection Description']
+    payload[:admin_collection][:unit] = row_data['Unit Name'] if row_data['Unit Name']
+    payload[:admin_collection][:managers] = ["woo@foo.edu"]
+
+    puts "Creating collection with payload = #{payload}"
+
+    params = {
+      method: :post,
+      url: "http://localhost:#{port}/admin/collections.json",
+      payload: payload,
+      headers: {
+        content_type: :json,
+        accept: :json,
+        :'Avalon-Api-Key' => ENV['AVALON_API_KEY']
+      },
+      verify_ssl: false,
+      timeout: 15
+    }
+
+    send_request params
+  end
+
+  def send_request(params)
+    JSON.parse(RestClient::Request.execute(params))
+  rescue => e
+    puts "#{e.class}: #{e.message}"
+    puts "API Response: #{e.response}"
   end
 
   def find_or_create_collection(row_data)
-    if row_data['Collection ID'].present?
-      Admin::Collection.find(row_data['Collection ID'])
+    if !row_data['Collection ID'].nil?
+      # Admin::Collection.find(row_data['Collection ID'])
+      collection = fetch_collection_json(row_data['Collection ID'])
     else
-      Admin::Collection.where({name: row_data['Collection Name']}).first || Admin::Collection.create({name: row_data['Collection Name'], unit: row_data['Unit Name'], description: row_data['Collection Description']})
+      collection = fetch_collection_by_name(row_data['Collection Name'])
+      collection ||= create_collection(row_data)
+      # Admin::Collection.where({name: row_data['Collection Name']}).first || Admin::Collection.create({name: row_data['Collection Name'], unit: row_data['Unit Name'], description: row_data['Collection Description']})
     end
+    raise "Collection could not be created nor found with row data = #{row_data}" unless collection
+    collection
   end
 
   def ingest_csv(filename)
@@ -138,18 +214,16 @@ class CSVReader
       if is_collection_row?(csv_line)
         puts "Starting Collection Row..."
         collection = find_or_create_collection(csv_line)
-
-        raise "Couldnt find collection!!!" unless collection
         # update collection metadata if submitted
-        collection.name = csv_line['Collection Name'] + SecureRandom.hex.slice(0..10) if csv_line['Collection Name']
-        collection.description = csv_line['Collection Description'] if csv_line['Collection Description']
-        collection.unit = csv_line['Unit Name'] if csv_line['Unit Name']
-        collection.managers = ["woo@foo.edu"]
-        collection.save!
+        # collection.name = csv_line['Collection Name'] + SecureRandom.hex.slice(0..10) if csv_line['Collection Name']
+        # collection.description = csv_line['Collection Description'] if csv_line['Collection Description']
+        # collection.unit = csv_line['Unit Name'] if csv_line['Unit Name']
+        # collection.managers = ["woo@foo.edu"]
+        # collection.save!
       else
         puts "Starting MediaObject Row..."
-        payload = generate_payload(csv_line, collection.id)
-        ingest_one_record(collection.id, payload)
+        payload = generate_payload(csv_line, collection['id'])
+        ingest_one_record(collection['id'], payload)
       end
 
     end
