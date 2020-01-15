@@ -1,4 +1,3 @@
-require 'securerandom'
 require 'csv'
 require 'rest-client'
 require 'json'
@@ -161,7 +160,7 @@ class CSVReader
   def create_collection(row_data)
     port = '80'
     payload = { admin_collection: {} }
-    payload[:admin_collection][:name] = row_data['Collection Name'] + SecureRandom.hex.slice(0..10) if row_data['Collection Name']
+    payload[:admin_collection][:name] = row_data['Collection Name'] if row_data['Collection Name']
     payload[:admin_collection][:description] = row_data['Collection Description'] if row_data['Collection Description']
     payload[:admin_collection][:unit] = row_data['Unit Name'] if row_data['Unit Name']
     payload[:admin_collection][:managers] = ["woo@foo.edu"]
