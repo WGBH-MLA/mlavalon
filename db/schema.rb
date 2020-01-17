@@ -12,10 +12,13 @@
 
 ActiveRecord::Schema.define(version: 2019_02_12_211753) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "annotations", force: :cascade do |t|
     t.string "uuid"
     t.string "source_uri"
-    t.integer "playlist_item_id"
+    t.bigint "playlist_item_id"
     t.text "annotation"
     t.string "type"
     t.index ["playlist_item_id"], name: "index_annotations_on_playlist_item_id"
@@ -26,23 +29,23 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
     t.string "token", null: false
     t.string "username", null: false
     t.string "email", null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["token"], name: "index_api_tokens_on_token", unique: true
     t.index ["username"], name: "index_api_tokens_on_username"
   end
 
   create_table "batch_entries", force: :cascade do |t|
-    t.integer "batch_registries_id"
-    t.text "payload", limit: 4294967295
+    t.bigint "batch_registries_id"
+    t.text "payload"
     t.boolean "complete", default: false, null: false
     t.boolean "error", default: false, null: false
     t.string "current_status"
-    t.string "error_message"
+    t.text "error_message"
     t.string "media_object_pid"
     t.integer "position"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["batch_registries_id"], name: "index_batch_entries_on_batch_registries_id"
     t.index ["position"], name: "index_batch_entries_on_position"
   end
@@ -60,8 +63,8 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
     t.text "error_message"
     t.boolean "error_email_sent", default: false, null: false
     t.boolean "locked", default: false, null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "bookmarks", force: :cascade do |t|
@@ -80,15 +83,15 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
     t.string "context_id"
     t.string "title"
     t.text "label"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "identities", force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "ingest_batches", force: :cascade do |t|
@@ -97,8 +100,8 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
     t.text "media_object_ids"
     t.boolean "finished", default: false
     t.boolean "email_sent", default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "migration_statuses", force: :cascade do |t|
@@ -118,7 +121,7 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
     t.string "namespace", default: "default", null: false
     t.string "template", null: false
     t.text "counters"
-    t.integer "seq", limit: 8, default: 0
+    t.bigint "seq", default: 0
     t.binary "rand"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -126,22 +129,22 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
   end
 
   create_table "playlist_items", force: :cascade do |t|
-    t.integer "playlist_id", null: false
-    t.integer "clip_id", null: false
+    t.bigint "playlist_id", null: false
+    t.bigint "clip_id", null: false
     t.integer "position"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["clip_id"], name: "index_playlist_items_on_clip_id"
     t.index ["playlist_id"], name: "index_playlist_items_on_playlist_id"
   end
 
   create_table "playlists", force: :cascade do |t|
     t.string "title"
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.string "comment"
     t.string "visibility"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "access_token"
     t.string "tags"
     t.index ["user_id"], name: "index_playlists_on_user_id"
@@ -164,8 +167,8 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
   create_table "sessions", force: :cascade do |t|
     t.string "session_id", null: false
     t.text "data"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["session_id"], name: "index_sessions_on_session_id"
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
@@ -202,4 +205,5 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "timelines", "users"
 end
