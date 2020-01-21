@@ -46,14 +46,14 @@ services:
       - /opt/solr/avalon_conf
     networks:
       internal:
-  matterhorn:
-    image: avalonmediasystem/matterhorn
-    volumes:
-      - ./masterfiles:/masterfiles
-      - streaming:/streamfiles
-      - work:/work
-    networks:
-      internal:
+  # matterhorn:
+  #   image: avalonmediasystem/matterhorn
+  #   volumes:
+  #     - ./masterfiles:/masterfiles
+  #     - streaming:/streamfiles
+  #     - work:/work
+  #   networks:
+  #     internal:
   hls:
     image: avalonmediasystem/nginx
     volumes:
@@ -67,7 +67,6 @@ services:
     networks:
       internal:
   avalon:
-    image: avalonmediasystem/avalon:6.x-dev
     build:
       context: ./docker
     command: "/rails_init-dev.sh"
