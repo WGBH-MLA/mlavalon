@@ -7,6 +7,7 @@ addons:
 services:
   - mysql2
   - redis-server
+  - postgresql
 before_install:
   - sudo rm -vf /etc/apt/sources.list.d/*riak*
   - sudo rm -vf /etc/apt/sources.list.d/*hhvm*
@@ -31,12 +32,13 @@ after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 language: ruby
 jdk:
-  - oraclejdk8
+  - oraclejdk11
 global_env:
-  - BUNDLER_VERSION=1.17.3
+  - BUNDLER_VERSION=2.0.1
+  - JAVA_HOME=/home/travis/oraclejdk11  # just trying out, remove if doesn't work
 rvm:
-  - 2.4
-  - 2.5
   - 2.6
-dist: trusty
+node_js:
+  - 12
+dist: xenial
 sudo: required

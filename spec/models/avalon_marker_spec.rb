@@ -42,7 +42,7 @@ describe AvalonMarker, type: :model do
 
       it { is_expected.to be_able_to(:create, avalon_marker) }
       it { is_expected.to be_able_to(:update, avalon_marker) }
-      it { is_expected.to be_able_to(:delete, avalon_marker) }
+      # it { is_expected.to be_able_to(:delete, avalon_marker) }
 
       context 'when master file is NOT readable by user' do
         it { is_expected.not_to be_able_to(:read, avalon_marker) }
