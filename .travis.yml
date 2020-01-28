@@ -32,10 +32,9 @@ after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 language: ruby
 jdk:
-  - oraclejdk11
+  - oraclejdk13
 global_env:
   - BUNDLER_VERSION=2.0.1
-  - JAVA_HOME=/home/travis/oraclejdk11  # just trying out, remove if doesn't work
 rvm:
   - 2.6
 node_js:
