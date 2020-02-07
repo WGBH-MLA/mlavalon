@@ -10,7 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_12_211753) do
+ActiveRecord::Schema.define(version: 2019_10_16_195828) do
+
+  create_table "active_encode_encode_records", force: :cascade do |t|
+    t.string "global_id"
+    t.string "state"
+    t.string "adapter"
+    t.string "title"
+    t.text "raw_object"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "create_options"
+    t.float "progress"
+    t.string "display_title"
+    t.string "master_file_id"
+    t.string "media_object_id"
+    t.index ["display_title"], name: "index_active_encode_encode_records_on_display_title"
+    t.index ["master_file_id"], name: "index_active_encode_encode_records_on_master_file_id"
+    t.index ["media_object_id"], name: "index_active_encode_encode_records_on_media_object_id"
+  end
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,12 +54,12 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
   end
 
   create_table "batch_entries", force: :cascade do |t|
-    t.bigint "batch_registries_id"
-    t.text "payload"
+    t.integer "batch_registries_id"
+    t.text "payload", limit: 1073741823
     t.boolean "complete", default: false, null: false
     t.boolean "error", default: false, null: false
     t.string "current_status"
-    t.text "error_message"
+    t.text "error_message", limit: 65535
     t.string "media_object_pid"
     t.integer "position"
     t.datetime "created_at", null: false
@@ -121,7 +139,7 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
     t.string "namespace", default: "default", null: false
     t.string "template", null: false
     t.text "counters"
-    t.bigint "seq", default: 0
+    t.integer "seq", default: 0
     t.binary "rand"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -187,7 +205,7 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
     t.string "access_token"
     t.string "tags"
     t.string "source"
-    t.text "manifest"
+    t.text "manifest", limit: 16777215
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_timelines_on_user_id"
@@ -201,7 +219,27 @@ ActiveRecord::Schema.define(version: 2019_02_12_211753) do
     t.string "provider"
     t.string "uid"
     t.string "guest"
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer "sign_in_count", default: 0, null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string "current_sign_in_ip"
+    t.string "last_sign_in_ip"
+    t.string "invitation_token"
+    t.datetime "invitation_created_at"
+    t.datetime "invitation_sent_at"
+    t.datetime "invitation_accepted_at"
+    t.integer "invitation_limit"
+    t.integer "invited_by_id"
+    t.string "invited_by_type"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
