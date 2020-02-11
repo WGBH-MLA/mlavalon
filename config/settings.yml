@@ -1,6 +1,6 @@
 name: 'Avalon Media System' # used in page titles
 domain:
-  host: avalon.wgbh.org
+  host: localhost
   port: 80
   protocol: http
 dropbox:
