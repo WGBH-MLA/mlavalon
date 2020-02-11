@@ -15,5 +15,5 @@ if server_options
 
   Rails.application.routes.default_url_options.merge!( server_options )
   ActionMailer::Base.default_url_options.merge!( server_options )
-  ApplicationController.default_url_options = server_options.merge!( {host: 'avalon.wgbh.org'} )
+  ApplicationController.default_url_options = server_options
 end
