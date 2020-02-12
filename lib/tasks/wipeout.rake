@@ -23,13 +23,13 @@ def wipeout_solr(solr)
   solr.commit
 end
 
-def wipeout_redis(redis)
-  redis.flushdb
+def wipeout_redis
+  Sidekiq.redis(&:flushdb)
 end
 
 def wipeout_db
   [MigrationStatus, ActiveAnnotations::Annotation, Bookmark, Search, ApiToken, Course,
-   IngestBatch, PlaylistItem, Playlist, RoleMap, StreamToken, User, Identity].each(&:delete_all)
+   IngestBatch, PlaylistItem, Playlist, RoleMap, StreamToken, User].each(&:delete_all)
 end
 
 namespace :avalon do
@@ -46,7 +46,7 @@ namespace :avalon do
 
     desc "Reset redis to empty state"
     task redis: :environment do
-      wipeout_redis(Resque.redis)
+      wipeout_redis
     end
 
     desc "Reset db to empty state"
@@ -64,7 +64,7 @@ WARNING: This process will destroy all data in:
 DB: All tables
 Fedora: #{ActiveFedora.fedora.build_connection.http.url_prefix}
 Solr: #{ActiveFedora.solr_config[:url]}
-Redis: #{Resque.redis.redis._client.options.values_at(:host,:port,:db).join(':')}
+Redis: #{Sidekiq.redis { |c| c._client.options.values_at(:host, :port, :db).join(':') }}
 
 Please run `rake avalon:wipeout CONFIRM=yes` to confirm.
 EOC
