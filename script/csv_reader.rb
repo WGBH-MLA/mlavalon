@@ -89,6 +89,7 @@ class CSVReader
                     label: media_object_data['Instantiation Label'],
                     id: media_object_data['Instantiation Id'],
                     url: media_object_data['Instantiation Streaming URL'],
+                    hls_url: media_object_data['Instantiation Streaming URL'],
                     duration: media_object_data['Instantiation Duration'],
                     mime_type:  media_object_data['Instantiation Mime Type'],
                     audio_bitrate: media_object_data['Instantiation Audio Bitrate'],
