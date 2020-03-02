@@ -77,7 +77,8 @@ services:
     <<: *redis
 
   avalon: &avalon
-    image: avalonmediasystem/avalon:7.0-slim-dev-20200106
+    # image: avalonmediasystem/avalon:7.0-slim-dev-20200106
+    image: mla-dockerhub.wgbh.org/avalon:latest
     build: .
     command: bash -c "/docker_init.sh && rails server -b 0.0.0.0"
     depends_on:
