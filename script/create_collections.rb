@@ -18,12 +18,13 @@ def create_collection(collection_name)
   # payload[:admin_collection][:description] = row_data['Collection Description'] if row_data['Collection Description']
   # payload[:admin_collection][:unit] = row_data['Unit Name'] if row_data['Unit Name']
   payload[:admin_collection][:managers] = ["woo@foo.edu"]
+  payload[:admin_collection][:unit] = "Default Unit"
 
   puts "Creating collection with payload = #{payload}"
 
   params = {
     method: :post,
-    url: "http://localhost:#{port}/admin/collections.json",
+    url: "http://0.0.0.0:#{port}/admin/collections.json",
     payload: payload,
     headers: {
       content_type: :json,
@@ -41,6 +42,3 @@ collection_names.each do |coll_name|
   puts "Boy I love #{coll_name}"
   create_collection(coll_name)
 end
-
-
-

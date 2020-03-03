@@ -112,7 +112,7 @@ services:
       - SETTINGS__MINIO__SECRET=minio123
       - SETTINGS__ENCODING__MASTERFILE_BUCKET=masterfiles
       - SETTINGS__ENCODING__DERIVATIVE_BUCKET=derivatives
-      - SETTINGS__DROPBOX__PATH=s3://masterfiles/dropbox/
+      # - SETTINGS__DROPBOX__PATH=s3://masterfiles/dropbox/
       - SETTINGS__DROPBOX__UPLOAD_URI=s3://masterfiles/dropbox/
       - SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://preserves/
       - SETTINGS__MASTER_FILE_MANAGEMENT__STRATEGY=MOVE
