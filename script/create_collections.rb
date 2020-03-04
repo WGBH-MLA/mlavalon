@@ -42,3 +42,40 @@ collection_names.each do |coll_name|
   puts "Boy I love #{coll_name}"
   create_collection(coll_name)
 end
+
+
+
+
+rows = CSV.read('./spec/fixtures/sample_csv_ingest/avalon_demo_batch_ingest_1.csv', headers: true)
+split_rows = {}
+rows.each do |row|
+  row_hash = row.to_h
+  series_name = row_hash.delete('Series Name')
+  series_name = row_hash['Title'] unless series_name.to_s =~ /\w+/
+  series_name = "ROGUES SHIT" unless series_name.to_s =~ /\w+/
+  split_rows[series_name] ||= []
+  split_rows[series_name] << row_hash
+end
+
+collection_dirs = Dir.glob("#{Settings.dropbox.path}/*").select { |d| File.directory? d }
+puts "Found collection dirs... #{collection_dirs}"
+split_rows.each do |series_name, rows|
+  puts "Finding directory for series_name = #{series_name}"
+  tr_series_name = series_name.tr(' ', '_')
+  collection_dir = collection_dirs.select { |d| d =~ /#{tr_series_name}/ }.first
+  if collection_dir
+    filename = "#{tr_series_name}-#{Time.now.strftime('%Y-%m-%d')}.csv"
+    filepath = File.join(collection_dir, filename)
+    CSV.open(filepath, 'wb') do |csv|
+      puts "Writing headrs to #{filename}: headers = #{rows.first.keys}"
+      csv << ["Woo tang batch", "woo@foo.edu"]
+      csv << rows.first.keys
+      rows.each do |row|
+        puts "Writing row to #{filename}: data = #{row.values}"
+        csv << row.values
+      end
+    end
+  else
+    puts "ERROR: Could not find collection dir for series name of #{series_name}!!!"
+  end
+end
