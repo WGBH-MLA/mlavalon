@@ -16,7 +16,7 @@ unless Admin::Collection.where(name_ssi: "FRONTLINE").first
   puts "Didnt find FRONTLINE, creating!"
   `bundle exec ruby script/create_collections.rb`
 else
-  puts "Didnt find FRONTLINE.... Boo!"
+  puts "Did find frontline..... Woo!"
 end
 
 # `cp -R spec/fixtures/batch_ingest/example_1/* /srv/avalon/dropbox`

@@ -61,6 +61,7 @@ rows.each do |row|
 end
 
 collection_dirs = Dir.glob("#{Settings.dropbox.path}/*").select { |d| File.directory? d }
+# collection_dirs = Dir.glob("spec/fixtures/batch_ingest/example_1/*").select { |d| File.directory? d }
 puts "Found collection dirs... #{collection_dirs}"
 split_rows.each do |series_name, rows|
   puts "Finding directory for series_name = #{series_name}"
