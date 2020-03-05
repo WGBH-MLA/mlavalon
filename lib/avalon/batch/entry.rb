@@ -145,7 +145,8 @@ module Avalon
         elsif FileLocator.new(file_spec[:file]).exist?
           #Do nothing.
         else
-          if self.class.derivativePaths(file_spec[:file]).present? && file_spec[:skip_transcoding]
+          # if self.class.derivativePaths(file_spec[:file]).present? && file_spec[:skip_transcoding]
+          if file_spec[:skip_transcoding]
             #Do nothing.
           elsif self.class.derivativePaths(file_spec[:file]).present? && !file_spec[:skip_transcoding]
             @errors.add(:content, "Derivative files found but skip transcoding not selected")
