@@ -59,8 +59,11 @@ module MARS
 
       def write_csv_for_collection(series_name, rows)
         collection = find_collection(series_name) || create_collection(series_name)
+        # We rescue/log errors when finding or creating collections, so we need
+        # to guard against the absence of a collection here.
+        return unless collection
         filepath = File.join collection.dropbox_absolute_path, File.basename(export_data.filename)
-        puts "Writing #{rows.count} rows to CSV for #{series_name} at #{filepath}..."
+        puts "Writing #{rows.count} rows to CSV for #{series_name} at #{filepath} ..."
         CSV.open(filepath, 'wb') do |csv|
           # Write the top row of metadata: Batch name, sumbitter username
           csv << ["MARS export for #{series_name}", submitter]
@@ -73,14 +76,11 @@ module MARS
       end
 
       def find_collection(name)
-        solr_response = ActiveFedora.solr.conn.get(:select, params: { q: "name_ssi:#{name}" })
+        solr_response = ActiveFedora.solr.conn.get(:select, params: { q: "name_ssi:\"#{name}\"" })
         # Dig into the solr response for the Collection ID... it's in there I swear!
         collection_id = solr_response['response']['docs'].first&.fetch('id', nil)
         return unless collection_id
         Admin::Collection.find collection_id
-      rescue => e
-        require "pry"; binding.pry
-        e
       end
 
       def create_collection(name)
@@ -92,7 +92,10 @@ module MARS
           }
         }
 
-        response = send_api_request api_params_for_create_collection(payload: payload)
+        response = send_api_request(api_params_for_create_collection(payload: payload))
+        # We rescue and log errors sent back from teh API, so here we need to
+        # guard against a missing collection ID.
+        return unless response
         # Return the saved collection.
         # TODO: If any background jobs were queued when creating the collection,
         # wait for them to finish.
