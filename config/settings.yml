@@ -4,7 +4,8 @@ domain:
   port: 80
   protocol: http
 dropbox:
-  path: /srv/avalon/dropbox
+  # path: /srv/avalon/dropbox
+  path: /home/app/avalon/demo_dropbox
   upload_uri: sftp://avalon.example.edu
 encoding:
   engine_adapter: ffmpeg

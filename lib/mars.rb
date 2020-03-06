@@ -70,9 +70,22 @@ module MARS
           # Write the headers (i.e. keys of the row hashes).
           csv << rows.first.keys
           # Write the rows (i.e. values of each row).
-          rows.each { |row| csv << row.values }
+          rows.each_with_index do |row, i|
+            # write csv data to one row
+            csv << row.values 
+
+            # bs_filepath = File.join collection.dropbox_absolute_path, File.basename(row["File"])
+
+
+
+            bs_filepath = File.join collection.dropbox_absolute_path, %(#{File.basename(row["File"], '.*')}.high#{File.extname(row["File"])})
+            puts "Now we write ze BS #{i} at #{bs_filepath}"
+
+            File.open(bs_filepath, 'wb') do |f|
+              f << "Good Gracious Files Is Bodacious. Searchin for the right yime to shoot my Files"
+            end 
+          end
         end
-        puts "Done writing #{rows.count} rows to CSV for #{series_name} at #{filepath}."
       end
 
       def find_collection(name)

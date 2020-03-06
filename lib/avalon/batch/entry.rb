@@ -194,35 +194,41 @@ module Avalon
       def process!
         media_object.save
 
+
         @files.each do |file_spec|
-          master_file = MasterFile.new
-          # master_file.save(validate: false) #required: need id before setting media_object
-          # master_file.media_object = media_object
-          files = self.class.gatherFiles(file_spec[:file])
-          self.class.attach_datastreams_to_master_file(master_file, file_spec[:file])
-          master_file.setContent(files)
+          begin
+            master_file = MasterFile.new
+            # master_file.save(validate: false) #required: need id before setting media_object
+            # master_file.media_object = media_object
+            files = self.class.gatherFiles(file_spec[:file])
+            self.class.attach_datastreams_to_master_file(master_file, file_spec[:file])
+            master_file.setContent(files)
 
-          # Overwrite files hash with working file paths to pass to matterhorn
-          if files.is_a?(Hash) && master_file.working_file_path.present?
-            files.each do |quality, file|
-              working_path = master_file.working_file_path.find { |path| File.basename(file) == File.basename(path) }
-              files[quality] = File.new(working_path)
+            # Overwrite files hash with working file paths to pass to matterhorn
+            if files.is_a?(Hash) && master_file.working_file_path.present?
+              files.each do |quality, file|
+                working_path = master_file.working_file_path.find { |path| File.basename(file) == File.basename(path) }
+                files[quality] = File.new(working_path)
+              end
             end
-          end
 
-          master_file.absolute_location = file_spec[:absolute_location] if file_spec[:absolute_location].present?
-          master_file.title = file_spec[:label] if file_spec[:label].present?
-          master_file.poster_offset = file_spec[:offset] if file_spec[:offset].present?
-          master_file.date_digitized = DateTime.parse(file_spec[:date_digitized]).to_time.utc.iso8601 if file_spec[:date_digitized].present?
+            master_file.absolute_location = file_spec[:absolute_location] if file_spec[:absolute_location].present?
+            master_file.title = file_spec[:label] if file_spec[:label].present?
+            master_file.poster_offset = file_spec[:offset] if file_spec[:offset].present?
+            master_file.date_digitized = DateTime.parse(file_spec[:date_digitized]).to_time.utc.iso8601 if file_spec[:date_digitized].present?
 
-          #Make sure to set content before setting the workflow
-          master_file.set_workflow(file_spec[:skip_transcoding] ? 'skip_transcoding' : nil)
-          if master_file.save
-            master_file.media_object = media_object
-            media_object.save
-            master_file.process(files)
-          else
-            Rails.logger.error "Problem saving MasterFile(#{master_file.id}): #{master_file.errors.full_messages.to_sentence}"
+            #Make sure to set content before setting the workflow
+            master_file.set_workflow(file_spec[:skip_transcoding] ? 'skip_transcoding' : nil)
+            if master_file.save
+              master_file.media_object = media_object
+              media_object.save
+              master_file.process(files)
+            else
+              Rails.logger.error "Problem saving MasterFile(#{master_file.id}): #{master_file.errors.full_messages.to_sentence}"
+            end
+          rescue Exception => e
+
+            require('pry');binding.pry
           end
         end
         # context = { media_object: media_object, user: @manifest.package.user.user_key, hidden: opts[:hidden] ? '1' : nil }
