@@ -226,9 +226,6 @@ module Avalon
             else
               Rails.logger.error "Problem saving MasterFile(#{master_file.id}): #{master_file.errors.full_messages.to_sentence}"
             end
-          rescue Exception => e
-
-            require('pry');binding.pry
           end
         end
         # context = { media_object: media_object, user: @manifest.package.user.user_key, hidden: opts[:hidden] ? '1' : nil }
