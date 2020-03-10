@@ -5,11 +5,20 @@ domain:
   protocol: http
 dropbox:
   # path: /srv/avalon/dropbox
+  # NOTE: Dropbox path needs to be accessible by both Avalon machine and the
+  # worker machine running background jobs.
+  # For development/test using Docker, this can be under the app's root, which
+  # is mounted inside each container. However in producdtion, this probably
+  # needs to be either an s3:// URL to a common bucket, or a shared Docker
+  # volume.
+  # TODO: Figure out what the dropbox should be for each env, and move this
+  # config to the appropriate settings file.
   path: /home/app/avalon/demo_dropbox
-  upload_uri: sftp://avalon.example.edu
+  # upload_uri: sftp://avalon.example.edu
 encoding:
-  engine_adapter: ffmpeg
-  presets_path: config/ffmpeg_presets.yml
+  engine_adapter: wgbh_skip_all
+  # engine_adapter: ffmpeg
+  # presets_path: config/ffmpeg_presets.yml
 mediainfo:
   path: '/usr/bin/mediainfo'
 ffmpeg:
