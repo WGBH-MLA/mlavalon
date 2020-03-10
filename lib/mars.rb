@@ -72,18 +72,18 @@ module MARS
           # Write the rows (i.e. values of each row).
           rows.each_with_index do |row, i|
             # write csv data to one row
-            csv << row.values 
+            csv << row.values
 
             # bs_filepath = File.join collection.dropbox_absolute_path, File.basename(row["File"])
 
 
 
-            bs_filepath = File.join collection.dropbox_absolute_path, %(#{File.basename(row["File"], '.*')}.high#{File.extname(row["File"])})
-            puts "Now we write ze BS #{i} at #{bs_filepath}"
-
-            File.open(bs_filepath, 'wb') do |f|
-              f << "Good Gracious Files Is Bodacious. Searchin for the right yime to shoot my Files"
-            end 
+            # bs_filepath = File.join collection.dropbox_absolute_path, %(#{File.basename(row["File"], '.*')}.high#{File.extname(row["File"])})
+            # puts "Now we write ze BS #{i} at #{bs_filepath}"
+            #
+            # File.open(bs_filepath, 'wb') do |f|
+            #   f << "Good Gracious Files Is Bodacious. Searchin for the right yime to shoot my Files"
+            # end
           end
         end
       end
