@@ -24,7 +24,7 @@ def wipeout_solr(solr)
 end
 
 def wipeout_redis
-  Sidekiq.redis(&:flushdb)
+  Sidekiq.redis(&:flushall)
 end
 
 def wipeout_db
