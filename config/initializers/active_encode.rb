@@ -1,7 +1,10 @@
+require 'active_encode/engine_adapters/wgbh_skip_all_adapter'
 ActiveEncode::Base.engine_adapter = Settings.encoding.engine_adapter.to_sym
 case Settings.encoding.engine_adapter.to_sym
 when :ffmpeg
   MasterFile.default_encoder_class = FfmpegEncode
+when :wgbh_skip_all
+  MasterFile.default_encoder_class = WGBHSkipAllEncode
 when :matterhorn
   Rubyhorn.init
 when :elastic_transcoder
