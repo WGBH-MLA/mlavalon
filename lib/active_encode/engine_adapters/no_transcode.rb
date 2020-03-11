@@ -12,7 +12,7 @@ require 'file_locator'
 #    3. All work is done in the create method so it's status is always completed or failed
 module ActiveEncode
   module EngineAdapters
-    class WgbhSkipAllAdapter
+    class NoTranscode
       WORK_DIR = ENV["ENCODE_WORK_DIR"] || "encodes" # Should read from config
       MEDIAINFO_PATH = ENV["MEDIAINFO_PATH"] || "mediainfo"
 
