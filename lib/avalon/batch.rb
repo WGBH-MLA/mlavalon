@@ -18,6 +18,7 @@ require "avalon/batch/ingest"
 require "avalon/batch/manifest"
 require "avalon/batch/file_manifest"
 require "avalon/batch/s3_manifest"
+require "avalon/batch/hybrid_manifest"
 require "avalon/batch/package"
 require "timeout"
 

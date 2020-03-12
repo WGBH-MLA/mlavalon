@@ -14,6 +14,7 @@ dropbox:
   # TODO: Figure out what the dropbox should be for each env, and move this
   # config to the appropriate settings file.
   path: /home/app/avalon/demo_dropbox
+  path_to_files: s3://s3-bos.wgbh.org/nehdigitization
   # upload_uri: sftp://avalon.example.edu
 encoding:
   engine_adapter: pass_through

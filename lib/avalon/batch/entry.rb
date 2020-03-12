@@ -194,7 +194,6 @@ module Avalon
       def process!
         media_object.save
 
-
         @files.each do |file_spec|
           begin
             master_file = MasterFile.new
