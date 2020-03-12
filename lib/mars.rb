@@ -58,6 +58,7 @@ module MARS
     private
 
       def write_csv_for_collection(series_name, rows)
+        FileUtils.mkdir_p Settings.dropbox.path
         collection = find_collection(series_name) || create_collection(series_name)
         # We rescue/log errors when finding or creating collections, so we need
         # to guard against the absence of a collection here.

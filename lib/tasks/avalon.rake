@@ -217,12 +217,12 @@ EOC
       # Starts the ingest process
       require 'avalon/batch/ingest'
 
-      WithLocking.run(name: 'batch_ingest') do
+      # WithLocking.run(name: 'batch_ingest') do
         Rails.logger.info "<< Scanning for new batch packages in existing collections >>"
         Admin::Collection.all.each do |collection|
           Avalon::Batch::Ingest.new(collection).scan_for_packages
         end
-      end
+      # end
     end
 
     desc "Starts Status Checking and Email Notification of Existing Batches"

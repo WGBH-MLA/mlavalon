@@ -11,18 +11,21 @@
 #   CONDITIONS OF ANY KIND, either express or implied. See the License for the
 #   specific language governing permissions and limitations under the License.
 # ---  END LICENSE_HEADER BLOCK  ---
-
 class IngestBatchEntryJob < ActiveJob::Base
   queue_as :ingest
 
   # ActiveJob will serialize/deserialize the batch_entry automatically using GlobalIDs
   def perform(batch_entry)
+
+    require "pry"; binding.pry
+
     # Validation checking that it is okay to ingest this batch entry
     if batch_entry.media_object_pid.present? && MediaObject.exists?(batch_entry.media_object_pid)
       published_error(batch_entry)
       return
     end
 
+    require "pry"; binding.pry
 
     entry = Avalon::Batch::Entry.from_json(batch_entry.payload)
     if entry.valid?
@@ -39,6 +42,9 @@ class IngestBatchEntryJob < ActiveJob::Base
     # TODO any post processing to update status?
 
   rescue StandardError => e
+
+    require "pry"; binding.pry
+
     process_error(batch_entry, e)
   end
 

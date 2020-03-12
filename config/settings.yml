@@ -16,7 +16,7 @@ dropbox:
   path: /home/app/avalon/demo_dropbox
   # upload_uri: sftp://avalon.example.edu
 encoding:
-  engine_adapter: wgbh_skip_all
+  engine_adapter: pass_through
   # engine_adapter: ffmpeg
   # presets_path: config/ffmpeg_presets.yml
 mediainfo:
