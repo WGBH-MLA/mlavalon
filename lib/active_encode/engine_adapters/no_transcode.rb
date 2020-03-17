@@ -16,65 +16,85 @@ module ActiveEncode
       WORK_DIR = ENV["ENCODE_WORK_DIR"] || "encodes" # Should read from config
       MEDIAINFO_PATH = ENV["MEDIAINFO_PATH"] || "mediainfo"
 
+      def null_encode_object
+        params = {}
+        params[:id] = 123
+        params[:current_operations] = []
+        params[:percent_complete] = 0
+        params[:errors] = []
+        params[:created_at] = Time.now
+        params[:updated_at] = Time.now
+        # params[:input] = ActiveEncode::Input.new({errors: [], id: '456', url: 'whoawhoawhoa', created_at: Time.now, updated_at: Time.now})
+
+        ae = ActiveEncode::Base.new(params)
+        input = ae.input
+        input.id = 456
+        input.url = 'whoawhawhoa.com'
+        ae.input = input
+
+        return ae
+      end
+
       def create(input_url, options = {})
-        # Decode file uris for ffmpeg (mediainfo works either way)
-        input_url = URI.decode(input_url) if input_url.starts_with? "file:///"
+        return null_encode_object
+      #   # Decode file uris for ffmpeg (mediainfo works either way)
+      #   input_url = URI.decode(input_url) if input_url.starts_with? "file:///"
 
-        new_encode = ActiveEncode::Base.new(input_url, options)
-        new_encode.id = SecureRandom.uuid
-        new_encode.current_operations = []
-        new_encode.output = []
+      #   new_encode = ActiveEncode::Base.new(input_url, options)
+      #   new_encode.id = SecureRandom.uuid
+      #   new_encode.current_operations = []
+      #   new_encode.output = []
 
-        # Create a working directory that holds all output files related to the encode
-        FileUtils.mkdir_p working_path("", new_encode.id)
-        FileUtils.mkdir_p working_path("outputs", new_encode.id)
+      #   # Create a working directory that holds all output files related to the encode
+      #   FileUtils.mkdir_p working_path("", new_encode.id)
+      #   FileUtils.mkdir_p working_path("outputs", new_encode.id)
 
-        # Extract technical metadata from input file
-        `#{MEDIAINFO_PATH} --Output=XML --LogFile=#{working_path("input_metadata", new_encode.id)} #{input_url.shellescape}`
-        new_encode.input = build_input new_encode
-        new_encode.input.id = new_encode.id
-        new_encode.created_at, new_encode.updated_at = get_times new_encode.id
+      #   # Extract technical metadata from input file
+      #   `#{MEDIAINFO_PATH} --Output=XML --LogFile=#{working_path("input_metadata", new_encode.id)} #{input_url.shellescape}`
+      #   new_encode.input = build_input new_encode
+      #   new_encode.input.id = new_encode.id
+      #   new_encode.created_at, new_encode.updated_at = get_times new_encode.id
 
-        if new_encode.input.duration.blank?
-          new_encode.state = :failed
-          new_encode.percent_complete = 1
+      #   if new_encode.input.duration.blank?
+      #     new_encode.state = :failed
+      #     new_encode.percent_complete = 1
 
-          new_encode.errors = if new_encode.input.file_size.blank?
-                                ["#{input_url} does not exist or is not accessible"]
-                              else
-                                ["Error inspecting input: #{input_url}"]
-                              end
+      #     new_encode.errors = if new_encode.input.file_size.blank?
+      #                           ["#{input_url} does not exist or is not accessible"]
+      #                         else
+      #                           ["Error inspecting input: #{input_url}"]
+      #                         end
 
-          write_errors new_encode
-          return new_encode
-        end
+      #     write_errors new_encode
+      #     return new_encode
+      #   end
 
-        # For saving filename to label map used to find the label when building outputs
-        filename_label_hash = {}
+      #   # For saving filename to label map used to find the label when building outputs
+      #   filename_label_hash = {}
 
-        # Copy derivatives to work directory
-        options[:outputs].each do |opt|
-          # url = opt[:url]
-          # output_path = working_path("outputs/#{sanitize_base opt[:url]}#{File.extname opt[:url]}", new_encode.id)
-          # FileUtils.cp FileLocator.new(url).location, output_path
-          # filename_label_hash[output_path] = opt[:label]
-          filename_label_hash[opt[:url]] = opt[:label]
-        end
+      #   # Copy derivatives to work directory
+      #   options[:outputs].each do |opt|
+      #     # url = opt[:url]
+      #     # output_path = working_path("outputs/#{sanitize_base opt[:url]}#{File.extname opt[:url]}", new_encode.id)
+      #     # FileUtils.cp FileLocator.new(url).location, output_path
+      #     # filename_label_hash[output_path] = opt[:label]
+      #     filename_label_hash[opt[:url]] = opt[:label]
+      #   end
 
-        # Write filename-to-label map so we can retrieve them on build_output
-        File.write working_path("filename_label.yml", new_encode.id), filename_label_hash.to_yaml
+      #   # Write filename-to-label map so we can retrieve them on build_output
+      #   File.write working_path("filename_label.yml", new_encode.id), filename_label_hash.to_yaml
 
-        new_encode.percent_complete = 1
-        new_encode.state = :running
-        new_encode.errors = []
+      #   new_encode.percent_complete = 1
+      #   new_encode.state = :running
+      #   new_encode.errors = []
 
-        new_encode
-      rescue StandardError => e
-        new_encode.state = :failed
-        new_encode.percent_complete = 1
-        new_encode.errors = [e.full_message]
-        write_errors new_encode
-        return new_encode
+      #   new_encode
+      # rescue StandardError => e
+      #   new_encode.state = :failed
+      #   new_encode.percent_complete = 1
+      #   new_encode.errors = [e.full_message]
+      #   write_errors new_encode
+      #   return new_encode
       end
 
       # Return encode object from file system

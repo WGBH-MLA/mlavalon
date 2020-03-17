@@ -199,9 +199,30 @@ module Avalon
             master_file = MasterFile.new
             # master_file.save(validate: false) #required: need id before setting media_object
             # master_file.media_object = media_object
-            files = self.class.gatherFiles(file_spec[:file])
+            
+            # gatherFiles cannot do anything we need it to do without modifications -> bai!
+            # files is either a hash or a File obj
+            # files = self.class.gatherFiles(file_spec[:file])
+
+            # this could go bye bye because its optional anyway (pulling in captions + structural metadata xml)
             self.class.attach_datastreams_to_master_file(master_file, file_spec[:file])
-            master_file.setContent(files)
+
+            # setContent does two things:
+            # -copy files around (no!)
+            # -sets mediainfo metadata on MasterFile object -> we'll just do that below instead
+            # master_file.setContent(files)
+
+            # shim in technical metadata through a second CSV that we generated earlier
+            batch_techdata_filename = File.join(file_spec[:absolute_location], 'techdata.csv')
+            # find the correct row in the collection's techdata csv
+            techdata = CSV.read(batch_techdata_filename, {headers: true}).find {|file_row| file_row['Absolute Location'] == file_spec[:absolute_location] }
+            master_file.file_format = techdata["file_format"]
+            master_file.duration = techdata["duration"]
+            master_file.display_aspect_ratio = techdata["display_aspect_ratio"]
+            master_file.original_frame_size = techdata["original_frame_size"]
+            master_file.poster_offset = techdata["poster_offset"]
+
+
 
             # Overwrite files hash with working file paths to pass to matterhorn
             if files.is_a?(Hash) && master_file.working_file_path.present?

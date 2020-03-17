@@ -50,21 +50,55 @@ module MARS
     end
 
     def generate
+
+      # grouped by series is a
+      # {
+      #   "Nova": [{novarow1},{novarow1},{novarow1},],
+      #   "Frontline": [etc...]
+      # }
+      FileUtils.mkdir_p Settings.dropbox.path
+
       export_data.rows_grouped_by_series.each do |series_name, rows|
-        write_csv_for_collection(series_name, rows)
+
+        collection = find_collection(series_name) || create_collection(series_name)
+
+        # tech rows
+        # map through array of row_hashes, selecting only keys for technical metadata
+        tech_metadata_rows = rows.map {|row_hash| row_hash.select {|k,v| ["Absolute Location", "Series Name", "file_format","duration","display_aspect_ratio","original_frame_size","poster_offset"].include?(k) } }
+        write_tech_csv_for_collection(collection, tech_metadata_rows)
+
+        # manifest rows
+        # map through array of row_hashes, selecting only keys for manifest metadata
+        manifest_rows = rows.map {|row_hash| row_hash.select {|k,v| ["file_format","duration","display_aspect_ratio","original_frame_size","poster_offset"].exclude?(k) } }
+        write_manifest_csv_for_collection(collection, manifest_rows)
       end
     end
 
     private
 
-      def write_csv_for_collection(series_name, rows)
-        FileUtils.mkdir_p Settings.dropbox.path
-        collection = find_collection(series_name) || create_collection(series_name)
+      def write_tech_csv_for_collection(collection, rows)
+        return unless collection
+        filepath = File.join collection.dropbox_absolute_path, %(techdata.csv)
+        puts "Writing #{rows.count} rows to techdata CSV for #{series_name} at #{filepath} ..."
+
+        CSV.open(filepath, 'wb') do |csv|
+          # Write the headers (i.e. keys of the row hashes).
+          csv << rows.first.keys
+          # Write the rows (i.e. values of each row).
+          rows.each_with_index do |row, i|
+            # write csv data to one row
+            csv << row.values
+          end
+        end
+      end
+
+      def write_manifest_csv_for_collection(collection, rows)
         # We rescue/log errors when finding or creating collections, so we need
         # to guard against the absence of a collection here.
         return unless collection
         filepath = File.join collection.dropbox_absolute_path, File.basename(export_data.filename)
         puts "Writing #{rows.count} rows to CSV for #{series_name} at #{filepath} ..."
+
         CSV.open(filepath, 'wb') do |csv|
           # Write the top row of metadata: Batch name, sumbitter username
           csv << ["MARS export for #{series_name}", submitter]
@@ -75,16 +109,6 @@ module MARS
             # write csv data to one row
             csv << row.values
 
-            # bs_filepath = File.join collection.dropbox_absolute_path, File.basename(row["File"])
-
-
-
-            # bs_filepath = File.join collection.dropbox_absolute_path, %(#{File.basename(row["File"], '.*')}.high#{File.extname(row["File"])})
-            # puts "Now we write ze BS #{i} at #{bs_filepath}"
-            #
-            # File.open(bs_filepath, 'wb') do |f|
-            #   f << "Good Gracious Files Is Bodacious. Searchin for the right yime to shoot my Files"
-            # end
           end
         end
       end
