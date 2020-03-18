@@ -1,0 +1,42 @@
+file_format
+  Moving Image
+  Sound
+  Unknown
+duration
+  .duration and .overall_duration will be returned as milliseconds AS LONG AS the Duration and Overall_Duration match one of the expected units (each separated by a space or not):
+
+  string of # of ms
+display_aspect_ratio
+  string of 4:3 or whatever
+original_frame_size
+
+poster_offset
+  # of SECONDS in to get poster img
+
+
+
+
+
+rake avalon:wipeout CONFIRM=yes
+
+docker-compose down -v
+cd demo_dropbox
+
+rm -rf ./*
+
+rake demo:mars_export_to_avalon_batch file=spec/fixtures/sample_csv_ingest/great_wonderful_demo_techmetadata.csv
+
+rake avalon:batch:ingest
+
+
+
+
+
+Further Things To Change
+=-=-=-=-=-=-=-=-=-=-=-=-
+-after_save MasterFile -> update_stills_from_offset! (if value changed)
+  runs ExtractStillJob -> runs MasterFile#extract_frame -> runs Masterfile#get_ffmpeg_frame_data
+    this runs master_file_behavior#stream_details -> should pick up hls stream if derivative object is there with correct streaming url
+      how you get that darn streaming URL into the derivative? might need a script for this, because its not submittable through the manifest csv
+
+  may have to just dump this, if it seems to be dependent on files
