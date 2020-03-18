@@ -106,7 +106,6 @@ module ActiveEncode
       input
     end
 
-
     def find(id, opts = {})
       # encode_class = opts[:cast]
       encode_class = ActiveEncode::Base

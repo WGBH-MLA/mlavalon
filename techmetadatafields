@@ -9,8 +9,9 @@ duration
 display_aspect_ratio
   string of 4:3 or whatever
 original_frame_size
-
+  640x480
 poster_offset
+  5
   # of SECONDS in to get poster img
 
 
@@ -40,3 +41,5 @@ Further Things To Change
       how you get that darn streaming URL into the derivative? might need a script for this, because its not submittable through the manifest csv
 
   may have to just dump this, if it seems to be dependent on files
+
+-do it delete the techdata csv as well when complete?!
