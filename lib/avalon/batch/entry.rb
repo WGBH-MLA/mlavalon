@@ -200,6 +200,8 @@ module Avalon
             # master_file.save(validate: false) #required: need id before setting media_object
             # master_file.media_object = media_object
             
+
+
             # gatherFiles cannot do anything we need it to do without modifications -> bai!
             # files is either a hash or a File obj
             # files = self.class.gatherFiles(file_spec[:file])
@@ -213,24 +215,24 @@ module Avalon
             # master_file.setContent(files)
 
             # shim in technical metadata through a second CSV that we generated earlier
-            batch_techdata_filename = File.join(file_spec[:absolute_location], 'techdata.csv')
+            batch_techdata_filepath = File.join(media_object.collection.dropbox_absolute_path, 'techdata.csv')
             # find the correct row in the collection's techdata csv
-            techdata = CSV.read(batch_techdata_filename, {headers: true}).find {|file_row| file_row['Absolute Location'] == file_spec[:absolute_location] }
+            techdata = CSV.read(batch_techdata_filepath, {headers: true}).find {|file_row| file_row['Absolute Location'] == file_spec[:absolute_location] }
             master_file.file_format = techdata["file_format"]
             master_file.duration = techdata["duration"]
             master_file.display_aspect_ratio = techdata["display_aspect_ratio"]
             master_file.original_frame_size = techdata["original_frame_size"]
             master_file.poster_offset = techdata["poster_offset"]
+            master_file.thumbnail_offset = techdata["poster_offset"]
 
-
-
+            # commenting this out -> we're not doing anything with derivatives
             # Overwrite files hash with working file paths to pass to matterhorn
-            if files.is_a?(Hash) && master_file.working_file_path.present?
-              files.each do |quality, file|
-                working_path = master_file.working_file_path.find { |path| File.basename(file) == File.basename(path) }
-                files[quality] = File.new(working_path)
-              end
-            end
+            # if files.is_a?(Hash) && master_file.working_file_path.present?
+            #   files.each do |quality, file|
+            #     working_path = master_file.working_file_path.find { |path| File.basename(file) == File.basename(path) }
+            #     files[quality] = File.new(working_path)
+            #   end
+            # end
 
             master_file.absolute_location = file_spec[:absolute_location] if file_spec[:absolute_location].present?
             master_file.title = file_spec[:label] if file_spec[:label].present?
@@ -238,6 +240,8 @@ module Avalon
             master_file.date_digitized = DateTime.parse(file_spec[:date_digitized]).to_time.utc.iso8601 if file_spec[:date_digitized].present?
 
             #Make sure to set content before setting the workflow
+
+            # I think this will still send us into the encodejob with the right options
             master_file.set_workflow(file_spec[:skip_transcoding] ? 'skip_transcoding' : nil)
             if master_file.save
               master_file.media_object = media_object

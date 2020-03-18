@@ -79,7 +79,7 @@ module MARS
       def write_tech_csv_for_collection(collection, rows)
         return unless collection
         filepath = File.join collection.dropbox_absolute_path, %(techdata.csv)
-        puts "Writing #{rows.count} rows to techdata CSV for #{series_name} at #{filepath} ..."
+        puts "Writing #{rows.count} rows to techdata CSV for #{collection.name} at #{filepath} ..."
 
         CSV.open(filepath, 'wb') do |csv|
           # Write the headers (i.e. keys of the row hashes).
@@ -97,11 +97,11 @@ module MARS
         # to guard against the absence of a collection here.
         return unless collection
         filepath = File.join collection.dropbox_absolute_path, File.basename(export_data.filename)
-        puts "Writing #{rows.count} rows to CSV for #{series_name} at #{filepath} ..."
+        puts "Writing #{rows.count} rows to CSV for #{collection.name} at #{filepath} ..."
 
         CSV.open(filepath, 'wb') do |csv|
           # Write the top row of metadata: Batch name, sumbitter username
-          csv << ["MARS export for #{series_name}", submitter]
+          csv << ["MARS export for #{collection.name}", submitter]
           # Write the headers (i.e. keys of the row hashes).
           csv << rows.first.keys
           # Write the rows (i.e. values of each row).

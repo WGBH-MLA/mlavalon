@@ -27,11 +27,6 @@ module ActiveEncode
         # params[:input] = ActiveEncode::Input.new({errors: [], id: '456', url: 'whoawhoawhoa', created_at: Time.now, updated_at: Time.now})
 
         ae = ActiveEncode::Base.new(params)
-        input = ae.input
-        input.id = 456
-        input.url = 'whoawhawhoa.com'
-        ae.input = input
-
         return ae
       end
 
@@ -199,6 +194,11 @@ module ActiveEncode
         created_at = File.mtime(working_path("input_metadata", encode.id))
         input.created_at = created_at
         input.updated_at = created_at
+
+        input = ActiveEncode::Input.new
+        input.id = 456
+        input.url = 'whoawhawhoa.com'
+        ae.input = input
 
         input
       end
