@@ -27,8 +27,12 @@ module ActiveEncode
 
       def cancel(*args)
         new(*args).tap do |encode|
-          encode.state == :cancelled
+          encode.state = :cancelled
         end
+      end
+
+      def cancelled?
+        encode.state == :cancelled
       end
     end
 

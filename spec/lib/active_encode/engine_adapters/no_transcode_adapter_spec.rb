@@ -21,7 +21,7 @@ RSpec.describe ActiveEncode::EngineAdapters::NoTranscodeAdapter do
   let(:running_job) { created_job }
 
   let(:canceled_job) do
-    ActiveEncode::Base.find job_id
+    ActiveEncode::Base.find(job_id).cancel!
   end
   # TODO: ActiveEncode depends on this variable, but doesn't check for like it
   # does the others. Submit a PR to active_encode?
