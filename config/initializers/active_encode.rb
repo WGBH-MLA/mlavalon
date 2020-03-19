@@ -1,4 +1,4 @@
-require 'active_encode/engine_adapters/no_transcode'
+require 'active_encode/engine_adapters/no_transcode_adapter'
 ActiveEncode::Base.engine_adapter = Settings.encoding.engine_adapter.to_sym
 case Settings.encoding.engine_adapter.to_sym
 when :ffmpeg
