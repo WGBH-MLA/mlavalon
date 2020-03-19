@@ -18,10 +18,17 @@ RSpec.describe ActiveEncode::EngineAdapters::NoTranscodeAdapter do
   let(:file_path) { 'path/to/file.mp4' }
 
   let(:created_job) { ActiveEncode::Base.create(file_path) }
-  let(:running_job) { created_job }
+  let(:running_job) do
+    created_job.tap do |job|
+      job.state = :running
+    end
+  end
 
+  # NoTranscode does not produce any actualy encode jobs, therefore it cannot
+  # result in any canceled jobs. However, to make the shared spec work, we spoof
+  # a canceled job here.
   let(:canceled_job) do
-    ActiveEncode::Base.find(job_id).cancel!
+    ActiveEncode::Base.find(job_id).tap { |encode| encode.state = :cancelled }
   end
   # TODO: ActiveEncode depends on this variable, but doesn't check for like it
   # does the others. Submit a PR to active_encode?
@@ -30,7 +37,14 @@ RSpec.describe ActiveEncode::EngineAdapters::NoTranscodeAdapter do
   end
 
   let(:completed_job) { ActiveEncode::Base.find job_id }
-  let(:failed_job) { ActiveEncode::Base.find job_id }
+  # NoTranscode does not actually trigger any real encode jobs, therefore said
+  # nonexistent jobs cannot fail. But to pass the shared spec, spoof it here.
+  let(:failed_job) do
+    ActiveEncode::Base.find(job_id).tap do |encode|
+      encode.state = :failed
+      encode.errors = ["YOU SHALL NOT PASS!"]
+    end
+  end
 
   let(:completed_tech_metadata) { { } }
   # let(:completed_tech_metadata) do
