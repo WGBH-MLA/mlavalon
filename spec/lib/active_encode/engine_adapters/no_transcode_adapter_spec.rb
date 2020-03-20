@@ -46,22 +46,8 @@ RSpec.describe ActiveEncode::EngineAdapters::NoTranscodeAdapter do
     end
   end
 
+  # Used to satisify shared specs.
   let(:completed_tech_metadata) { { } }
-  # let(:completed_tech_metadata) do
-  #   {
-  #     audio_bitrate: 171_030,
-  #     audio_codec: 'mp4a-40-2',
-  #     duration: 6315.0,
-  #     file_size: 199_160,
-  #     frame_rate: 23.719,
-  #     height: 110.0,
-  #     id: "completed-id",
-  #     url: "/home/pdinh/Downloads/videoshort.mp4",
-  #     video_bitrate: 74_477,
-  #     video_codec: 'avc1',
-  #     width: 200.0
-  #   }
-  # end
   let(:completed_output) { [{}] }
   let(:failed_tech_metadata) { {} }
 

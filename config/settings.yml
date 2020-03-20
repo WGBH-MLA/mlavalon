@@ -17,7 +17,7 @@ dropbox:
   path_to_files: s3://s3-bos.wgbh.org/nehdigitization
   # upload_uri: sftp://avalon.example.edu
 encoding:
-  engine_adapter: pass_through
+  engine_adapter: no_transcode
   # engine_adapter: ffmpeg
   # presets_path: config/ffmpeg_presets.yml
 mediainfo:

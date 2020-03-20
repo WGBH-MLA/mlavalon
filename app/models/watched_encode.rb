@@ -27,6 +27,9 @@ class WatchedEncode < ActiveEncode::Base
 
   after_completed do |encode|
     # Upload to minio if using it with ffmpeg
+
+    require 'pry'; binding.pry
+
     if Settings.minio && Settings.encoding.engine_adapter.to_sym == :ffmpeg
       bucket = Aws::S3::Bucket.new(name: Settings.encoding.derivative_bucket)
       encode.output.collect! do |output|

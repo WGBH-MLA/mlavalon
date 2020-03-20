@@ -11,7 +11,7 @@
 #   CONDITIONS OF ANY KIND, either express or implied. See the License for the
 #   specific language governing permissions and limitations under the License.
 # ---  END LICENSE_HEADER BLOCK  ---
-require 'active_encode/engine_adapters/wgbh_skip_all_adapter'
-class WGBHSkipAllEncode < WatchedEncode
-  self.engine_adapter = :wgbh_skip_all
+require 'active_encode/engine_adapters/no_transcode_adapter'
+class NoTranscode < WatchedEncode
+  self.engine_adapter = :no_transcode
 end
