@@ -3,7 +3,6 @@ require 'fileutils'
 require 'nokogiri'
 require 'shellwords'
 require 'file_locator'
-require 'active_encode/null_encode'
 
 module ActiveEncode
   module EngineAdapters
