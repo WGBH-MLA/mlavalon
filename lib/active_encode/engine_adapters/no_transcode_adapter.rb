@@ -9,14 +9,15 @@ module ActiveEncode
     class NoTranscodeAdapter
       INPUT_URL = 'http://no-transcode'.freeze
       INPUT_ID = 'NO-TRANSCODE-INPUT-ID'.freeze
-      ENCODE_ID = 'NO-TRANSCODE'.freeze
+      # ENCODE_ID = 'NO-TRANSCODE'.freeze
 
       # Return a new ActiveEncode::Base instance, but explicitly does NOT do
       # anything else. The instance should represent an encode job that has just
       # started, but in reality, there is no interaction with any 3rd party
       # system, nor the filesystem.
-      def create(_input_url, _options = {})
-        generate_encode
+      def create(_input_url, options = {})
+        require('pry');binding.pry
+        generate_encode(options[:master_file_id])
       end
 
       # Returns an ActiveEncode::Base instance that is always completed,
@@ -47,9 +48,12 @@ module ActiveEncode
         # @param :updated_at [Time] Since no real encode job was ever started,
         #   let alone updated, this can default to anytime after :create_at.
         #   Default is 42 seconds after :created_at.
-        def generate_encode(state: :running)
+        def generate_encode(state: :running, master_file_id:)
           ActiveEncode::Base.new(INPUT_URL).tap do |encode|
-            encode.id = ENCODE_ID
+            # encode.id = ENCODE_ID
+            encode.id = SecureRandom.uuid
+            encode.global_id = encode.to_global_id.to_s
+            encode.master_file_id = master_file_id
             encode.state = state
             encode.input.id = INPUT_ID
             encode.input.created_at = encode.input.updated_at = Time.now

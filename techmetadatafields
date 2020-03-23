@@ -25,7 +25,11 @@ cd demo_dropbox
 
 rm -rf ./*
 
+
+rake demo:ingest file=spec/fixtures/sample_csv_ingest/single_record_techmetadata.csv CONFIRM=yes
 rake demo:mars_export_to_avalon_batch file=spec/fixtures/sample_csv_ingest/great_wonderful_demo_techmetadata.csv
+
+rake demo:mars_export_to_avalon_batch file=spec/fixtures/sample_csv_ingest/single_record_techmetadata.csv
 
 rake avalon:batch:ingest
 

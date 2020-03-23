@@ -12,6 +12,23 @@
 #   specific language governing permissions and limitations under the License.
 # ---  END LICENSE_HEADER BLOCK  ---
 require 'active_encode/engine_adapters/no_transcode_adapter'
+
+
 class NoTranscode < WatchedEncode
   self.engine_adapter = :no_transcode
+  # before_create prepend: true do |encode|
+  #   require('pry');binding.pry
+  #   encode
+  # end
+  
+  # persist this thing before and after create!
+  around_create do |encode, block|
+    master_file_id = encode.options[:master_file_id]
+    model = ActiveEncode::EncodeRecord.find_or_initialize_by(global_id: encode_attributes[:global_id])
+    master_file = MasterFile.find(master_file_id)
+    master_file.workflow_id = encode.id
+    master_file.encoder_classname = self.class.name
+    master_file.save
+  end
+
 end

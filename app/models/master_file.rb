@@ -283,9 +283,6 @@ class MasterFile < ActiveFedora::Base
     #TODO pull this from the encode
     self.date_digitized ||= Time.now.utc.iso8601
 
-    require 'pry'; binding.pry
-
-
     outputs = Array(encode.output).collect do |output|
       {
         id: output.id,
@@ -312,11 +309,6 @@ class MasterFile < ActiveFedora::Base
       existing = derivatives.to_a.find { |d| d.quality == quality }
       d = Derivative.from_output(output, managed)
       d.master_file = self
-
-
-      require 'pry'; binding.pry
-
-
 
       if d.save && existing
         existing.delete
