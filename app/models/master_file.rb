@@ -212,6 +212,11 @@ class MasterFile < ActiveFedora::Base
   end
 
   def set_workflow( workflow  = nil )
+
+    # TODO: make this conditional on whether using NoTranscode encode class.
+    self.workflow_name = nil
+    return
+
     if workflow == 'skip_transcoding'
       workflow = 'pass_through'
     elsif self.file_format == 'Sound'
@@ -244,6 +249,8 @@ class MasterFile < ActiveFedora::Base
 
   def process file=nil
     raise "MasterFile is already being processed" if status_code.present? && !finished_processing?
+
+    require "pry"; binding.pry
 
     return process_pass_through(file) if self.workflow_name == 'pass_through'
 
@@ -309,7 +316,6 @@ class MasterFile < ActiveFedora::Base
       existing = derivatives.to_a.find { |d| d.quality == quality }
       d = Derivative.from_output(output, managed)
       d.master_file = self
-
       if d.save && existing
         existing.delete
       end

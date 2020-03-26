@@ -192,6 +192,9 @@ module Avalon
       end
 
       def process!
+
+        require "pry"; binding.pry
+
         media_object.save
 
         @files.each do |file_spec|
@@ -199,7 +202,7 @@ module Avalon
             master_file = MasterFile.new
             # master_file.save(validate: false) #required: need id before setting media_object
             # master_file.media_object = media_object
-            
+
 
 
             # gatherFiles cannot do anything we need it to do without modifications -> bai!
@@ -243,6 +246,9 @@ module Avalon
 
             # I think this will still send us into the encodejob with the right options
             master_file.set_workflow(file_spec[:skip_transcoding] ? 'skip_transcoding' : nil)
+
+            require "pry"; binding.pry
+
             if master_file.save
               master_file.media_object = media_object
               media_object.save
