@@ -1,0 +1,23 @@
+<% @mars_ingests.each do |mi| %>
+
+  <% link_to show_mars_ingest_path(mi) do %>
+
+    <div class="row">
+      
+      <div class="col-md-3">
+        <%= mi.input_filename %>
+      </div>      
+      <div class="col-md-3">
+        Started At <%= mi.created_at %>
+      </div>      
+      <div class="col-md-3">
+        <%= mi.number_of_items %> Items
+      </div>      
+      <div class="col-md-3">
+        <%= %(Errors: #{mi.error}) if mi.error %>
+      </div>
+    </div>
+    
+  <% end %>
+<% end %>
+

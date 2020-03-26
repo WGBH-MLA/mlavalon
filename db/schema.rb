@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_16_195828) do
+ActiveRecord::Schema.define(version: 2020_03_26_140506) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -118,6 +118,15 @@ ActiveRecord::Schema.define(version: 2019_10_16_195828) do
     t.text "media_object_ids"
     t.boolean "finished", default: false
     t.boolean "email_sent", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "mars_ingests", force: :cascade do |t|
+    t.string "input_filename"
+    t.integer "number_of_items"
+    t.string "error"
+    t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

@@ -216,4 +216,7 @@ Rails.application.routes.draw do
     mount Sidekiq::Web, at: '/jobs', as: 'jobs'
   end
   get '/jobs(.:format)', to: redirect('/')
+
+
+  resources :mars_ingests, only: [:new, :create, :index, :show]
 end
