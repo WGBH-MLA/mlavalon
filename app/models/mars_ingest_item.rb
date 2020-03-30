@@ -2,13 +2,10 @@ require 'json'
 require 'uri'
 
 class MarsIngestItem < ActiveRecord::Base
-  class InvalidManifestError
-  end
-
   belongs_to :mars_ingest
 
   validates do
-    # runs the ingestrow validations
+    # runs the marsingestrow validations
   end
 
   validates, :mars_ingest_id, presence: true
@@ -22,11 +19,10 @@ class MarsIngestItem < ActiveRecord::Base
     payload = map_json_payload
     mars_ingest = MarsIngest.find(ingest_id)
     status = 'enqueued'
-
   end
 
   def map_json_payload
-        {
+    {
       fields: {
         title: @csv_row_hash['Title'],
         date_issued: @csv_row_hash['Date Issued'],
