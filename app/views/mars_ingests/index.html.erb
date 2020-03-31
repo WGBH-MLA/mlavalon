@@ -1,0 +1,7 @@
+<% @page_title = t('mars_ingests.title', :application_name => application_name) %>
+
+<div class="page-title-wrapper">
+  <h1 class="page-title">Mars Ingests</h1>
+</div>
+
+<%= react_component("MarsIngestList", { baseUrl: mars_ingests_url(format: :json) }) %>
