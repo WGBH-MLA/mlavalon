@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :mars_ingest_item do
-    # mars_ingest { FactoryBot.create(:mars_ingest) }
+    mars_ingest { FactoryBot.create(:mars_ingest) }
     status { 'enqueued' }
     
     # generate with real methods
