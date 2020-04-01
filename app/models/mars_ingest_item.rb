@@ -8,9 +8,10 @@ class MarsIngestItem < ActiveRecord::Base
   attr_accessor :csv_row_hash
 
   before_save :parse_json
-
   def parse_json
-    payload = create_json_payload
+    if csv_row_hash
+      payload = create_json_payload(csv_row_hash)
+    end
   end
 
   # validates do
@@ -25,7 +26,7 @@ class MarsIngestItem < ActiveRecord::Base
 
   def valid_json_parse
     begin
-      JSON.parse(create_json_payload)
+      JSON.parse(create_json_payload(csv_row_hash))
     rescue JSON::ParserError
       false
     end
