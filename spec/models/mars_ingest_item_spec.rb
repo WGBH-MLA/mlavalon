@@ -19,7 +19,6 @@ RSpec.describe MarsIngestItem do
 
   it 'parses and saves a valid payload on #save' do
     unsaved_item.save
-    require('pry');binding.pry
     # expect(unsaved_item.payload).to eq()
   end
 

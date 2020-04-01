@@ -7,10 +7,10 @@ class MarsIngestItem < ActiveRecord::Base
   # csv row objec
   attr_accessor :csv_row_hash
 
-  before_save :parse_json
+  before_validation :parse_json
   def parse_json
     if csv_row_hash
-      payload = create_json_payload(csv_row_hash)
+      self.row_payload = create_json_payload(csv_row_hash)
     end
   end
 
