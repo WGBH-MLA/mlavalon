@@ -2,26 +2,42 @@ require 'json'
 require 'uri'
 
 class MarsIngestItem < ActiveRecord::Base
+  before_save :parse_json
   belongs_to :mars_ingest
 
-  validates do
-    # runs the marsingestrow validations
+  # validates do
+  #   # runs the marsingestrow validations
+  # end
+
+  validates :mars_ingest_id, presence: true
+  validates :row_payload, presence: true
+  validate :valid_json_parse
+
+  def valid_json_parse
+    begin
+      JSON.parse(create_json_payload)
+    rescue JSONParsingError
+      false
+    end
   end
 
-  validates, :mars_ingest_id, presence: true
-  validates, :row_payload, presence: true
-  validates, :mars_ingest_id, presence: true
-  validates, :status, inclusion: %w(enqueued processing failed succeeded)
+  validates :mars_ingest_id, presence: true
+  validates :status, inclusion: %w(enqueued processing failed succeeded)
 
-  def initialize(ingest_id, csv_row_hash)
-    raise InvalidRowError unless validate_rowdata(csv_row_hash)
-    @csv_row_hash = csv_row_hash
-    payload = map_json_payload
-    mars_ingest = MarsIngest.find(ingest_id)
-    status = 'enqueued'
+  # def initialize
+  #   raise InvalidRowError unless validate_rowdata(csv_row_hash)
+  #   require('pry');binding.pry
+  #   @csv_row_hash = csv_row_hash
+  #   payload = map_json_payload
+  #   mars_ingest = MarsIngest.find(ingest_id)
+  #   status = 'enqueued'
+  # end
+
+  def parse_json
+    payload = create_json_payload
   end
 
-  def map_json_payload
+  def create_json_payload
     {
       fields: {
         title: @csv_row_hash['Title'],
@@ -109,7 +125,7 @@ class MarsIngestItem < ActiveRecord::Base
           status_code: "COMPLETED"
         }
       ]
-    }
+    }.to_json
   end
 end
 
