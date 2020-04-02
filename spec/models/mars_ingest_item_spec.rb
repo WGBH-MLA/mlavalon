@@ -35,7 +35,7 @@ RSpec.describe MarsIngestItem do
     end
     
     it 'doesnt accept bad payload' do
-      enqueued_item.payload = bad_payload
+      enqueued_item.row_payload = bad_payload
       expect(enqueued_item.save).to raise_error(InvalidThingyError)
     end
   end  

@@ -2,14 +2,16 @@ require 'json'
 require 'uri'
 
 class MarsIngestItem < ActiveRecord::Base
-  belongs_to :mars_ingest
+  # belongs_to :mars_ingest
 
   # csv row objec
-  attr_accessor :csv_row_hash
+  attr_accessor :csv_header_array
+  attr_accessor :csv_value_array
 
   before_validation :parse_json
   def parse_json
-    if csv_row_hash
+    if csv_header_array && csv_value_array
+      csv_row_hash = create_row_hash
       self.row_payload = create_json_payload(csv_row_hash)
     end
   end
@@ -18,9 +20,8 @@ class MarsIngestItem < ActiveRecord::Base
   #   # runs the marsingestrow validations
   # end
 
-  validates :mars_ingest_id, presence: true
+  # validates :mars_ingest_id, presence: true
   validates :row_payload, presence: true
-  validates :mars_ingest_id, presence: true
   validates :status, inclusion: %w(enqueued processing failed succeeded)
   validate :valid_json_parse
 
@@ -31,6 +32,130 @@ class MarsIngestItem < ActiveRecord::Base
       false
     end
   end
+
+  def is_collection_name?(field_name)
+    field_name == "Collection Name"
+  end
+
+  def is_single_field?(field_name)
+    # ['Creators','Alternative Titles','Translated Titles','Uniform Titles','Notes','Resource Types','Contributors','Publishers','Genres','Subjects','Related Item Urls','Geographic Subjects','Temporal Subjects','Topical Subjects','Languages','Tables Of Contents','Other Identifiers','Comments'].include?(field_name)
+    MARS_INGEST_API_SCHEMA[field_name].type == :media_object
+  end
+
+  def is_multi_field?(field_name)
+    # ['Creators','Alternative Titles','Translated Titles','Uniform Titles','Notes','Resource Types','Contributors','Publishers','Genres','Subjects','Related Item Urls','Geographic Subjects','Temporal Subjects','Topical Subjects','Languages','Tables Of Contents','Other Identifiers','Comments'].include?(field_name)
+    MARS_INGEST_API_SCHEMA[field_name].type == :media_object_multi
+  end
+
+  def is_instantiation_field?(field_name)
+    # ['Instantiation Label','Instantiation Id','Instantiation Streaming URL','Instantiation Streaming URL','Instantiation Duration','Instantiation Mime Type','Instantiation Audio Bitrate','Instantiation Audio Codec','Instantiation Video Bitrate','Instantiation Video Codec','Instantiation Width','Instantiation Height'].include?(field_name)
+    MARS_INGEST_API_SCHEMA[field_name].type == :instantiation
+  end
+
+  def is_file_field?(field_name)
+    
+    MARS_INGEST_API_SCHEMA[field_name].type == :file
+  end
+
+
+  # if its a single field => assign
+  # if its a multi field => shovel that hoe in
+  # if its an array, get bucc
+
+  def find_fileset_indexes(fileset_start_name)
+    csv_header_array.each_with_index.map {|f,i| i if f == fileset_start_name}.compact
+  end
+
+  def pull_filesets(indexes)
+    filesets = []
+    # indexes is array of filesetstart indexes
+    indexes.each_with_index do |start_of_fileset, index|
+
+      fileset = { files: [{}] }
+
+      # cut out section for this fileset
+      start_of_next_fileset = indexes[index + 1] || -1
+
+      fileset_headers = csv_header_array.slice!(start_of_fileset..start_of_next_fileset)
+      fileset_values = csv_value_array.slice!(start_of_fileset..start_of_next_fileset)
+
+      # make this set into a hash
+      fileset_headers.each_with_index do |header, i|
+        ingest_api_header = convert_header(header)
+
+        if is_instantiation_field?(header)
+          # its an Instantiation field
+          fileset[:files].first[ingest_api_header] = fileset_values[i]
+        else
+          # its a File field
+          fileset[ingest_api_header] = fileset_values[i]
+        end
+      end
+
+      # add each fileset to this fookin array
+      filesets << fileset
+    end
+
+    filesets
+  end
+
+  # convert input header to ingest key name
+  def convert_header(input_header)
+    require('pry');binding.pry unless MARS_INGEST_API_SCHEMA[input_header]
+
+
+    MARS_INGEST_API_SCHEMA[input_header].ingest_field_name
+  end
+
+  def create_row_hash
+    row_hash = {}
+
+    indexes = find_fileset_indexes('File Label')
+    # this takes filesets OUT of values AND headers arrays
+    filesets = pull_filesets(indexes)
+    row_hash[:files] = filesets
+
+    # csv_header_array.each do |header|
+    #   ingest_api_header = convert_header(header)
+
+    #   if is_multi_field?(header)
+    #     row_hash[ingest_api_header] = []
+    #   else
+    #     row_hash[ingest_api_header] = ""
+    #   end
+    # end
+
+    csv_header_array.each_with_index do |header, index|
+      ingest_api_header = convert_header(header)
+      next unless ingest_api_header
+
+      if is_multi_field?(header)
+        # init array if missing
+        row_hash[ingest_api_header] ||= []
+
+        # shovel shit
+        row_hash[ingest_api_header] << csv_value_array[index]
+      elsif is_single_field?(header)
+        
+        row_hash[ingest_api_header] = csv_value_array[index]
+      elsif is_collection_name?(header)
+
+        row_hash[ingest_api_header] = get_collection_id(csv_value_array[index])
+      end
+    end
+
+  require('pry');binding.pry
+
+  end
+
+  def get_collection_id(collection_name)
+    find_or_create_collection(collection_name).id
+  end
+
+  def find_or_create_collection(collection_name)
+    Admin::Collection.where(name_uniq_si: collection_name).first || Admin::Collection.create({name: collection_name, unit: 'Default Unit', managers: ['archivist1@example.com']})
+  end
+
 
   def create_json_payload(csv_row_hash)
     {
@@ -122,5 +247,68 @@ class MarsIngestItem < ActiveRecord::Base
       ]
     }.to_json
   end
-end
 
+  MARS_INGEST_API_SCHEMA = {
+    # gotta look up the damn id
+    'Collection Name' => MarsIngestFieldDef.new(:collection, :collection_id),
+    'Collection Description' => MarsIngestFieldDef.new(:ignore, false),
+
+    'Title' => MarsIngestFieldDef.new(:media_object, :title),
+    'Date Issued' => MarsIngestFieldDef.new(:media_object, :date_issued),
+    'Statement Of' => MarsIngestFieldDef.new(:media_object, :statement_of_responsibility),
+    'Date Created' => MarsIngestFieldDef.new(:media_object, :date_created),
+    'Copyright Date' => MarsIngestFieldDef.new(:media_object, :copyright_date),
+    'Abstract' => MarsIngestFieldDef.new(:media_object, :abstract),
+    'Format' => MarsIngestFieldDef.new(:media_object, :format),
+    'Bibliographic Id' => MarsIngestFieldDef.new(:media_object, :bibliographic_id),
+    'Terms Of Use' => MarsIngestFieldDef.new(:media_object, :terms_of_use),
+    'Physical Description' => MarsIngestFieldDef.new(:media_object, :physical_description),
+
+    'Creators' => MarsIngestFieldDef.new(:media_object_multi, :creator),
+    'Alternative Titles' => MarsIngestFieldDef.new(:media_object_multi, :alternative_title),
+    'Translated Titles' => MarsIngestFieldDef.new(:media_object_multi, :translated_title),
+    'Uniform Titles' => MarsIngestFieldDef.new(:media_object_multi, :uniform_title),
+    'Notes' => MarsIngestFieldDef.new(:media_object_multi, :note),
+    'Resource Types' => MarsIngestFieldDef.new(:media_object_multi, :resource_type),
+    'Contributors' => MarsIngestFieldDef.new(:media_object_multi, :contributor),
+    'Publishers' => MarsIngestFieldDef.new(:media_object_multi, :publisher),
+    'Genres' => MarsIngestFieldDef.new(:media_object_multi, :genre),
+    'Subjects' => MarsIngestFieldDef.new(:media_object_multi, :subject),
+    'Related Item Urls' => MarsIngestFieldDef.new(:media_object_multi, :related_item_url),
+    'Geographic Subjects' => MarsIngestFieldDef.new(:media_object_multi, :geographic_subject),
+    'Temporal Subjects' => MarsIngestFieldDef.new(:media_object_multi, :temporal_subject),
+    'Topical Subjects' => MarsIngestFieldDef.new(:media_object_multi, :topical_subject),
+    'Languages' => MarsIngestFieldDef.new(:media_object_multi, :language),
+    'Tables Of Contents' => MarsIngestFieldDef.new(:media_object_multi, :table_of_contents),
+    'Other Identifiers' => MarsIngestFieldDef.new(:media_object_multi, :other_identifier),
+    'Comments' => MarsIngestFieldDef.new(:media_object_multi, :comment),
+
+    'Instantiation Label' => MarsIngestFieldDef.new(:instantiation, :label),
+    'Instantiation Id' => MarsIngestFieldDef.new(:instantiation, :id),
+    'Instantiation Streaming URL' => MarsIngestFieldDef.new(:instantiation, :url),
+    'Instantiation Streaming URL' => MarsIngestFieldDef.new(:instantiation, :hls_url),
+    'Instantiation Duration' => MarsIngestFieldDef.new(:instantiation, :duration),
+    'Instantiation Mime Type' => MarsIngestFieldDef.new(:instantiation, :mime_type),
+    'Instantiation Audio Bitrate' => MarsIngestFieldDef.new(:instantiation, :audio_bitrate),
+    'Instantiation Audio Codec' => MarsIngestFieldDef.new(:instantiation, :audio_codec),
+    'Instantiation Video Bitrate' => MarsIngestFieldDef.new(:instantiation, :video_bitrate),
+    'Instantiation Video Codec' => MarsIngestFieldDef.new(:instantiation, :video_codec),
+    'Instantiation Width' => MarsIngestFieldDef.new(:instantiation, :width),
+    'Instantiation Height' => MarsIngestFieldDef.new(:instantiation, :height),
+
+    'File Label' => MarsIngestFieldDef.new(:file, :label),
+    'File Title' => MarsIngestFieldDef.new(:file, :title),
+    'File Location' => MarsIngestFieldDef.new(:file, :file_location),
+    'File Checksum' => MarsIngestFieldDef.new(:file, :file_checksum),
+    'File Size' => MarsIngestFieldDef.new(:file, :file_size),
+    'File Duration' => MarsIngestFieldDef.new(:file, :duration),
+    'File Aspect Ratio' => MarsIngestFieldDef.new(:file, :display_aspect_ratio),
+    'File Frame Size' => MarsIngestFieldDef.new(:file, :original_frame_size),
+    'File Format' => MarsIngestFieldDef.new(:file, :file_format),
+    'File Caption Text' => MarsIngestFieldDef.new(:file, :captions),
+    'File Caption Type' => MarsIngestFieldDef.new(:file, :captions_type),
+    'File Other Id' => MarsIngestFieldDef.new(:file, :other_identifier),
+    'File Comment' => MarsIngestFieldDef.new(:file, :comment),
+    'File Date Digitized' => MarsIngestFieldDef.new(:file, :date_digitized)
+  }
+end
