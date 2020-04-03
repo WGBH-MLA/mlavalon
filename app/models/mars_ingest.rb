@@ -47,8 +47,6 @@ class MarsIngest < ActiveRecord::Base
   def valid_manifest_data?
     manifest = MarsManifest.new(url: manifest_url)
     unless manifest.valid?
-      require 'pry'; binding.pry
-
       errors.add(:manifest_url, "#{manifest.errors.messages}")
     end
   end
