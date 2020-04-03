@@ -7,7 +7,7 @@ RSpec.describe MarsIngestItem do
   let (:enqueued_item) { FactoryBot.create(:mars_ingest_item) }
   let (:processing_item) { FactoryBot.create(:mars_ingest_item, :processing) }
 
-  let(:bad_payload) { "{;;what:}" }
+  let(:bad_payload) { %({ "not : "cool man"}) }
 
   # let(:mapped_payload) {
   #   # big ol hash
@@ -31,12 +31,13 @@ RSpec.describe MarsIngestItem do
   describe 'validations' do
     it 'doesnt accept bogus status' do
       enqueued_item.status = 'straight_gumbo'
-      expect(enqueued_item.save).to raise_error(InvalidThingyError)
+      expect(enqueued_item.save).to raise_error
     end
     
     it 'doesnt accept bad payload' do
       enqueued_item.row_payload = bad_payload
-      expect(enqueued_item.save).to raise_error(InvalidThingyError)
+      require('pry');binding.pry
+      expect(enqueued_item.save).to raise_error
     end
   end  
 end

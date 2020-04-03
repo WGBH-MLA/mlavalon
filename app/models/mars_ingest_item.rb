@@ -11,8 +11,7 @@ class MarsIngestItem < ActiveRecord::Base
   before_validation :parse_json
   def parse_json
     if csv_header_array && csv_value_array
-      csv_row_hash = create_row_hash
-      self.row_payload = create_json_payload(csv_row_hash)
+      self.row_payload = create_row_hash.to_json
     end
   end
 
@@ -23,18 +22,20 @@ class MarsIngestItem < ActiveRecord::Base
   # validates :mars_ingest_id, presence: true
   validates :row_payload, presence: true
   validates :status, inclusion: %w(enqueued processing failed succeeded)
-  validate :valid_json_parse
+  validate :valid_json_parse, on: :save
+
+  # validates_with MarsManifestRowVali
 
   def valid_json_parse
     begin
-      JSON.parse(create_json_payload(csv_row_hash))
-    rescue JSON::ParserError
-      false
+      JSON.parse(row_payload)
+    rescue JSON::ParserError => e
+      errors.add("Failed to parse payload: #{e.message}")
     end
   end
 
-  def is_collection_name?(field_name)
-    field_name == "Collection Name"
+  def is_collection_field?(field_name)
+    MARS_INGEST_API_SCHEMA[field_name].type == :collection
   end
 
   def is_single_field?(field_name)
@@ -109,53 +110,51 @@ class MarsIngestItem < ActiveRecord::Base
 
   def create_row_hash
     row_hash = {}
+    row_hash[:fields] = {}
+
+    collection_id = nil
+    collection_name = nil
+    collection_id = nil
+    collection_desc = nil
+    unit_name = nil
 
     indexes = find_fileset_indexes('File Label')
     # this takes filesets OUT of values AND headers arrays
     filesets = pull_filesets(indexes)
     row_hash[:files] = filesets
 
-    # csv_header_array.each do |header|
-    #   ingest_api_header = convert_header(header)
-
-    #   if is_multi_field?(header)
-    #     row_hash[ingest_api_header] = []
-    #   else
-    #     row_hash[ingest_api_header] = ""
-    #   end
-    # end
 
     csv_header_array.each_with_index do |header, index|
       ingest_api_header = convert_header(header)
       next unless ingest_api_header
 
       if is_multi_field?(header)
+
         # init array if missing
         row_hash[ingest_api_header] ||= []
 
         # shovel shit
-        row_hash[ingest_api_header] << csv_value_array[index]
+        row_hash[:fields][ingest_api_header] << csv_value_array[index]
       elsif is_single_field?(header)
         
-        row_hash[ingest_api_header] = csv_value_array[index]
-      elsif is_collection_name?(header)
+        row_hash[:fields][ingest_api_header] = csv_value_array[index]
+      elsif is_collection_field?(header)
 
-        row_hash[ingest_api_header] = get_collection_id(csv_value_array[index])
+        # collect all this junk in case we're creating the collection
+        if header == 'Collection Name'
+          collection_name = csv_value_array[index]
+        elsif header == 'Collection ID'
+          collection_id = csv_value_array[index]
+        elsif header == 'Collection Description'
+          collection_desc = csv_value_array[index]
+        elsif header == 'Unit Name'
+          unit_name = csv_value_array[index]
+        end
       end
     end
 
-  require('pry');binding.pry
-
+    row_hash[:collection_id] = collection_id || CollectionCreator.find_or_create_collection(collection_name, unit_name, collection_desc).id
   end
-
-  def get_collection_id(collection_name)
-    find_or_create_collection(collection_name).id
-  end
-
-  def find_or_create_collection(collection_name)
-    Admin::Collection.where(name_uniq_si: collection_name).first || Admin::Collection.create({name: collection_name, unit: 'Default Unit', managers: ['archivist1@example.com']})
-  end
-
 
   def create_json_payload(csv_row_hash)
     {
@@ -250,8 +249,10 @@ class MarsIngestItem < ActiveRecord::Base
 
   MARS_INGEST_API_SCHEMA = {
     # gotta look up the damn id
-    'Collection Name' => MarsIngestFieldDef.new(:collection, :collection_id),
-    'Collection Description' => MarsIngestFieldDef.new(:ignore, false),
+    'Collection ID' => MarsIngestFieldDef.new(:collection, false),
+    'Collection Name' => MarsIngestFieldDef.new(:collection, false),
+    'Collection Description' => MarsIngestFieldDef.new(:collection, false),
+    'Unit Name' => MarsIngestFieldDef.new(:collection, false),
 
     'Title' => MarsIngestFieldDef.new(:media_object, :title),
     'Date Issued' => MarsIngestFieldDef.new(:media_object, :date_issued),
@@ -263,6 +264,7 @@ class MarsIngestItem < ActiveRecord::Base
     'Bibliographic Id' => MarsIngestFieldDef.new(:media_object, :bibliographic_id),
     'Terms Of Use' => MarsIngestFieldDef.new(:media_object, :terms_of_use),
     'Physical Description' => MarsIngestFieldDef.new(:media_object, :physical_description),
+    'Statement Of Responsibility' => MarsIngestFieldDef.new(:media_object, :statement_of_responsibility),
 
     'Creators' => MarsIngestFieldDef.new(:media_object_multi, :creator),
     'Alternative Titles' => MarsIngestFieldDef.new(:media_object_multi, :alternative_title),

@@ -9,7 +9,6 @@ FactoryBot.define do
 
     csv_header_array { CSV.read('spec/fixtures/sample_csv_ingest/sample_csv_ingest_1.csv').first }
     csv_value_array { CSV.read('spec/fixtures/sample_csv_ingest/sample_csv_ingest_1.csv').last }
-    # row_payload { '{}' } #thatjsoon
 
     trait :processing do
       status { 'processing'}
