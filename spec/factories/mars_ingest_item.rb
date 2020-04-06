@@ -17,5 +17,6 @@ FactoryBot.define do
       status { 'processing'}
       job_id { 'bip bip bip' }
     end
+
   end
 end

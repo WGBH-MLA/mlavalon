@@ -28,7 +28,6 @@ class MarsIngestItem < ActiveRecord::Base
 
   def valid_json_parse
     return unless row_payload
-    puts "HEY HEY HEY #{row_payload}"
     JSON.parse(row_payload)
   rescue JSON::ParserError => e
     errors.add(:base, "Failed to parse payload: #{e.message}")
