@@ -20,6 +20,13 @@ RSpec.describe MarsIngestItem do
   end
 
   describe 'validations' do
+    it 'does accept valid statuses' do
+      %w(enqueued processing failed succeeded).each do |status|
+        enqueued_item.status = status
+        expect(enqueued_item.valid?).to eq(true)
+      end
+    end
+
     it 'doesnt accept bogus status' do
       enqueued_item.status = 'straight_gumbo'
       expect{ enqueued_item.save! }.to raise_error(ActiveRecord::RecordInvalid)
