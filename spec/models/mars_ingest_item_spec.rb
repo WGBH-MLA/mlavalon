@@ -28,7 +28,6 @@ RSpec.describe MarsIngestItem do
     it 'doesnt accept bad payload' do
 
       enqueued_item.row_payload = bad_payload
-      require('pry');binding.pry
       expect(enqueued_item.save!).to raise_error(ActiveRecord::RecordInvalid)
     end
   end  

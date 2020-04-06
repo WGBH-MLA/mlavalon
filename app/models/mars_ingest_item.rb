@@ -27,13 +27,10 @@ class MarsIngestItem < ActiveRecord::Base
   # validates_with MarsManifestRowVali
 
   def valid_json_parse
-    begin
-      JSON.parse(row_payload)
-    rescue JSON::ParserError => e
-      require('pry');binding.pry
-
-      errors.add(:row_payload, "Failed to parse payload: #{e.message}")
-    end
+    puts "HEY HEY HEY #{row_payload}"
+    JSON.parse(row_payload)
+  rescue JSON::ParserError => e
+    errors.add(:base, "Failed to parse payload: #{e.message}")
   end
 
   def is_collection_field?(field_name)
@@ -117,7 +114,6 @@ class MarsIngestItem < ActiveRecord::Base
     filesets = pull_filesets(indexes)
     row_hash[:files] = filesets
 
-
     csv_header_array.each_with_index do |header, index|
       ingest_api_header = convert_header(header)
       next unless ingest_api_header
@@ -125,7 +121,7 @@ class MarsIngestItem < ActiveRecord::Base
       if is_multi_field?(header)
 
         # init array if missing
-        row_hash[ingest_api_header] ||= []
+        row_hash[:fields][ingest_api_header] ||= []
 
         # shovel this
         row_hash[:fields][ingest_api_header] << csv_value_array[index]
@@ -147,16 +143,17 @@ class MarsIngestItem < ActiveRecord::Base
       end
     end
 
-
     # hardcoded for the API
-    row_has[:workflow_name] = "avalon"
-    row_has[:percent_complete] = "100.0"
-    row_has[:percent_succeeded] = "100.0"
-    row_has[:percent_failed] = "0"
-    row_has[:status_code] = "COMPLETED"
+    row_hash[:workflow_name] = "avalon"
+    row_hash[:percent_complete] = "100.0"
+    row_hash[:percent_succeeded] = "100.0"
+    row_hash[:percent_failed] = "0"
+    row_hash[:status_code] = "COMPLETED"
 
 
     row_hash[:collection_id] = collection_id || CollectionCreator.find_or_create_collection(collection_name, unit_name, collection_desc).id
+
+    row_hash
   end
 
   MARS_INGEST_API_SCHEMA = {
