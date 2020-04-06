@@ -29,7 +29,6 @@ class MarsIngestItem < ActiveRecord::Base
   def valid_json_parse
     begin
       JSON.parse(row_payload)
-      raise "FUCK"
     rescue JSON::ParserError => e
       require('pry');binding.pry
 
