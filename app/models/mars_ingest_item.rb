@@ -8,8 +8,8 @@ class MarsIngestItem < ActiveRecord::Base
   attr_accessor :csv_header_array
   attr_accessor :csv_value_array
 
-  before_validation :parse_json
-  def parse_json
+  before_validation :create_payload
+  def create_payload
     if csv_header_array && csv_value_array
       self.row_payload = create_row_hash.to_json
     end
@@ -22,7 +22,7 @@ class MarsIngestItem < ActiveRecord::Base
   # validates :mars_ingest_id, presence: true
   validates :row_payload, presence: true
   validates :status, inclusion: %w(enqueued processing failed succeeded)
-  validate :valid_json_parse, on: :save
+  validate :valid_json_parse, on: [:create, :update]
 
   # validates_with MarsManifestRowVali
 

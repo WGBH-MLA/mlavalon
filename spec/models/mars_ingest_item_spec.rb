@@ -19,22 +19,18 @@ RSpec.describe MarsIngestItem do
 
   it 'parses and saves a valid payload on #save' do
     unsaved_item.save
-    # expect(unsaved_item.payload).to eq()
+    expect(unsaved_item.payload).to eq()
   end
-
-  it 'returns me a nice-a payload ' do
-    expect(enqueued_item).payload
-  end
-  
-
 
   describe 'validations' do
     it 'doesnt accept bogus status' do
       enqueued_item.status = 'straight_gumbo'
       expect(enqueued_item.save).to raise_error
     end
-    
+
+    # doesnt validate when directly assigned....
     it 'doesnt accept bad payload' do
+
       enqueued_item.row_payload = bad_payload
       require('pry');binding.pry
       expect(enqueued_item.save).to raise_error
