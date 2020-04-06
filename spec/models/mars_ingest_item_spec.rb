@@ -9,26 +9,25 @@ RSpec.describe MarsIngestItem do
 
   let(:bad_payload) { %({ "not : "cool man"}) }
 
-  it 'is linked to a mars ingest' do
-    expect(enqueued_item).mars_ingest.class.to eq(MarsIngest)
-  end
+  # it 'is linked to a mars ingest' do
+  #   expect(enqueued_item).mars_ingest.class.to eq(MarsIngest)
+  # end
 
   it 'parses and saves a valid payload on #save' do
     expect(unsaved_item.valid?).to be(true)
-    # expect(unsaved_item.row_payload).to have_errors_on
   end
 
   describe 'validations' do
     it 'doesnt accept bogus status' do
       enqueued_item.status = 'straight_gumbo'
-      expect(enqueued_item.save!).to raise_error(ActiveRecord::RecordInvalid)
+      expect{ enqueued_item.save! }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     # doesnt validate when directly assigned....
     it 'doesnt accept bad payload' do
 
       enqueued_item.row_payload = bad_payload
-      expect(enqueued_item.save!).to raise_error(ActiveRecord::RecordInvalid)
+      expect{ enqueued_item.save! }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end  
 end

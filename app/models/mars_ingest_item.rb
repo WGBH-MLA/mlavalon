@@ -8,7 +8,7 @@ class MarsIngestItem < ActiveRecord::Base
   attr_accessor :csv_header_array
   attr_accessor :csv_value_array
 
-  before_validation :create_payload
+  before_save :create_payload
   def create_payload
     if csv_header_array && csv_value_array
       self.row_payload = create_row_hash.to_json
@@ -27,6 +27,7 @@ class MarsIngestItem < ActiveRecord::Base
   # validates_with MarsManifestRowVali
 
   def valid_json_parse
+    return unless row_payload
     puts "HEY HEY HEY #{row_payload}"
     JSON.parse(row_payload)
   rescue JSON::ParserError => e

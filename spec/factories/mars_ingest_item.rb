@@ -7,6 +7,9 @@ FactoryBot.define do
     # generate with real methods
     error { nil }
 
+    # placeholder so we can insert a bad payload
+    row_payload { "{}" }
+
     csv_header_array { CSV.read('spec/fixtures/sample_csv_ingest/sample_csv_ingest_1.csv').first }
     csv_value_array { CSV.read('spec/fixtures/sample_csv_ingest/sample_csv_ingest_1.csv').last }
 
