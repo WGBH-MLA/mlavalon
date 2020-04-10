@@ -246,7 +246,7 @@ en:
       timeline:
         title: "Title"
         description: "Description"
-      user:  
+      user:
         login: "Username or email"
   iiif:
     auth:
@@ -267,3 +267,6 @@ en:
       users:
         index:
           email_label: Email
+
+  mars_ingests:
+    title: "MARS Ingests"

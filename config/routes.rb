@@ -95,6 +95,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :mars_ingests, only: [:index, :show]
+
   resources :media_objects, except: [:create, :update] do
     member do
       put :update, action: :update, defaults: { format: 'html' }, constraints: { format: 'html' }
