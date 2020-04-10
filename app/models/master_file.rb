@@ -250,8 +250,6 @@ class MasterFile < ActiveFedora::Base
   def process file=nil
     raise "MasterFile is already being processed" if status_code.present? && !finished_processing?
 
-    require "pry"; binding.pry
-
     return process_pass_through(file) if self.workflow_name == 'pass_through'
 
     ActiveEncodeJobs::CreateEncodeJob.perform_later(input_path, id)

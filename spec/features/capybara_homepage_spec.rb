@@ -100,7 +100,6 @@ describe 'Sign in page' do
     visit '/users/auth/identity/register'
     fill_in 'email', with: 'user1@example.com'
     fill_in 'password', with: 'test123'
-    # binding.pry
     fill_in 'password_confirmation', with: 'test123'
     # save_and_open_page
     click_on 'Connect'

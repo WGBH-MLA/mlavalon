@@ -25,8 +25,6 @@ class IngestBatchEntryJob < ActiveJob::Base
 
     entry = Avalon::Batch::Entry.from_json(batch_entry.payload)
 
-    require "pry"; binding.pry
-
     if entry.valid?
       # Set to process status on the BatchEntries
       update_status(batch_entry, "Processing")

@@ -16,7 +16,6 @@ module ActiveEncode
       # started, but in reality, there is no interaction with any 3rd party
       # system, nor the filesystem.
       def create(_input_url, options = {})
-        require('pry');binding.pry
         generate_encode(options[:master_file_id])
       end
 

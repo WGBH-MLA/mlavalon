@@ -192,9 +192,6 @@ module Avalon
       end
 
       def process!
-
-        require "pry"; binding.pry
-
         media_object.save
 
         @files.each do |file_spec|
@@ -246,8 +243,6 @@ module Avalon
 
             # I think this will still send us into the encodejob with the right options
             master_file.set_workflow(file_spec[:skip_transcoding] ? 'skip_transcoding' : nil)
-
-            require "pry"; binding.pry
 
             if master_file.save
               master_file.media_object = media_object
