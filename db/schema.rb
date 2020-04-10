@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_16_195828) do
+ActiveRecord::Schema.define(version: 2020_03_30_200944) do
 
   create_table "active_encode_encode_records", force: :cascade do |t|
     t.string "global_id"
@@ -118,6 +118,24 @@ ActiveRecord::Schema.define(version: 2019_10_16_195828) do
     t.text "media_object_ids"
     t.boolean "finished", default: false
     t.boolean "email_sent", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "mars_ingest_items", force: :cascade do |t|
+    t.integer "mars_ingest_id"
+    t.string "row_payload"
+    t.string "error"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "job_id"
+  end
+
+  create_table "mars_ingests", force: :cascade do |t|
+    t.text "error_msg"
+    t.integer "item_count"
+    t.text "manifest_url", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
