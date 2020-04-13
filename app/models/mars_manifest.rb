@@ -3,14 +3,18 @@
 # Avalon Ingest API. Also provides accessors an enumerable array of
 # MarsManifestRow objects, each of which are used to validate individual row
 # data.
+require 'active_support/core_ext/module/delegation'
+
 class MarsManifest
   include ActiveModel::Validations
 
   attr_reader :url
 
-  validates :rows, presence: true
   validates :headers, presence: true
-  validate :valid_headers?
+  # validate :validate_headers
+  validate :validate_rows
+
+  delegate :normalize_header, :validators_for, to: :class
 
   def initialize(url:)
     @url = url
@@ -21,10 +25,8 @@ class MarsManifest
   end
 
   def rows
-    @rows ||= csv&.map do |row|
-      # TODO: code it
-      # MarsManifestRow.new(headers: headers, row_data: row)
-    end
+    # Get all rows after the header.
+    @rows ||= csv&.slice(1..-1)
   end
 
   private
@@ -53,7 +55,7 @@ class MarsManifest
 
     # Runs validation on each row.
     # @return [Boolean] true if all rows are valid.
-    def rows_valid?
+    def validate_rows
       return true
       # TODO: replace true with validation of all rows, e.g...
       # rows.map { |row| row.valid? }.all?
@@ -68,18 +70,14 @@ class MarsManifest
     end
 
     # @return [Boolean] true if #headers are valid; false if not.
-    def valid_headers?
-      if missing_headers?
+    def validate_headers
+      unless missing_headers.empty?
         add_error(:headers, "Missing headers '#{missing_headers.join("','")}'")
       end
 
-      if unrecognized_headers?
+      unless unrecognized_headers.empty?
         add_error(:headers, "Unrecognized headers '#{unrecognized_headers.join("', '")}'")
       end
-      # return false unless headers
-      # regular_headers, *file_header_groups = headers.slice_when { |i, j| headers_eq?(i, j) }.to_a
-      # headers_eq?(regular_headers, HEADERS) &&
-      #   file_header_groups.map { |file_headers| headers_eq?(file_headers, FILE_HEADERS) }
     end
 
     # Checks for missing headers from the CSV manifest by normalizing them and
@@ -102,23 +100,31 @@ class MarsManifest
       end
     end
 
-    # @return [Boolean] true if there are missing headers; false if not.
-    def missing_headers?; !missing_headers.empty?; end
+    def validate_rows
+      rows.each_with_index { |row_vals, i| validate_row(row_vals: row_vals, row_num: i + 1) }
+    end
 
-    # @return [Boolean] true if there are unercognized headers; false if not.
-    def unrecognized_headers?; !unrecognized_headers.empty?; end
+    def validate_row_vals(row_val:, row_num:)
+      row_vals.each_with_index do |val, i|
+        validate_cell(value: val, header: headers[col_num], row_num: row_num)
+      end
+    end
 
-    # Normalizes a header string by 1) making lowercase, 2) reducing excessive
-    # whitespace down to a single space, 3) stripping leading/trailing
-    # whitespace.
-    # @return [String] the normalized header.
-    def normalize_header(header)
-      header.downcase.gsub(/ +/, ' ').strip
+    def validate_cell(value:, header:, row_num:)
+      validators_for(header).each do |validator|
+        unless validator.valid?(val)
+          add_error(header, "Invalid value #{val} for #{header} on row #{row_num}")
+        end
+      end
     end
 
   # MarsManfiest class methods
   class << self
     def required_headers
+      allowed_headers
+    end
+
+    def allowed_headers
       [
         "Collection Name",
         "Collection Description",
@@ -177,6 +183,14 @@ class MarsManifest
         "File Other Id",
         "File Comment"
       ]
+    end
+
+    # Normalizes a header string by 1) making lowercase, 2) reducing excessive
+    # whitespace down to a single space, 3) stripping leading/trailing
+    # whitespace.
+    # @return [String] the normalized header.
+    def normalize_header(header)
+      header.downcase.gsub(/ +/, ' ').strip
     end
   end
 end

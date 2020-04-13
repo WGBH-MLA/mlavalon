@@ -17,7 +17,7 @@ RSpec.describe MarsManifest do
       it { is_expected.to have_errors_on(:url) }
     end
 
-    context 'when created with a valid URL', :focus do
+    context 'when created with a valid URL' do
       let(:url) { 'http://example.com' }
       before do
         # Now that we're dealing with a valid URL, stub the request to it.
