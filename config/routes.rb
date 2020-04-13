@@ -95,7 +95,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :mars_ingests, only: [:index, :show]
+  resources :mars_ingests, only: [:index, :show, :create]
 
   resources :media_objects, except: [:create, :update] do
     member do
