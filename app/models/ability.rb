@@ -54,6 +54,10 @@ class Ability
       if @user_groups.include? "manager"
         can :create, Admin::Collection
       end
+
+      if @user_groups.include? "manager"
+        can :create, MarsIngest
+      end
     end
   end
 
