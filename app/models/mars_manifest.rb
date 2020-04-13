@@ -22,7 +22,7 @@ class MarsManifest
   end
 
   def headers
-    @headers ||= Array(csv&.first)
+    @headers ||= Array(csv.first) if csv
   end
 
   def rows
@@ -61,7 +61,6 @@ class MarsManifest
       @raw_data ||= Net::HTTP.get(URI.parse(url))
     rescue => e
       add_error(:url, e.message)
-      nil
     end
 
     def validate_rows
@@ -97,11 +96,14 @@ class MarsManifest
     # idempotent, and you can end up with a field having duplicate errors).
     # @param field [Symbol] the field name.
     # @param msg [String] the error message
+    # @return [nil] always
     def add_error(field, msg)
       errors.add(field, msg) unless errors[field].include? msg
+      nil
     end
 
     # @return [Boolean] true if #headers are valid; false if not.
+<<<<<<< HEAD
     def validate_headers
       if csv
         unless missing_headers.empty?
@@ -111,6 +113,18 @@ class MarsManifest
         unless unallowed_headers.empty?
           add_error(:headers, "Unallowed headers '#{unallowed_headers.join("', '")}'")
         end
+=======
+    def valid_headers?
+      # If we're already invalid, don't try to validate more.
+      return unless errors.empty?
+
+      if missing_headers?
+        add_error(:headers, "Missing headers '#{missing_headers.join("','")}'")
+      end
+
+      if unrecognized_headers?
+        add_error(:headers, "Unrecognized headers '#{unrecognized_headers.join("', '")}'")
+>>>>>>> Renders modal form for creating new MarsIngest
       end
     end
 
