@@ -18,4 +18,10 @@ class MarsIngestsController < ApplicationController
       format.json { render json: @mars_ingest }
     end
   end
+
+  def create
+    @mars_ingest = MarsIngest.new params.require(:mars_ingest).permit(:manifest_url)
+    @mars_ingest.save!
+    @mars_ingest.start!
+  end
 end
