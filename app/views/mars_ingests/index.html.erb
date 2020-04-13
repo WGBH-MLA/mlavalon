@@ -2,6 +2,16 @@
 
 <div class="page-title-wrapper">
   <h1 class="page-title">Mars Ingests</h1>
+
+  <% if can? :create, MarsIngest %>
+    <!-- TODO: pull to the right, get it to look like Collections page -->
+    <div class="col-xs-6 collection-btn">
+      <%= button_tag("New Mars Ingest", class: 'btn btn-primary btn-large', data: {toggle:"modal", target:"#new_mars_ingest"}) %>
+    </div>
+  <% end %>
 </div>
+
+<% @mars_ingest = MarsIngest.new %>
+<%= render "form", modal_title: "MARS Ingest" %>
 
 <%= react_component("MarsIngestList", { baseUrl: mars_ingests_url(format: :json) }) %>

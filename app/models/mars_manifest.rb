@@ -17,7 +17,7 @@ class MarsManifest
   end
 
   def headers
-    @headers ||= Array(csv&.first)
+    @headers ||= Array(csv.first) if csv
   end
 
   def rows
@@ -33,10 +33,9 @@ class MarsManifest
     # the error message on the :csv field, invalidating the model instance.
     # @return Array parsed CSV data; nil if an error occcurs.
     def csv
-      @csv ||= CSV.parse(raw_data)
+      @csv ||= CSV.parse(raw_data) if raw_data
     rescue => e
       add_error(:csv, e.message)
-      nil
     end
 
     # Fetches data form the URL in the @url attribute, memoized in @raw_data. If
@@ -48,7 +47,6 @@ class MarsManifest
       @raw_data ||= Net::HTTP.get(URI.parse(url))
     rescue => e
       add_error(:url, e.message)
-      nil
     end
 
     # Runs validation on each row.
@@ -63,12 +61,17 @@ class MarsManifest
     # idempotent, and you can end up with a field having duplicate errors).
     # @param field [Symbol] the field name.
     # @param msg [String] the error message
+    # @return [nil] always
     def add_error(field, msg)
       errors.add(field, msg) unless errors[field].include? msg
+      nil
     end
 
     # @return [Boolean] true if #headers are valid; false if not.
     def valid_headers?
+      # If we're already invalid, don't try to validate more.
+      return unless errors.empty?
+
       if missing_headers?
         add_error(:headers, "Missing headers '#{missing_headers.join("','")}'")
       end
@@ -76,10 +79,6 @@ class MarsManifest
       if unrecognized_headers?
         add_error(:headers, "Unrecognized headers '#{unrecognized_headers.join("', '")}'")
       end
-      # return false unless headers
-      # regular_headers, *file_header_groups = headers.slice_when { |i, j| headers_eq?(i, j) }.to_a
-      # headers_eq?(regular_headers, HEADERS) &&
-      #   file_header_groups.map { |file_headers| headers_eq?(file_headers, FILE_HEADERS) }
     end
 
     # Checks for missing headers from the CSV manifest by normalizing them and
