@@ -3,14 +3,19 @@
 # Avalon Ingest API. Also provides accessors an enumerable array of
 # MarsManifestRow objects, each of which are used to validate individual row
 # data.
+require 'active_support/core_ext/module/delegation'
+
 class MarsManifest
   include ActiveModel::Validations
 
   attr_reader :url
 
-  validates :rows, presence: true
-  validates :headers, presence: true
-  validate :valid_headers?
+  validate :validate_manifest
+  # validate :validate_headers
+  # validate :validate_rows
+
+  delegate :normalize_header, :required_headers, :allowed_headers,
+           :validation_methods, :validation_methods_for, to: :class
 
   def initialize(url:)
     @url = url
@@ -21,23 +26,31 @@ class MarsManifest
   end
 
   def rows
-    @rows ||= csv&.map do |row|
-      # TODO: code it
-      # MarsManifestRow.new(headers: headers, row_data: row)
-    end
+    @rows ||= Array(csv&.slice(1..-1))
+  end
+
+  # Parses raw data as CSV, memoized in @csv. If an error occurs, it adds
+  # the error message on the :csv field, invalidating the model instance.
+  # @return Array parsed CSV data; nil if an error occcurs.
+  def csv
+    @csv ||= CSV.parse(raw_data)
+  rescue => e
+    add_error(:csv, e.message)
+    nil
   end
 
   private
 
-    # Parses raw data as CSV, memoized in @csv. If an error occurs, it adds
-    # the error message on the :csv field, invalidating the model instance.
-    # @return Array parsed CSV data; nil if an error occcurs.
-    def csv
-      @csv ||= CSV.parse(raw_data)
-    rescue => e
-      add_error(:csv, e.message)
-      nil
+    def validate_manifest
+      validate_headers
+      validate_rows if errors.empty?
     end
+
+    # def mars_manifest_rows
+    #   @mars_manifest_rows ||= rows.map do |row_vals|
+    #     MarsManifestRow.new(headers: headers, values: row_vals)
+    #   end
+    # end
 
     # Fetches data form the URL in the @url attribute, memoized in @raw_data. If
     # an error occurs, it adds the error message on the :url field, invalidating
@@ -51,12 +64,33 @@ class MarsManifest
       nil
     end
 
-    # Runs validation on each row.
-    # @return [Boolean] true if all rows are valid.
-    def rows_valid?
-      return true
-      # TODO: replace true with validation of all rows, e.g...
-      # rows.map { |row| row.valid? }.all?
+    def validate_rows
+      rows.each_with_index { |row, row_num| validate_row(row, row_num) }
+    end
+
+    def validate_row(row, row_num)
+      row.each_with_index do |value, col_num|
+        validate_value_has_header(value, row_num, col_num)
+        validate_value_format(value, row_num, col_num)
+      end
+    end
+
+    def validate_value_has_header(value, row_num, col_num)
+      if headers[col_num].to_s.empty?
+        errors.add(:rows, "No header for value '#{value}', column #{col_num + 1}, row #{row_num + 1}.")
+      end
+    end
+
+    def validate_value_format(value, row_num, col_num)
+      validation_methods_for(headers[col_num]).each do |validation_method|
+        send(validation_method, value, row_num, col_num)
+      end
+    end
+
+    def presence(value, row_num, col_num)
+      if value.to_s.strip.empty?
+        errors.add(:values, "Value required for #{headers[col_num]} in column #{col_num}, row #{row_num}")
+      end
     end
 
     # Adds an error message to a field idempotently (because errors.add is not
@@ -68,116 +102,123 @@ class MarsManifest
     end
 
     # @return [Boolean] true if #headers are valid; false if not.
-    def valid_headers?
-      if missing_headers?
-        add_error(:headers, "Missing headers '#{missing_headers.join("','")}'")
-      end
+    def validate_headers
+      if csv
+        unless missing_headers.empty?
+          add_error(:headers, "Missing headers '#{missing_headers.join("','")}'")
+        end
 
-      if unrecognized_headers?
-        add_error(:headers, "Unrecognized headers '#{unrecognized_headers.join("', '")}'")
+        unless unallowed_headers.empty?
+          add_error(:headers, "Unallowed headers '#{unallowed_headers.join("', '")}'")
+        end
       end
-      # return false unless headers
-      # regular_headers, *file_header_groups = headers.slice_when { |i, j| headers_eq?(i, j) }.to_a
-      # headers_eq?(regular_headers, HEADERS) &&
-      #   file_header_groups.map { |file_headers| headers_eq?(file_headers, FILE_HEADERS) }
     end
 
     # Checks for missing headers from the CSV manifest by normalizing them and
     # then comparing them to the normalized required headers.
     # @return [Array] list of missing headers.
     def missing_headers
-      normalized_headers = headers.map { |h| normalize_header(h) }
-      @missing_headers ||= MarsManifest.required_headers.select do |req_header|
-        normalized_headers.exclude? normalize_header(req_header)
+      @missing_headers ||= MarsManifest.required_headers.select do |required_header|
+        normalized_headers.exclude? required_header
       end
     end
 
     # Checks for unrecognized headers from the CSV manifest by normalizing them
     # and then comparing them to the normalized required headers.
     # @return [Array] list of unrecognized headers.
-    def unrecognized_headers
-      normalized_required_headers = MarsManifest.required_headers.map { |h| normalize_header(h) }
-      @unrecognized_headers ||= headers.select do |header|
-        normalized_required_headers.exclude? normalize_header(header)
+    def unallowed_headers
+      @unallowed_headers ||= headers.select do |header|
+        allowed_headers.exclude? normalize_header(header)
       end
     end
 
-    # @return [Boolean] true if there are missing headers; false if not.
-    def missing_headers?; !missing_headers.empty?; end
+    def normalized_headers
+      @normalized_headers ||= headers.map { |h| normalize_header(h) }
+    end
 
-    # @return [Boolean] true if there are unercognized headers; false if not.
-    def unrecognized_headers?; !unrecognized_headers.empty?; end
+  # MarsManfiest class methods
+  class << self
+    def required_headers
+      validation_methods.select do |field, validations|
+        validations.include? :presence
+      end.keys
+    end
+
+    def allowed_headers
+      validation_methods.keys
+    end
+
+    def validation_methods_for(header)
+      validation_methods[normalize_header(header)] || []
+    end
+
+    def validation_methods
+      {
+        "collection name" => [:presence],
+        "collection description" => [],
+        "unit name" => [],
+        "collection id" => [],
+        "title" => [],
+        "date issued" => [],
+        "creator" => [],
+        "alternative title" => [],
+        "translated title" => [],
+        "uniform title" => [],
+        "statement of responsibility" => [],
+        "date created" => [],
+        "copyright date" => [],
+        "abstract" => [],
+        "note" => [],
+        "format" => [],
+        "resource type" => [],
+        "contributor" => [],
+        "publisher" => [],
+        "genre" => [],
+        "subject" => [],
+        "related item url" => [],
+        "geographic subject" => [],
+        "temporal subject" => [],
+        "topical subject" => [],
+        "bibliographic id" => [],
+        "language" => [],
+        "terms of use" => [],
+        "tables of content" => [],
+        "physical description" => [],
+        "other identifier" => [],
+        "comment" => [],
+        "file label" => [],
+        "file title" => [],
+        "instantiation label" => [],
+        "instantiation id" => [],
+        "instantiation streaming url" => [],
+        "instantiation duration" => [],
+        "instantiation mime type" => [],
+        "instantiation audio bitrate" => [],
+        "instantiation audio codec" => [],
+        "instantiation video bitrate" => [],
+        "instantiation video codec" => [],
+        "instantiation width" => [],
+        "instantiation heightfile location" => [],
+        "file checksum" => [],
+        "file size" => [],
+        "file duration" => [],
+        "file aspect ratio" => [],
+        "file frame size" => [],
+        "file format" => [],
+        "file date digitized" => [],
+        "file caption text" => [],
+        "file caption type" => [],
+        "file other id" => [],
+        "file comment" => []
+      }
+    end
 
     # Normalizes a header string by 1) making lowercase, 2) reducing excessive
     # whitespace down to a single space, 3) stripping leading/trailing
     # whitespace.
     # @return [String] the normalized header.
     def normalize_header(header)
-      header.downcase.gsub(/ +/, ' ').strip
-    end
-
-  # MarsManfiest class methods
-  class << self
-    def required_headers
-      [
-        "Collection Name",
-        "Collection Description",
-        "Unit Name",
-        "Collection ID",
-        "Title",
-        "Date Issued",
-        "Creators",
-        "Alternative Titles",
-        "Translated Titles",
-        "Uniform Titles",
-        "Statement Of Responsibility",
-        "Date Created",
-        "Copyright Date",
-        "Abstract",
-        "Notes",
-        "Format",
-        "Resource Types",
-        "Contributors",
-        "Publishers",
-        "Genres",
-        "Subjects",
-        "Related Item Urls",
-        "Geographic Subjects",
-        "Temporal Subjects",
-        "Topical Subjects",
-        "Bibliographic Id",
-        "Languages",
-        "Terms Of Use",
-        "Tables Of Contents",
-        "Physical Description",
-        "Other Identifiers",
-        "Comments",
-        "File Label",
-        "File Title",
-        "Instantiation Label",
-        "Instantiation Id",
-        "Instantiation Streaming URL",
-        "Instantiation Duration",
-        "Instantiation Mime Type",
-        "Instantiation Audio Bitrate",
-        "Instantiation Audio Codec",
-        "Instantiation Video Bitrate",
-        "Instantiation Video Codec",
-        "Instantiation Width",
-        "Instantiation Height",
-        "File Location",
-        "File Checksum",
-        "File Size",
-        "File Duration",
-        "File Aspect Ratio",
-        "File Frame Size",
-        "File Format",
-        "File Date Digitized",
-        "File Caption Text",
-        "File Caption Type",
-        "File Other Id",
-        "File Comment"
-      ]
+      header.to_s.downcase.gsub(/ +/, ' ').strip
     end
   end
 end
