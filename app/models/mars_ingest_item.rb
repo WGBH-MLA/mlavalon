@@ -20,7 +20,7 @@ class MarsIngestItem < ActiveRecord::Base
   # end
 
   # validates :mars_ingest_id, presence: true
-  validates :row_payload, presence: true
+  # validates :row_payload, presence: true
   validates :status, inclusion: %w(enqueued processing failed succeeded)
   validate :valid_json_parse
 
