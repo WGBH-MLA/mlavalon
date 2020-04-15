@@ -14,15 +14,13 @@ class MarsIngest < ActiveRecord::Base
 
     @manifest.rows.each_with_index do |row, index|
       next if index == 0
-
-      mars_item = MarsIngestItem.new
+      mars_item = MarsIngestItem.new(status: 'enqueued')
       mars_item.csv_header_array = headers
       mars_item.csv_value_array = row
       mars_item.save!
-
-      # Mars
+      job_id = MarsIngestItemJob.new(mars_item.id).perform_later
+      Rails.logger.info("Started MarsIngestItemJob with jid #{job_id} from MarsIngestItem #{mars_item.id}")
     end
-
   end
 
   private
