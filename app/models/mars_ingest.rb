@@ -9,6 +9,22 @@ class MarsIngest < ActiveRecord::Base
     end
   end
 
+  def start
+    headers = @manifest.headers
+
+    @manifest.rows.each_with_index do |row, index|
+      next if index == 0
+
+      mars_item = MarsIngestItem.new
+      mars_item.csv_header_array = headers
+      mars_item.csv_value_array = row
+      mars_item.save!
+
+      # Mars
+    end
+
+  end
+
   private
 
     def manifest
