@@ -5,19 +5,13 @@
 
   <% if can? :create, MarsIngest %>
     <!-- TODO: pull to the right, get it to look like Collections page -->
-
-    <div class="row">
-      <div class="col-md-12 collection-btn">
-        
-        <% csrf_token = form_authenticity_token %>
-        <%= react_component("MarsIngestNew", {token: csrf_token}) %>
-      </div>
+    <div class="col-xs-6 collection-btn">
+      <%= button_tag("New Mars Ingest", class: 'btn btn-primary btn-large', data: {toggle:"modal", target:"#new_mars_ingest"}) %>
     </div>
   <% end %>
 </div>
 
-<div class="row">
-  <div class="col-md-12">
-    <%= react_component("MarsIngestList", { baseUrl: mars_ingests_url(format: :json) }) %>
-  </div>
-</div>
+<% @mars_ingest = MarsIngest.new %>
+<%= render "form", modal_title: "MARS Ingest" %>
+
+<%= react_component("MarsIngestList", { baseUrl: mars_ingests_url(format: :json) }) %>
