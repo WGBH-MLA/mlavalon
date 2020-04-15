@@ -54,13 +54,10 @@ describe MarsIngestItemJob do
     end
 
     describe 'after_perform' do
-      it 'updates the MarsIngestItem#status to succeeded' do
+      it 'updates the MarsIngestItem#status to failed' do
         job.perform_now
         expect(mars_ingest_item.reload.status).to eq('failed')
       end
     end
   end
-
-#  the rescue_from callback retries the job if the Ingest API fails with a "record already exists".
-
 end
