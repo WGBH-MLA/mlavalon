@@ -15,12 +15,15 @@ class MarsIngestList extends Component {
   }
 
   componentDidMount() {
+    console.log('Mounted dat')
     this.retrieveResults();
   }
 
   async retrieveResults() {
     this.setState({ isLoading: true });
     let url = this.props.baseUrl;
+
+    console.log('Retrieved dat')
 
     try {
       const response = await Axios({ url });
