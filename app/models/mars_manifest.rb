@@ -8,8 +8,6 @@ class MarsManifest
 
   attr_reader :url
 
-  validates :rows, presence: true
-  validates :headers, presence: true
   validate :valid_headers?
 
   def initialize(url:)
@@ -17,7 +15,7 @@ class MarsManifest
   end
 
   def headers
-    @headers ||= Array(csv.first) if csv
+    @headers ||= Array(csv&.first)
   end
 
   def rows
@@ -35,7 +33,7 @@ class MarsManifest
     def csv
       @csv ||= CSV.parse(raw_data) if raw_data
     rescue => e
-      add_error(:csv, e.message)
+      add_error(:csv, "Invalid CSV file at URL: '#{url}'")
     end
 
     # Fetches data form the URL in the @url attribute, memoized in @raw_data. If
@@ -46,7 +44,7 @@ class MarsManifest
     def raw_data
       @raw_data ||= Net::HTTP.get(URI.parse(url))
     rescue => e
-      add_error(:url, e.message)
+      add_error(:url, "Invalid Manifest URL: '#{url}'")
     end
 
     # Runs validation on each row.
@@ -69,15 +67,15 @@ class MarsManifest
 
     # @return [Boolean] true if #headers are valid; false if not.
     def valid_headers?
-      # If we're already invalid, don't try to validate more.
-      return unless errors.empty?
+      # Only validate headers if we have CSV data.
+      if csv
+        if missing_headers?
+          add_error(:headers, "Missing headers '#{missing_headers.join("','")}'")
+        end
 
-      if missing_headers?
-        add_error(:headers, "Missing headers '#{missing_headers.join("','")}'")
-      end
-
-      if unrecognized_headers?
-        add_error(:headers, "Unrecognized headers '#{unrecognized_headers.join("', '")}'")
+        if unrecognized_headers?
+          add_error(:headers, "Unrecognized headers '#{unrecognized_headers.join("', '")}'")
+        end
       end
     end
 
