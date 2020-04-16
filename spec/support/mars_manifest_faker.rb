@@ -89,7 +89,7 @@ class MarsManifestFaker
         "Bibliographic Id",
         ["Language"] * rand(1..4),
         "Terms Of Use",
-        ["Tables Of Content"] * rand(1..4),
+        ["Table Of Contents"] * rand(1..4),
         "Physical Description",
         ["Other Identifier", "Other Identifier Type"] * rand(1..4),
         ["Comment"] * rand(1..4),
@@ -176,7 +176,7 @@ class MarsManifestFaker
       when "other identifier type"
         Avalon::ControlledVocabulary.vocabulary[:identifier_types].values.sample
       when 'collection id', "format", "resource type", "bibliographic id",
-           "tables of content", "other identifier",
+           "table of contents", "other identifier",
            "file label", "file title", "instantiation label",
            "instantiation id", "instantiation duration", "instantiation mime type",
            "instantiation width", "instantiation height", "file location",
