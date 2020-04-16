@@ -117,6 +117,19 @@ class MarsIngestItem < ActiveRecord::Base
     filesets = pull_filesets(indexes)
     row_hash[:files] = filesets
 
+    # paired fields will work correctly as long as THE COLUMNS APPEAR IN PAIRS
+    # Note,Note Type,Note,Note Type
+    # zesty,cool note,wahhh,uncool note
+
+    # should become
+    # payload[:note] => ['zesty','wahhh']
+    # payload[:note_type] => ['cool note','uncool note']
+
+    # the ingest API takes these two arrays and maps them into pairs, for each pair of fields
+    # MediaObjectsController#media_object_parameters v
+    # [{note: 'zesty' type: 'cool note'}, {note: 'wahhh', note_type: 'uncool note'}]
+
+
     csv_header_array.each_with_index do |header, index|
       ingest_api_header = convert_header(header)
       next unless ingest_api_header
@@ -182,19 +195,28 @@ class MarsIngestItem < ActiveRecord::Base
     'Alternative Titles' => MarsIngestFieldDef.new(:media_object_multi, :alternative_title),
     'Translated Titles' => MarsIngestFieldDef.new(:media_object_multi, :translated_title),
     'Uniform Titles' => MarsIngestFieldDef.new(:media_object_multi, :uniform_title),
+    
     'Notes' => MarsIngestFieldDef.new(:media_object_multi, :note),
+    'Note Types' => MarsIngestFieldDef.new(:media_object_multi, :note_type),
+    
     'Resource Types' => MarsIngestFieldDef.new(:media_object_multi, :resource_type),
     'Contributors' => MarsIngestFieldDef.new(:media_object_multi, :contributor),
     'Publishers' => MarsIngestFieldDef.new(:media_object_multi, :publisher),
     'Genres' => MarsIngestFieldDef.new(:media_object_multi, :genre),
     'Subjects' => MarsIngestFieldDef.new(:media_object_multi, :subject),
+    
+    'Related Item Labels' => MarsIngestFieldDef.new(:media_object_multi, :related_item_label),
     'Related Item Urls' => MarsIngestFieldDef.new(:media_object_multi, :related_item_url),
+    
     'Geographic Subjects' => MarsIngestFieldDef.new(:media_object_multi, :geographic_subject),
     'Temporal Subjects' => MarsIngestFieldDef.new(:media_object_multi, :temporal_subject),
     'Topical Subjects' => MarsIngestFieldDef.new(:media_object_multi, :topical_subject),
     'Languages' => MarsIngestFieldDef.new(:media_object_multi, :language),
     'Tables Of Contents' => MarsIngestFieldDef.new(:media_object_multi, :table_of_contents),
+
+    'Other Identifier Types' => MarsIngestFieldDef.new(:media_object_multi, :other_identifier_type),
     'Other Identifiers' => MarsIngestFieldDef.new(:media_object_multi, :other_identifier),
+
     'Comments' => MarsIngestFieldDef.new(:media_object_multi, :comment),
 
     'Instantiation Label' => MarsIngestFieldDef.new(:instantiation, :label),
