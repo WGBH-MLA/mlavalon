@@ -81,7 +81,7 @@ class MarsManifest
 
     def validate_presence(value, row_num, col_num)
       if value.to_s.strip.empty?
-        errors.add(:values, "Value required for #{headers[col_num]} in column #{col_num}, row #{row_num}")
+        errors.add(:values, "Value required for #{headers[col_num]} in column #{col_num + 1}, row #{row_num + 1}")
       end
     end
 

@@ -14,7 +14,7 @@ class MarsIngestItem < ActiveRecord::Base
   before_save :create_payload
   def create_payload
     if csv_header_array && csv_value_array
-      self.row_payload = create_row_hash.to_json
+      self.row_payload = create_row_hash.to_s.force_encoding('UTF-8').to_json
     end
   end
 

@@ -1,18 +1,6 @@
 class MarsIngestsController < ApplicationController
   before_action :authenticate_user!
 
-  after_action :save_items, only: [:create]
-
-  def save_items
-    @mars_ingest.manifest.rows.each do |row|
-      mars_ingest_item = MarsIngestItem.new(status: 'enqueued')
-      mars_ingest_item.csv_header_array = @mars_ingest.manifest.headers
-      mars_ingest_item.csv_value_array = row
-      mars_ingest_item.mars_ingest_id = @mars_ingest.id
-      mars_ingest_item.save!
-    end
-  end
-
   def index
     @mars_ingests = MarsIngest.all
 
@@ -45,7 +33,7 @@ class MarsIngestsController < ApplicationController
 
     def start_ingest(mars_ingest)
       mars_ingest.mars_ingest_items.each do |mars_ingest_item|
-        job_id = MarsIngestItemJob.new(mars_ingest_item.id).perform_later
+        job_id = MarsIngestItemJob.perform_later(mars_ingest_item.id)
         Rails.logger.info("Started MarsIngestItemJob with jid #{job_id} from MarsIngestItem #{mars_ingest_item.id}")
       end
     end
