@@ -10,16 +10,13 @@ class MarsManifest
 
   attr_reader :url
 
-<<<<<<< HEAD
   validate :validate_manifest
   # validate :validate_headers
   # validate :validate_rows
 
   delegate :normalize_header, :required_headers, :allowed_headers,
            :validation_methods, :validation_methods_for, to: :class
-=======
   validate :valid_headers?
->>>>>>> WIP
 
   def initialize(url:)
     @url = url
@@ -107,7 +104,6 @@ class MarsManifest
     end
 
     # @return [Boolean] true if #headers are valid; false if not.
-<<<<<<< HEAD
     def validate_headers
       if csv
         unless missing_headers.empty?
@@ -117,30 +113,6 @@ class MarsManifest
         unless unallowed_headers.empty?
           add_error(:headers, "Unallowed headers '#{unallowed_headers.join("', '")}'")
         end
-=======
-    def valid_headers?
-<<<<<<< HEAD
-      # If we're already invalid, don't try to validate more.
-      return unless errors.empty?
-
-      if missing_headers?
-        add_error(:headers, "Missing headers '#{missing_headers.join("','")}'")
-      end
-
-      if unrecognized_headers?
-        add_error(:headers, "Unrecognized headers '#{unrecognized_headers.join("', '")}'")
->>>>>>> Renders modal form for creating new MarsIngest
-=======
-      # Only validate headers if we have CSV data.
-      if csv
-        if missing_headers?
-          add_error(:headers, "Missing headers '#{missing_headers.join("','")}'")
-        end
-
-        if unrecognized_headers?
-          add_error(:headers, "Unrecognized headers '#{unrecognized_headers.join("', '")}'")
-        end
->>>>>>> WIP
       end
     end
 
