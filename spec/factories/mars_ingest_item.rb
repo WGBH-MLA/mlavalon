@@ -1,9 +1,8 @@
 FactoryBot.define do
   factory :mars_ingest_item do
-    # TODO turn on when avail
-    # mars_ingest { FactoryBot.create(:mars_ingest) }
+    mars_ingest
     status { 'enqueued' }
-    
+
     # generate with real methods
     error { nil }
 

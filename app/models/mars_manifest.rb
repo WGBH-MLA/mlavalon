@@ -10,13 +10,11 @@ class MarsManifest
 
   attr_reader :url
 
+
   validate :validate_manifest
-  # validate :validate_headers
-  # validate :validate_rows
 
   delegate :normalize_header, :required_headers, :allowed_headers,
            :validation_methods, :validation_methods_for, to: :class
-  validate :valid_headers?
 
   def initialize(url:)
     @url = url
@@ -46,12 +44,6 @@ class MarsManifest
       validate_headers
       validate_rows if errors.empty?
     end
-
-    # def mars_manifest_rows
-    #   @mars_manifest_rows ||= rows.map do |row_vals|
-    #     MarsManifestRow.new(headers: headers, values: row_vals)
-    #   end
-    # end
 
     # Fetches data form the URL in the @url attribute, memoized in @raw_data. If
     # an error occurs, it adds the error message on the :url field, invalidating
@@ -87,10 +79,15 @@ class MarsManifest
       end
     end
 
-    def presence(value, row_num, col_num)
+    def validate_presence(value, row_num, col_num)
       if value.to_s.strip.empty?
         errors.add(:values, "Value required for #{headers[col_num]} in column #{col_num}, row #{row_num}")
       end
+    end
+
+    def validate_date(value, row_num, col_num)
+      # TODO actually validate the value as a date, once we know the proper
+      # format.
     end
 
     # Adds an error message to a field idempotently (because errors.add is not
@@ -103,8 +100,8 @@ class MarsManifest
       nil
     end
 
-    # @return [Boolean] true if #headers are valid; false if not.
     def validate_headers
+      # Only validate headers if we have CSV data.
       if csv
         unless missing_headers.empty?
           add_error(:headers, "Missing headers '#{missing_headers.join("','")}'")
@@ -125,9 +122,9 @@ class MarsManifest
       end
     end
 
-    # Checks for unrecognized headers from the CSV manifest by normalizing them
+    # Checks for unallowed headers from the CSV manifest by normalizing them
     # and then comparing them to the normalized required headers.
-    # @return [Array] list of unrecognized headers.
+    # @return [Array] list of unallowed headers.
     def unallowed_headers
       @unallowed_headers ||= headers.select do |header|
         allowed_headers.exclude? normalize_header(header)
@@ -142,7 +139,7 @@ class MarsManifest
   class << self
     def required_headers
       validation_methods.select do |field, validations|
-        validations.include? :presence
+        validations.include? :validate_presence
       end.keys
     end
 
@@ -156,12 +153,12 @@ class MarsManifest
 
     def validation_methods
       {
-        "collection name" => [:presence],
+        "collection name" => [:validate_presence],
         "collection description" => [],
         "unit name" => [],
         "collection id" => [],
-        "title" => [],
-        "date issued" => [],
+        "title" => [:validate_presence],
+        "date issued" => [:validate_date],
         "creator" => [],
         "alternative title" => [],
         "translated title" => [],

@@ -1,9 +1,128 @@
 require 'faker'
 require 'avalon/controlled_vocabulary'
+require 'active_support/core_ext/module/delegation'
 
 # Maps Manifest headers to fake data, mostly using Faker gem.
 class MarsManifestFaker
+  attr_reader :headers, :rows
+
+  delegate :fake_row_for, :random_headers, to: :class
+
+  def initialize(size: rand(2..50))
+    @headers = random_headers
+    @rows = size.to_i.times.map { fake_row_for(@headers) }
+  end
+
+  def to_s
+    headers_and_rows_as_strings = [ headers.join(',') ] + rows_as_strings
+    headers_and_rows_as_strings.join("\n")
+  end
+
+  # Appends header, returns self for method chaining.
+  def append_headers(headers)
+    @headers += Array(headers)
+    self
+  end
+
+  # Sets a value within a given row.
+  # @param header [String] the header for which you want to set the value.
+  #   Default nil, in which case, it appends the value to the end of the row.
+  # @param row_num [Integer, Range] the row number(s) you want to affect.
+  #   To affect the first row use: row_num: 0.
+  #   To affect all rows use: row_num: (0..-1)
+  def set_value(value, header: nil, row_num: 0)
+    col_index = headers.index(header) if header
+    rows.slice(row_num).each do |row|
+      if col_index
+        row[col_index] = value
+      else
+        row << value
+      end
+    end
+    self
+  end
+
+  private
+
+    def rows_as_strings
+      # Convert the escpaped rows to double quoted strings.
+      rows_with_escaped_quotes.map { |row| '"' + row.join('","') + '"' }
+    end
+
+    # Escape double quotes by replacing them all with double-double quotes.
+    # Sounds weird, but that's the CSV way.
+    def rows_with_escaped_quotes
+      rows.map do |row|
+        row.map { |r| r.to_s.gsub('"', '""') }
+      end
+    end
+
   class << self
+
+    def random_headers
+      [
+        "Collection Name",
+        "Collection Description",
+        "Unit Name",
+        "Collection ID",
+        "Title",
+        "Date Issued",
+        ["Creator"] * rand(1..4),
+        ["Alternative Title"] * rand(1..4),
+        ["Translated Title"] * rand(1..4),
+        ["Uniform Title"] * rand(1..4),
+        "Statement Of Responsibility",
+        "Date Created",
+        "Copyright Date",
+        "Abstract",
+        ["Note"] * rand(1..4),
+        "Format",
+        ["Resource Type"] * rand(1..4),
+        ["Contributor"] * rand(1..4),
+        ["Publisher"] * rand(1..4),
+        ["Genre"] * rand(1..4),
+        ["Subject"] * rand(1..4),
+        ["Related Item Url"] * rand(1..4),
+        ["Geographic Subject"] * rand(1..4),
+        ["Temporal Subject"] * rand(1..4),
+        ["Topical Subject"] * rand(1..4),
+        "Bibliographic Id",
+        ["Language"] * rand(1..4),
+        "Terms Of Use",
+        ["Tables Of Content"] * rand(1..4),
+        "Physical Description",
+        ["Other Identifier", "Other Identifier Type"] * rand(1..4),
+        ["Comment"] * rand(1..4),
+        [
+          "File Label",
+          "File Title",
+          "Instantiation Label",
+          "Instantiation Id",
+          "Instantiation Streaming URL",
+          "Instantiation Duration",
+          "Instantiation Mime Type",
+          "Instantiation Audio Bitrate",
+          "Instantiation Audio Codec",
+          "Instantiation Video Bitrate",
+          "Instantiation Video Codec",
+          "Instantiation Width",
+          "Instantiation Height",
+          "File Location",
+          "File Checksum",
+          "File Size",
+          "File Duration",
+          "File Aspect Ratio",
+          "File Frame Size",
+          "File Format",
+          "File Date Digitized",
+          "File Caption Text",
+          "File Caption Type",
+          "File Other Id",
+          "File Comment"
+        ] * rand(1..4)
+      ].flatten
+    end
+
 
     def fake_row_for(headers)
       headers.map { |header| fake_value_for(header) }

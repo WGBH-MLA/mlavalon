@@ -2,11 +2,14 @@ require 'json'
 require 'uri'
 
 class MarsIngestItem < ActiveRecord::Base
-  # belongs_to :mars_ingest
+  STATUSES = %w(enqueued processing failed succeeded)
 
-  # csv row objec
+
+  # csv row object
   attr_accessor :csv_header_array
   attr_accessor :csv_value_array
+
+  belongs_to :mars_ingest
 
   before_save :create_payload
   def create_payload
@@ -21,7 +24,7 @@ class MarsIngestItem < ActiveRecord::Base
 
   # validates :mars_ingest_id, presence: true
   # validates :row_payload, presence: true
-  validates :status, inclusion: %w(enqueued processing failed succeeded)
+  validates :status, inclusion: STATUSES
   validate :valid_json_parse
 
   # validates_with MarsManifestRowVali
