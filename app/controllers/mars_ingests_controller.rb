@@ -1,7 +1,9 @@
 class MarsIngestsController < ApplicationController
   before_action :authenticate_user!
 
-  after_create do
+  after_action :save_items, only: [:create]
+
+  def save_items
     manifest.rows.each do |row|
       mars_ingest_item = MarsIngestItem.new(status: 'enqueued')
       mars_ingest_item.csv_header_array = manifest.headers
