@@ -5,8 +5,10 @@
 
   <% if can? :create, MarsIngest %>
     <!-- TODO: pull to the right, get it to look like Collections page -->
-    <div class="col-xs-6 collection-btn">
-      <%= button_tag("New Mars Ingest", class: 'btn btn-primary btn-large', data: {toggle:"modal", target:"#new_mars_ingest"}) %>
+    <div class="row">
+      <div class="col-md-12 collection-btn">
+        <%= button_tag("New Mars Ingest", class: 'btn btn-primary btn-large', data: {toggle:"modal", target:"#new_mars_ingest"}) %>
+      </div>
     </div>
   <% end %>
 </div>
