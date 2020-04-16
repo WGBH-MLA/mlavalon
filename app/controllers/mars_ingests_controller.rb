@@ -42,7 +42,7 @@ class MarsIngestsController < ApplicationController
   private
 
     def start_ingest(mars_ingest)
-      mars_ingest.mars_ingest_items.each |mars_ingest_item|
+      mars_ingest.mars_ingest_items.each do |mars_ingest_item|
         job_id = MarsIngestItemJob.new(mars_ingest_item.id).perform_later
         Rails.logger.info("Started MarsIngestItemJob with jid #{job_id} from MarsIngestItem #{mars_ingest_item.id}")
       end
