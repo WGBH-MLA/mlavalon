@@ -11,6 +11,8 @@ class MarsIngest < ActiveRecord::Base
       mars_ingest_item.mars_ingest_id = id
       mars_ingest_item.save!
     end
+
+    update_columns(item_count: mars_ingest_items.count)
   end
 
   def validate_manifest
