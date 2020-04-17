@@ -49,13 +49,10 @@ class MarsIngestItemJob < ActiveJob::Base
       }
 
       begin
-        resp = JSON.parse(RestClient::Request.execute(params))
+        resp = RestClient::Request.execute(params)
 
       rescue Exception => e
-
-        if resp.response.code != 200
-          raise response.body
-        end
+        raise resp.to_s
       end
 
     end
