@@ -25,10 +25,7 @@ class MarsIngest extends Component {
 
     try {
       const response = await Axios({ url });
-
       let data = response.data;
-
-      console.log('data: ' + data);
 
       if(!(data instanceof Array)){
          data = [data];
@@ -47,10 +44,7 @@ class MarsIngest extends Component {
   render() {
     let mars_ingest_data = this.state.searchResult;
     let isLoading = this.state.isLoading;
-
-    // I THINK this should work for the IngestItems.
-    // DOUBLE CHECK WITH REAL DATA
-    let mars_ingest_items = ( typeof mars_ingest_data.mars_ingest_items != 'undefined' && mars_ingest_data.mars_ingest_items instanceof Array ) ? mars_ingest_data.mars_ingest_items : []
+    let mars_ingest_items = ( Array.isArray(mars_ingest_data) && mars_ingest_data.length > 0 && Object.keys(mars_ingest_data[0]).includes("mars_ingest_items") ) ? mars_ingest_data[0].mars_ingest_items : []
 
     return (
 
@@ -107,10 +101,7 @@ class MarsIngest extends Component {
             )}
           </tbody>
         </table>
-
-
       </div>
-
 
     );
   }
