@@ -103,6 +103,7 @@ class MarsIngestItem < ActiveRecord::Base
   end
 
   def create_row_hash
+
     row_hash = {}
     row_hash[:fields] = {}
 
@@ -132,7 +133,6 @@ class MarsIngestItem < ActiveRecord::Base
 
     csv_header_array.each_with_index do |header, index|
       ingest_api_header = convert_header(header)
-      next unless ingest_api_header
 
       if is_multi_field?(header)
 
@@ -148,7 +148,11 @@ class MarsIngestItem < ActiveRecord::Base
 
         # collect all this junk in case we're creating the collection
         if header == 'Collection Name'
+          
+          logger.info "COLLECTIONNAAMEHEADER  #{header}"
+          logger.info "COLLECTIONVAL #{csv_value_array[index]}"
           collection_name = csv_value_array[index]
+
         elsif header == 'Collection ID'
           collection_id = csv_value_array[index]
         elsif header == 'Collection Description'
@@ -166,18 +170,27 @@ class MarsIngestItem < ActiveRecord::Base
     row_hash[:percent_failed] = "0"
     row_hash[:status_code] = "COMPLETED"
 
+    logger.info "PREHEADERS"
+    logger.info csv_header_array
+    logger.info "PREVALUES"
+    logger.info csv_value_array
 
+
+    logger.info %(COLLECTION INFO #{collection_name} #{unit_name} #{collection_desc} #{collection_id})
     row_hash[:collection_id] = collection_id || CollectionCreator.find_or_create_collection(collection_name, unit_name, collection_desc).id
+
+    logger.info "ROW HAHS"
+    logger.info row_hash.inspect
 
     row_hash
   end
 
   MARS_INGEST_API_SCHEMA = {
     # gotta look up the damn id
-    'Collection ID' => MarsIngestFieldDef.new(:collection, false),
-    'Collection Name' => MarsIngestFieldDef.new(:collection, false),
-    'Collection Description' => MarsIngestFieldDef.new(:collection, false),
-    'Unit Name' => MarsIngestFieldDef.new(:collection, false),
+    'Collection ID' => MarsIngestFieldDef.new(:collection, :unmapped),
+    'Collection Name' => MarsIngestFieldDef.new(:collection, :unmapped),
+    'Collection Description' => MarsIngestFieldDef.new(:collection, :unmapped),
+    'Unit Name' => MarsIngestFieldDef.new(:collection, :unmapped),
 
     'Title' => MarsIngestFieldDef.new(:media_object, :title),
     'Date Issued' => MarsIngestFieldDef.new(:media_object, :date_issued),

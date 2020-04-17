@@ -1,6 +1,6 @@
 class MarsIngestsController < ApplicationController
   before_action :authenticate_user!
-
+ 
   def index
     @mars_ingests = MarsIngest.all
 

@@ -1,4 +1,5 @@
 class MarsIngestItemJob < ActiveJob::Base
+  MLAVALON_HOST = "mlavalon_avalon_1"
   queue_as :mars_ingest_item_job
 
   after_enqueue { update_status 'enqueued' }
@@ -9,13 +10,15 @@ class MarsIngestItemJob < ActiveJob::Base
 
   rescue_from(StandardError) do |exception|
     error_message = extract_error_message(exception)
-    Rails.logger.error "#{error_message}\n\n#{exception.backtrace.join("\n")}"
+    logger.error "#{error_message}\n\n#{exception.backtrace.join("\n")}"
     update_status 'failed', error_message
   end
 
   def perform(id)
     ingest_item = MarsIngestItem.find(id)
+    logger.info "started job, found #{ingest_item.inspect}"
     ingest_item.update(job_id: self.job_id) if ingest_item.job_id == nil
+    logger.info "updated job with #{self.job_id}"
     ingest_payload(ingest_item.row_payload)
   end
 
@@ -28,10 +31,12 @@ class MarsIngestItemJob < ActiveJob::Base
     end
 
     def ingest_payload(payload)
+      logger.info "Trying to Ingest Payload"
       port = '3000'
+
       params = {
         method: :post,
-        url: "http://localhost:#{port}/media_objects.json",
+        url: "http://#{MLAVALON_HOST}:#{port}/media_objects.json",
         payload: payload,
         headers: {
           content_type: :json,
@@ -43,7 +48,10 @@ class MarsIngestItemJob < ActiveJob::Base
       }
 
       JSON.parse(RestClient::Request.execute(params))
+    rescue Exception => e
+      require('pry');binding.pry
     end
+
 
     # NOTE: this MUST not raise an exception, as it is used inside of the
     # rescue_from block. This is only to extract a more meaninful error from

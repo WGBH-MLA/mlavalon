@@ -155,13 +155,15 @@ services:
     <<: *avalon
     command: dumb-init -- bash -c "bundle install && bundle exec sidekiq -C config/sidekiq.yml"
     ports: []
+    environment:
+      AVALON_API_KEY: 9fcee031d3f8daeb26f320b9f2e7927fc4261b667de8cc3706a9dcfec04b411414fee426140d3333819b064c9e74ee322bf81ae7524722d669c92d2e33724314
 
   minio:
     image: minio/minio:RELEASE.2019-10-12T01-39-57Z
     command: minio server /data
     environment:
       MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: minio123
+      MINIO_SECRET_KEY: minio123      
     volumes:
       - data:/data
     ports:
