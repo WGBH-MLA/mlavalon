@@ -27,6 +27,10 @@ class MarsIngestsController < ApplicationController
     else
       render json: { errors: @mars_ingest.errors.messages.values.flatten }, status: 422
     end
+  rescue => e
+    error_msg = "Unexpected Error: #{e.class}: #{e.message}"
+    Rails.logger.error("#{e.class}: #{e.message}\n\nBacktrace:\n#{e.backtrace.join("\n")}")
+    render json: { errors: [error_msg] }, status: 422
   end
 
   private
