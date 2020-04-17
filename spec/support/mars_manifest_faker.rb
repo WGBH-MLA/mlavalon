@@ -8,7 +8,8 @@ class MarsManifestFaker
 
   delegate :fake_row_for, :random_headers, to: :class
 
-  def initialize(size: rand(2..50))
+  def initialize(size: nil)
+    size ||= rand(2..50)
     @headers = random_headers
     @rows = size.to_i.times.map { fake_row_for(@headers) }
   end
@@ -59,70 +60,76 @@ class MarsManifestFaker
 
   class << self
 
+    # repeats a value by a given number or a random number within a range.
+    def repeat(r)
+      raise "block expected" unless block_given?
+      return Array.new(rand(r)) { yield } if r.is_a? Range
+      Array.new(r.to_i) { yield }
+    end
+
     def random_headers
       [
         "Collection Name",
-        "Collection Description",
+        repeat(0..1) { "Collection Description" },
         "Unit Name",
-        "Collection ID",
-        "Title",
-        "Date Issued",
-        ["Creator"] * rand(1..4),
-        ["Alternative Title"] * rand(1..4),
-        ["Translated Title"] * rand(1..4),
-        ["Uniform Title"] * rand(1..4),
-        "Statement Of Responsibility",
-        "Date Created",
-        "Copyright Date",
-        "Abstract",
-        ["Note"] * rand(1..4),
-        "Format",
-        ["Resource Type"] * rand(1..4),
-        ["Contributor"] * rand(1..4),
-        ["Publisher"] * rand(1..4),
-        ["Genre"] * rand(1..4),
-        ["Subject"] * rand(1..4),
-        ["Related Item Url"] * rand(1..4),
-        ["Geographic Subject"] * rand(1..4),
-        ["Temporal Subject"] * rand(1..4),
-        ["Topical Subject"] * rand(1..4),
+        repeat(0..1) { "Collection ID" },
+        repeat(1..4) { "Title" },
+        repeat(0..1) { "Date Issued" },
+        repeat(0..4) { "Creator" },
+        repeat(0..2) { "Alternative Title" },
+        repeat(0..4) { "Translated Title" },
+        repeat(0..4) { "Uniform Title" },
+        repeat(0..1) { "Statement Of Responsibility" },
+        repeat(0..1) { "Date Created" },
+        repeat(0..1) { "Copyright Date" },
+        repeat(0..1) { "Abstract" },
+        repeat(0..3) { "Note" },
+        repeat(0..1) { "Format" },
+        repeat(0..4) { "Resource Type" },
+        repeat(0..3) { "Contributor" },
+        repeat(0..3) { "Publisher" },
+        repeat(0..3) { "Genre" },
+        repeat(0..3) { "Subject" },
+        repeat(0..1) { "Related Item Url" },
+        repeat(0..3) { "Geographic Subject" },
+        repeat(0..3) { "Temporal Subject" },
+        repeat(0..3) { "Topical Subject" },
         "Bibliographic Id",
-        ["Language"] * rand(1..4),
-        "Terms Of Use",
-        ["Table Of Contents"] * rand(1..4),
-        "Physical Description",
-        ["Other Identifier", "Other Identifier Type"] * rand(1..4),
-        ["Comment"] * rand(1..4),
-        [
+        repeat(0..4) { "Language" },
+        repeat(0..1) { "Terms Of Use" },
+        repeat(0..1) { "Table Of Contents" },
+        repeat(0..1) { "Physical Description" },
+        repeat(0..4) { ["Other Identifier", "Other Identifier Type"] },
+        repeat(0..3) { "Comment" },
+        repeat(1..4) { [
           "File Label",
           "File Title",
           "Instantiation Label",
-          "Instantiation Id",
+          repeat(0..1) { "Instantiation Id" },
           "Instantiation Streaming URL",
-          "Instantiation Duration",
-          "Instantiation Mime Type",
-          "Instantiation Audio Bitrate",
-          "Instantiation Audio Codec",
-          "Instantiation Video Bitrate",
-          "Instantiation Video Codec",
-          "Instantiation Width",
-          "Instantiation Height",
-          "File Location",
-          "File Checksum",
-          "File Size",
-          "File Duration",
-          "File Aspect Ratio",
-          "File Frame Size",
-          "File Format",
-          "File Date Digitized",
-          "File Caption Text",
-          "File Caption Type",
-          "File Other Id",
-          "File Comment"
-        ] * rand(1..4)
-      ].flatten
+          repeat(0..1) { "Instantiation Duration" },
+          repeat(0..1) { "Instantiation Mime Type" },
+          repeat(0..1) { "Instantiation Audio Bitrate" },
+          repeat(0..1) { "Instantiation Audio Codec" },
+          repeat(0..1) { "Instantiation Video Bitrate" },
+          repeat(0..1) { "Instantiation Video Codec" },
+          repeat(0..1) { "Instantiation Width" },
+          repeat(0..1) { "Instantiation Height" },
+          repeat(0..1) { "File Location" },
+          repeat(0..1) { "File Checksum" },
+          repeat(0..1) { "File Size" },
+          repeat(0..1) { "File Duration" },
+          repeat(0..1) { "File Aspect Ratio" },
+          repeat(0..1) { "File Frame Size" },
+          repeat(0..1) { "File Format" },
+          repeat(0..1) { "File Date Digitized" },
+          repeat(0..1) { "File Caption Text" },
+          repeat(0..1) { "File Caption Type" },
+          repeat(0..1) { "File Other Id" },
+          repeat(0..1) { "File Comment" }
+        ] }
+      ].flatten.compact
     end
-
 
     def fake_row_for(headers)
       headers.map { |header| fake_value_for(header) }
@@ -194,9 +201,8 @@ class MarsManifestFaker
     end
 
     def quote
-      [ Faker::Movies::PrincessBride.quote, Faker::Movies::Lebowski.quote,
-        Faker::Movies::Ghostbusters.quote, Faker::Quote.yoda
-      ].sample
+      [ Faker::Movies::PrincessBride.quote, Faker::Movies::Ghostbusters.quote,
+        Faker::Quote.yoda ].sample
     end
 
     def person
