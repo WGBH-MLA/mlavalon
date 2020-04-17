@@ -41,15 +41,23 @@ class MarsIngestItemJob < ActiveJob::Base
         headers: {
           content_type: :json,
           accept: :json,
-          :'Avalon-Api-Key' => ENV['AVALON_API_KEY']
+          # :'Avalon-Api-Key' => ENV['AVALON_API_KEY']
+          :'Avalon-Api-Key' => '9fcee031d3f8daeb26f320b9f2e7927fc4261b667de8cc3706a9dcfec04b411414fee426140d3333819b064c9e74ee322bf81ae7524722d669c92d2e33724314'
         },
         verify_ssl: false,
-        timeout: 15
+        timeout: -1
       }
 
-      JSON.parse(RestClient::Request.execute(params))
-    rescue Exception => e
-      require('pry');binding.pry
+      begin
+        resp = JSON.parse(RestClient::Request.execute(params))
+
+      rescue Exception => e
+
+        if resp.response.code != 200
+          raise response.body
+        end
+      end
+
     end
 
 

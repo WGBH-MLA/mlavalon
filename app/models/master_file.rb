@@ -309,12 +309,13 @@ class MasterFile < ActiveFedora::Base
       existing = derivatives.to_a.find { |d| d.quality == quality }
       d = Derivative.from_output(output, managed)
       d.master_file = self
+
       if d.save && existing
         existing.delete
       end
     end
 
-    save
+    self.save
   end
 
   alias_method :'_poster_offset', :'poster_offset'

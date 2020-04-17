@@ -170,6 +170,7 @@ class MediaObjectsController < ApplicationController
   end
 
   def update_media_object
+
     begin
       collection = Admin::Collection.find(api_params[:collection_id])
     rescue ActiveFedora::ObjectNotFoundError
@@ -233,8 +234,15 @@ class MediaObjectsController < ApplicationController
         master_file.date_digitized = DateTime.parse(file_spec[:date_digitized]).to_time.utc.iso8601 if file_spec[:date_digitized].present?
         master_file.identifier += Array(params[:files][index][:other_identifier])
         master_file.comment += Array(params[:files][index][:comment])
+
+
         master_file._media_object = @media_object
         if file_spec[:files].present?
+          # this is not getting mapped properly, hardcoding for now
+          master_file.workflow_name = 'avalon' unless master_file.workflow_name
+          # need to persist this before saving derivative
+          master_file.save
+
           if master_file.update_derivatives(file_spec[:files], false)
             master_file.update_stills_from_offset!
             WaveformJob.perform_later(master_file.id)
@@ -260,7 +268,7 @@ class MediaObjectsController < ApplicationController
         end
 
         #Ensure these are set because sometimes there is a timing issue that prevents the masterfile save from doing it
-        @media_object.set_media_types!
+        @media_object.set_media_types!  
         @media_object.set_resource_types!
         @media_object.set_duration!
         @media_object.workflow.last_completed_step = HYDRANT_STEPS.last.step
@@ -279,6 +287,7 @@ class MediaObjectsController < ApplicationController
     if error_messages.empty?
       render json: {id: @media_object.id}, status: 200
     else
+
       logger.warn "update_media_object failed for #{params[:fields][:title] rescue '<unknown>'}: #{error_messages}"
       render json: {errors: error_messages}, status: 422
       @media_object.destroy unless action_name == 'json_update'
@@ -659,6 +668,6 @@ class MediaObjectsController < ApplicationController
   end
 
   def api_params
-    params.permit(:collection_id, :publish, :import_bib_record, :replace_masterfiles)
+    params.permit(:_json, :collection_id, :publish, :import_bib_record, :replace_masterfiles)
   end
 end

@@ -14,7 +14,7 @@ class MarsIngestItem < ActiveRecord::Base
   before_save :create_payload
   def create_payload
     if csv_header_array && csv_value_array
-      self.row_payload = create_row_hash.to_s.force_encoding('UTF-8').to_json
+      self.row_payload = create_row_hash.to_json
     end
   end
 
@@ -69,7 +69,8 @@ class MarsIngestItem < ActiveRecord::Base
     # indexes is array of filesetstart indexes
     indexes.each_with_index do |start_of_fileset, index|
 
-      fileset = { files: [{}] }
+
+      fileset = { 'files' => [{}] }
 
       # cut out section for this fileset
       start_of_next_fileset = indexes[index + 1] || -1
@@ -80,17 +81,28 @@ class MarsIngestItem < ActiveRecord::Base
       # make this set into a hash
       fileset_headers.each_with_index do |header, i|
         ingest_api_header = convert_header(header)
+        encoded_value = encode_value(fileset_values[i])
 
         if is_instantiation_field?(header)
           # its an Instantiation field
-          fileset[:files].first[ingest_api_header] = fileset_values[i]
+          fileset['files'].first[ingest_api_header] = encoded_value
         else
           # its a File field
-          fileset[ingest_api_header] = fileset_values[i]
+          fileset[ingest_api_header] = encoded_value
         end
       end
 
       # add each fileset to this fookin array
+      # fileset['workflow_name'] = "avalon"
+      fileset['label'] = "FILE TITLE MISSING" unless fileset['label'].present?
+      # fileset['title'] = "4:3" unless fileset['title'].present?
+      # fileset[''] = "4:3" unless fileset['display_aspect_ratio'].present?
+      # fileset['display_aspect_ratio'] = "4:3" unless fileset['display_aspect_ratio'].present?
+
+      # fileset['files']['title'] = 1 unless fileset['files'] && fileset['files']['title']
+      # fileset['files']['id'] = 1 unless fileset['files'] && fileset['files']['id']
+
+      fileset['files'].first['label'] = 'DERIVATIVE LABEL MISSING' unless fileset['files'] && fileset['files'].first['label']
       filesets << fileset
     end
 
@@ -102,10 +114,15 @@ class MarsIngestItem < ActiveRecord::Base
     MARS_INGEST_API_SCHEMA.fetch(input_header).ingest_field_name
   end
 
+  def encode_value(str)
+    return if str.nil?
+    str.to_s.force_encoding('UTF-8')
+  end
+
   def create_row_hash
 
     row_hash = {}
-    row_hash[:fields] = {}
+    row_hash['fields'] = {}
 
     collection_id = nil
     collection_name = nil
@@ -116,15 +133,15 @@ class MarsIngestItem < ActiveRecord::Base
     indexes = find_fileset_indexes('File Label')
     # this takes filesets OUT of values AND headers arrays
     filesets = pull_filesets(indexes)
-    row_hash[:files] = filesets
+    row_hash['files'] = filesets
 
     # paired fields will work correctly as long as THE COLUMNS APPEAR IN PAIRS
     # Note,Note Type,Note,Note Type
     # zesty,cool note,wahhh,uncool note
 
     # should become
-    # payload[:note] => ['zesty','wahhh']
-    # payload[:note_type] => ['cool note','uncool note']
+    # payload['note'] => ['zesty','wahhh']
+    # payload['note_type'] => ['cool note','uncool note']
 
     # the ingest API takes these two arrays and maps them into pairs, for each pair of fields
     # MediaObjectsController#media_object_parameters v
@@ -133,24 +150,25 @@ class MarsIngestItem < ActiveRecord::Base
 
     csv_header_array.each_with_index do |header, index|
       ingest_api_header = convert_header(header)
+      encoded_value = encode_value(csv_value_array[index])
 
       if is_multi_field?(header)
 
         # init array if missing
-        row_hash[:fields][ingest_api_header] ||= []
+        row_hash['fields'][ingest_api_header] ||= []
 
         # shovel this
-        row_hash[:fields][ingest_api_header] << csv_value_array[index]
+        row_hash['fields'][ingest_api_header] << encoded_value
       elsif is_single_field?(header)
 
-        row_hash[:fields][ingest_api_header] = csv_value_array[index]
+        row_hash['fields'][ingest_api_header] = encoded_value
       elsif is_collection_field?(header)
 
         # collect all this junk in case we're creating the collection
         if header == 'Collection Name'
           
           logger.info "COLLECTIONNAAMEHEADER  #{header}"
-          logger.info "COLLECTIONVAL #{csv_value_array[index]}"
+          logger.info "COLLECTIONVAL #{encoded_value}"
           collection_name = csv_value_array[index]
 
         elsif header == 'Collection ID'
@@ -164,11 +182,10 @@ class MarsIngestItem < ActiveRecord::Base
     end
 
     # hardcoded for the API
-    row_hash[:workflow_name] = "avalon"
-    row_hash[:percent_complete] = "100.0"
-    row_hash[:percent_succeeded] = "100.0"
-    row_hash[:percent_failed] = "0"
-    row_hash[:status_code] = "COMPLETED"
+    row_hash['percent_complete'] = "100.0"
+    row_hash['percent_succeeded'] = "100.0"
+    row_hash['percent_failed'] = "0"
+    row_hash['status_code'] = "COMPLETED"
 
     logger.info "PREHEADERS"
     logger.info csv_header_array
@@ -177,7 +194,7 @@ class MarsIngestItem < ActiveRecord::Base
 
 
     logger.info %(COLLECTION INFO #{collection_name} #{unit_name} #{collection_desc} #{collection_id})
-    row_hash[:collection_id] = collection_id || CollectionCreator.find_or_create_collection(collection_name, unit_name, collection_desc).id
+    row_hash['collection_id'] = collection_id || CollectionCreator.find_or_create_collection(collection_name, unit_name, collection_desc).id
 
     logger.info "ROW HAHS"
     logger.info row_hash.inspect
@@ -187,77 +204,77 @@ class MarsIngestItem < ActiveRecord::Base
 
   MARS_INGEST_API_SCHEMA = {
     # gotta look up the damn id
-    'Collection ID' => MarsIngestFieldDef.new(:collection, :unmapped),
-    'Collection Name' => MarsIngestFieldDef.new(:collection, :unmapped),
-    'Collection Description' => MarsIngestFieldDef.new(:collection, :unmapped),
-    'Unit Name' => MarsIngestFieldDef.new(:collection, :unmapped),
+    'Collection ID' => MarsIngestFieldDef.new(:collection, 'unmapped'),
+    'Collection Name' => MarsIngestFieldDef.new(:collection, 'unmapped'),
+    'Collection Description' => MarsIngestFieldDef.new(:collection, 'unmapped'),
+    'Unit Name' => MarsIngestFieldDef.new(:collection, 'unmapped'),
 
-    'Title' => MarsIngestFieldDef.new(:media_object, :title),
-    'Date Issued' => MarsIngestFieldDef.new(:media_object, :date_issued),
-    'Statement Of' => MarsIngestFieldDef.new(:media_object, :statement_of_responsibility),
-    'Date Created' => MarsIngestFieldDef.new(:media_object, :date_created),
-    'Copyright Date' => MarsIngestFieldDef.new(:media_object, :copyright_date),
-    'Abstract' => MarsIngestFieldDef.new(:media_object, :abstract),
-    'Format' => MarsIngestFieldDef.new(:media_object, :format),
-    'Bibliographic Id' => MarsIngestFieldDef.new(:media_object, :bibliographic_id),
-    'Terms Of Use' => MarsIngestFieldDef.new(:media_object, :terms_of_use),
-    'Physical Description' => MarsIngestFieldDef.new(:media_object, :physical_description),
-    'Statement Of Responsibility' => MarsIngestFieldDef.new(:media_object, :statement_of_responsibility),
+    'Title' => MarsIngestFieldDef.new(:media_object, 'title'),
+    'Date Issued' => MarsIngestFieldDef.new(:media_object, 'date_issued'),
+    'Statement Of' => MarsIngestFieldDef.new(:media_object, 'statement_of_responsibility'),
+    'Date Created' => MarsIngestFieldDef.new(:media_object, 'date_created'),
+    'Copyright Date' => MarsIngestFieldDef.new(:media_object, 'copyright_date'),
+    'Abstract' => MarsIngestFieldDef.new(:media_object, 'abstract'),
+    'Format' => MarsIngestFieldDef.new(:media_object, 'format'),
+    'Bibliographic Id' => MarsIngestFieldDef.new(:media_object, 'bibliographic_id'),
+    'Terms Of Use' => MarsIngestFieldDef.new(:media_object, 'terms_of_use'),
+    'Physical Description' => MarsIngestFieldDef.new(:media_object, 'physical_description'),
+    'Statement Of Responsibility' => MarsIngestFieldDef.new(:media_object, 'statement_of_responsibility'),
 
-    'Creator' => MarsIngestFieldDef.new(:media_object_multi, :creator),
-    'Alternative Title' => MarsIngestFieldDef.new(:media_object_multi, :alternative_title),
-    'Translated Title' => MarsIngestFieldDef.new(:media_object_multi, :translated_title),
-    'Uniform Title' => MarsIngestFieldDef.new(:media_object_multi, :uniform_title),
+    'Creator' => MarsIngestFieldDef.new(:media_object_multi, 'creator'),
+    'Alternative Title' => MarsIngestFieldDef.new(:media_object_multi, 'alternative_title'),
+    'Translated Title' => MarsIngestFieldDef.new(:media_object_multi, 'translated_title'),
+    'Uniform Title' => MarsIngestFieldDef.new(:media_object_multi, 'uniform_title'),
     
-    'Note' => MarsIngestFieldDef.new(:media_object_multi, :note),
-    'Note Type' => MarsIngestFieldDef.new(:media_object_multi, :note_type),
+    'Note' => MarsIngestFieldDef.new(:media_object_multi, 'note'),
+    'Note Type' => MarsIngestFieldDef.new(:media_object_multi, 'note_type'),
     
-    'Resource Type' => MarsIngestFieldDef.new(:media_object_multi, :resource_type),
-    'Contributor' => MarsIngestFieldDef.new(:media_object_multi, :contributor),
-    'Publisher' => MarsIngestFieldDef.new(:media_object_multi, :publisher),
-    'Genre' => MarsIngestFieldDef.new(:media_object_multi, :genre),
-    'Subject' => MarsIngestFieldDef.new(:media_object_multi, :subject),
+    'Resource Type' => MarsIngestFieldDef.new(:media_object_multi, 'resource_type'),
+    'Contributor' => MarsIngestFieldDef.new(:media_object_multi, 'contributor'),
+    'Publisher' => MarsIngestFieldDef.new(:media_object_multi, 'publisher'),
+    'Genre' => MarsIngestFieldDef.new(:media_object_multi, 'genre'),
+    'Subject' => MarsIngestFieldDef.new(:media_object_multi, 'subject'),
     
-    'Related Item Label' => MarsIngestFieldDef.new(:media_object_multi, :related_item_label),
-    'Related Item Url' => MarsIngestFieldDef.new(:media_object_multi, :related_item_url),
+    'Related Item Label' => MarsIngestFieldDef.new(:media_object_multi, 'related_item_label'),
+    'Related Item Url' => MarsIngestFieldDef.new(:media_object_multi, 'related_item_url'),
     
-    'Geographic Subject' => MarsIngestFieldDef.new(:media_object_multi, :geographic_subject),
-    'Temporal Subject' => MarsIngestFieldDef.new(:media_object_multi, :temporal_subject),
-    'Topical Subject' => MarsIngestFieldDef.new(:media_object_multi, :topical_subject),
-    'Language' => MarsIngestFieldDef.new(:media_object_multi, :language),
-    'Table Of Contents' => MarsIngestFieldDef.new(:media_object_multi, :table_of_contents),
+    'Geographic Subject' => MarsIngestFieldDef.new(:media_object_multi, 'geographic_subject'),
+    'Temporal Subject' => MarsIngestFieldDef.new(:media_object_multi, 'temporal_subject'),
+    'Topical Subject' => MarsIngestFieldDef.new(:media_object_multi, 'topical_subject'),
+    'Language' => MarsIngestFieldDef.new(:media_object_multi, 'language'),
+    'Table Of Contents' => MarsIngestFieldDef.new(:media_object_multi, 'table_of_contents'),
 
-    'Other Identifier Type' => MarsIngestFieldDef.new(:media_object_multi, :other_identifier_type),
-    'Other Identifier' => MarsIngestFieldDef.new(:media_object_multi, :other_identifier),
+    'Other Identifier Type' => MarsIngestFieldDef.new(:media_object_multi, 'other_identifier_type'),
+    'Other Identifier' => MarsIngestFieldDef.new(:media_object_multi, 'other_identifier'),
 
-    'Comment' => MarsIngestFieldDef.new(:media_object_multi, :comment),
+    'Comment' => MarsIngestFieldDef.new(:media_object_multi, 'comment'),
 
-    'Instantiation Label' => MarsIngestFieldDef.new(:instantiation, :label),
-    'Instantiation Id' => MarsIngestFieldDef.new(:instantiation, :id),
-    'Instantiation Streaming URL' => MarsIngestFieldDef.new(:instantiation, :url),
-    'Instantiation Streaming URL' => MarsIngestFieldDef.new(:instantiation, :hls_url),
-    'Instantiation Duration' => MarsIngestFieldDef.new(:instantiation, :duration),
-    'Instantiation Mime Type' => MarsIngestFieldDef.new(:instantiation, :mime_type),
-    'Instantiation Audio Bitrate' => MarsIngestFieldDef.new(:instantiation, :audio_bitrate),
-    'Instantiation Audio Codec' => MarsIngestFieldDef.new(:instantiation, :audio_codec),
-    'Instantiation Video Bitrate' => MarsIngestFieldDef.new(:instantiation, :video_bitrate),
-    'Instantiation Video Codec' => MarsIngestFieldDef.new(:instantiation, :video_codec),
-    'Instantiation Width' => MarsIngestFieldDef.new(:instantiation, :width),
-    'Instantiation Height' => MarsIngestFieldDef.new(:instantiation, :height),
+    'Instantiation Label' => MarsIngestFieldDef.new(:instantiation, 'label'),
+    'Instantiation Id' => MarsIngestFieldDef.new(:instantiation, 'id'),
+    'Instantiation Streaming URL' => MarsIngestFieldDef.new(:instantiation, 'url'),
+    'Instantiation Streaming URL' => MarsIngestFieldDef.new(:instantiation, 'hls_url'),
+    'Instantiation Duration' => MarsIngestFieldDef.new(:instantiation, 'duration'),
+    'Instantiation Mime Type' => MarsIngestFieldDef.new(:instantiation, 'mime_type'),
+    'Instantiation Audio Bitrate' => MarsIngestFieldDef.new(:instantiation, 'audio_bitrate'),
+    'Instantiation Audio Codec' => MarsIngestFieldDef.new(:instantiation, 'audio_codec'),
+    'Instantiation Video Bitrate' => MarsIngestFieldDef.new(:instantiation, 'video_bitrate'),
+    'Instantiation Video Codec' => MarsIngestFieldDef.new(:instantiation, 'video_codec'),
+    'Instantiation Width' => MarsIngestFieldDef.new(:instantiation, 'width'),
+    'Instantiation Height' => MarsIngestFieldDef.new(:instantiation, 'height'),
 
-    'File Label' => MarsIngestFieldDef.new(:file, :label),
-    'File Title' => MarsIngestFieldDef.new(:file, :title),
-    'File Location' => MarsIngestFieldDef.new(:file, :file_location),
-    'File Checksum' => MarsIngestFieldDef.new(:file, :file_checksum),
-    'File Size' => MarsIngestFieldDef.new(:file, :file_size),
-    'File Duration' => MarsIngestFieldDef.new(:file, :duration),
-    'File Aspect Ratio' => MarsIngestFieldDef.new(:file, :display_aspect_ratio),
-    'File Frame Size' => MarsIngestFieldDef.new(:file, :original_frame_size),
-    'File Format' => MarsIngestFieldDef.new(:file, :file_format),
-    'File Caption Text' => MarsIngestFieldDef.new(:file, :captions),
-    'File Caption Type' => MarsIngestFieldDef.new(:file, :captions_type),
-    'File Other Id' => MarsIngestFieldDef.new(:file, :other_identifier),
-    'File Comment' => MarsIngestFieldDef.new(:file, :comment),
-    'File Date Digitized' => MarsIngestFieldDef.new(:file, :date_digitized)
+    'File Label' => MarsIngestFieldDef.new(:file, 'label'),
+    'File Title' => MarsIngestFieldDef.new(:file, 'title'),
+    'File Location' => MarsIngestFieldDef.new(:file, 'file_location'),
+    'File Checksum' => MarsIngestFieldDef.new(:file, 'file_checksum'),
+    'File Size' => MarsIngestFieldDef.new(:file, 'file_size'),
+    'File Duration' => MarsIngestFieldDef.new(:file, 'duration'),
+    'File Aspect Ratio' => MarsIngestFieldDef.new(:file, 'display_aspect_ratio'),
+    'File Frame Size' => MarsIngestFieldDef.new(:file, 'original_frame_size'),
+    'File Format' => MarsIngestFieldDef.new(:file, 'file_format'),
+    'File Caption Text' => MarsIngestFieldDef.new(:file, 'captions'),
+    'File Caption Type' => MarsIngestFieldDef.new(:file, 'captions_type'),
+    'File Other Id' => MarsIngestFieldDef.new(:file, 'other_identifier'),
+    'File Comment' => MarsIngestFieldDef.new(:file, 'comment'),
+    'File Date Digitized' => MarsIngestFieldDef.new(:file, 'date_digitized')
   }
 end

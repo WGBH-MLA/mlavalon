@@ -78,6 +78,29 @@ class CatalogController < ApplicationController
     config.add_facet_field 'collection_ssim', label: 'Collection', limit: 5
     config.add_facet_field 'unit_ssim', label: 'Unit', limit: 5
     config.add_facet_field 'language_sim', label: 'Language', limit: 5
+
+    config.add_facet_field "system_modified_dtsi", label: 'Modified Date', limit: 10
+    config.add_facet_field "publisher_sim", label: 'Publishers', limit: 10
+    config.add_facet_field "contributor_sim", label: "Contributors", limit: 10
+    config.add_facet_field "subject_sim", label: "Subjects", limit: 10
+    config.add_facet_field "notes_sim", label: "Notes", limit: 10
+    config.add_facet_field "table_of_contents_sim", label: "Tables Of Contents", limit: 10
+    config.add_facet_field "location_sim", label: "Location", limit: 10
+    config.add_facet_field "material_sim", label: "Material", limit: 10
+    config.add_facet_field "subject_topic_sim", label: "Topical Subjects", limit: 10
+    config.add_facet_field "subject_geographic_sim", label: "Geographic Subjects", limit: 10
+    config.add_facet_field "subject_temporal_sim", label: "Temporal Subjects", limit: 10
+    config.add_facet_field "subject_occupation_sim", label: "Occupation Subjects", limit: 10
+    config.add_facet_field "subject_person_sim", label: "Personal Subjects", limit: 10
+    config.add_facet_field "subject_corporate_sim", label: "Corporate Subjects", limit: 10
+    config.add_facet_field "subject_family_sim", label: "Family Subjects", limit: 10
+    config.add_facet_field "subject_title_sim", label: "Title Subjects", limit: 10
+    config.add_facet_field "date_ssi", label: "Date", limit: 10
+    config.add_facet_field  "all_comments_sim", label: "Comments", limit: 10
+
+
+
+
     # Hide these facets if not a Collection Manager
     config.add_facet_field 'workflow_published_sim', label: 'Published', limit: 5, if: Proc.new {|context, config, opts| Ability.new(context.current_user, context.user_session).can? :create, MediaObject}, group: "workflow"
     config.add_facet_field 'avalon_uploader_ssi', label: 'Created by', limit: 5, if: Proc.new {|context, config, opts| Ability.new(context.current_user, context.user_session).can? :create, MediaObject}, group: "workflow"
