@@ -34,7 +34,7 @@ class MarsManifest
   def csv
     @csv ||= CSV.parse(raw_data)
   rescue => e
-    add_error(:csv, e.message)
+    add_error(:csv, "Data not recognized as CSV.")
     nil
   end
 

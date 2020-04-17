@@ -74,8 +74,8 @@ class MarsIngestItem < ActiveRecord::Base
       # cut out section for this fileset
       start_of_next_fileset = indexes[index + 1] || -1
 
-      fileset_headers = csv_header_array.slice!(start_of_fileset..start_of_next_fileset)
-      fileset_values = csv_value_array.slice!(start_of_fileset..start_of_next_fileset)
+      fileset_headers = csv_header_array.slice!(start_of_fileset...start_of_next_fileset)
+      fileset_values = csv_value_array.slice!(start_of_fileset...start_of_next_fileset)
 
       # make this set into a hash
       fileset_headers.each_with_index do |header, i|

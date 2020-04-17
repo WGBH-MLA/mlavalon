@@ -21,9 +21,9 @@ class MarsIngest < ActiveRecord::Base
     end
   end
 
-  # private
+  private
 
-  def manifest
-    @manifest ||= MarsManifest.new(url: manifest_url)
-  end
+    def manifest
+      @manifest ||= MarsManifest.new(url: manifest_url)
+    end
 end
