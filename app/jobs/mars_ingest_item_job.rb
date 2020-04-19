@@ -32,11 +32,11 @@ class MarsIngestItemJob < ActiveJob::Base
 
     def ingest_payload(payload)
       logger.info "Trying to Ingest Payload"
-      port = '3000'
+      port = '80'
 
       params = {
         method: :post,
-        url: "http://#{MLAVALON_HOST}:#{port}/media_objects.json",
+        url: "http://127.0.0.1:#{port}/media_objects.json",
         payload: payload,
         headers: {
           content_type: :json,
@@ -48,13 +48,10 @@ class MarsIngestItemJob < ActiveJob::Base
         timeout: -1
       }
 
-      begin
-        resp = RestClient::Request.execute(params)
-      rescue Exception => e
-        # require('pry');binding.pry
-        raise resp.to_s
-      end
-
+      JSON.parse(RestClient::Request.execute(params))
+    rescue Exception => e
+      # require('pry');binding.pry
+      raise extract_error_message(e)
     end
 
 
