@@ -78,6 +78,7 @@ class MarsIngestItem < ActiveRecord::Base
       fileset_headers = csv_header_array.slice!(start_of_fileset...start_of_next_fileset)
       fileset_values = csv_value_array.slice!(start_of_fileset...start_of_next_fileset)
 
+
       # make this set into a hash
       fileset_headers.each_with_index do |header, i|
         ingest_api_header = convert_header(header)
@@ -131,7 +132,6 @@ class MarsIngestItem < ActiveRecord::Base
     unit_name = nil
 
 
-    require('pry');binding.pry
     indexes = find_fileset_indexes('File Label')
     # this takes filesets OUT of values AND headers arrays
     filesets = pull_filesets(indexes)
@@ -200,8 +200,6 @@ class MarsIngestItem < ActiveRecord::Base
 
     logger.info "ROW HAHS"
     logger.info row_hash.inspect
-
-    require('pry');binding.pry
 
     row_hash
   end
