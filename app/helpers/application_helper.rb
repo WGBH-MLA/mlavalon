@@ -61,29 +61,29 @@ module ApplicationHelper
   # TODO: Fix me with latest changes from 5.1.4
   def image_for(document)
     master_file_id = document["section_id_ssim"].try :first
+    return "https://avalon.wgbh.org/master_files/#{master_file_id}/thumbnail"
+    # video_count = document["avalon_resource_type_ssim"].count{|m| m.start_with?('moving image'.titleize) } rescue 0
+    # audio_count = document["avalon_resource_type_ssim"].count{|m| m.start_with?('sound recording'.titleize) } rescue 0
 
-    video_count = document["avalon_resource_type_ssim"].count{|m| m.start_with?('moving image'.titleize) } rescue 0
-    audio_count = document["avalon_resource_type_ssim"].count{|m| m.start_with?('sound recording'.titleize) } rescue 0
-
-    if master_file_id
-      if video_count > 0
-        thumbnail_master_file_path(master_file_id)
-      elsif audio_count > 0
-        asset_path('audio_icon.png')
-      else
-        nil
-      end
-    else
-      if video_count > 0 && audio_count > 0
-        asset_path('hybrid_icon.png')
-      elsif video_count > audio_count
-        asset_path('video_icon.png')
-      elsif audio_count > video_count
-        asset_path('audio_icon.png')
-      else
-        nil
-      end
-    end
+    # if master_file_id
+    #   if video_count > 0
+    #     thumbnail_master_file_path(master_file_id)
+    #   elsif audio_count > 0
+    #     asset_path('audio_icon.png')
+    #   else
+    #     nil
+    #   end
+    # else
+    #   if video_count > 0 && audio_count > 0
+    #     asset_path('hybrid_icon.png')
+    #   elsif video_count > audio_count
+    #     asset_path('video_icon.png')
+    #   elsif audio_count > video_count
+    #     asset_path('audio_icon.png')
+    #   else
+    #     nil
+    #   end
+    # end
   end
 
   def avalon_image_tag(document, image_options)
