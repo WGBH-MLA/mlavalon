@@ -130,6 +130,8 @@ class MarsIngestItem < ActiveRecord::Base
     collection_desc = nil
     unit_name = nil
 
+
+    require('pry');binding.pry
     indexes = find_fileset_indexes('File Label')
     # this takes filesets OUT of values AND headers arrays
     filesets = pull_filesets(indexes)
@@ -198,6 +200,8 @@ class MarsIngestItem < ActiveRecord::Base
 
     logger.info "ROW HAHS"
     logger.info row_hash.inspect
+
+    require('pry');binding.pry
 
     row_hash
   end

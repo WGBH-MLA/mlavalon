@@ -50,7 +50,6 @@ class MarsIngestItemJob < ActiveJob::Base
 
       begin
         resp = RestClient::Request.execute(params)
-
       rescue Exception => e
         # require('pry');binding.pry
         raise resp.to_s

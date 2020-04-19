@@ -241,6 +241,8 @@ class MediaObjectsController < ApplicationController
           # this is not getting mapped properly, hardcoding for now
           master_file.workflow_name = 'avalon' unless master_file.workflow_name
           # need to persist this before saving derivative
+          
+          require('pry');binding.pry
           master_file.save
 
           if master_file.update_derivatives(file_spec[:files], false)
@@ -285,6 +287,7 @@ class MediaObjectsController < ApplicationController
       end
     end
     if error_messages.empty?
+      require('pry');binding.pry
       render json: {id: @media_object.id}, status: 200
     else
 
