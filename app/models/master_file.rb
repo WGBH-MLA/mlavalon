@@ -549,30 +549,37 @@ class MasterFile < ActiveFedora::Base
   def find_frame_source(options={})
     options[:offset] ||= 2000
 
-    source = FileLocator.new(working_file_path&.first || file_location)
-    options[:master] = true
-    if source.source.nil? or (source.uri.scheme == 's3' and not source.exist?)
-      source = FileLocator.new(self.derivatives.where(quality_ssi: 'high').first.absolute_location)
-      options[:master] = false
-    end
-    response = { source: source&.location }.merge(options)
-    return response if response[:source].to_s =~ %r(^https?://)
+    # throw this away, only for grabbing files
+    # source = FileLocator.new(working_file_path&.first || file_location)
+    # options[:master] = true
+    # if source.source.nil? or (source.uri.scheme == 's3' and not source.exist?)
+    #   source = FileLocator.new(self.derivatives.where(quality_ssi: 'high').first.absolute_location)
+    #   options[:master] = false
+    # end
+    # response = { source: source&.location }.merge(options)
+    # return response if response[:source].to_s =~ %r(^https?://)
 
-    unless File.exists?(response[:source])
-      Rails.logger.warn("Masterfile `#{file_location}` not found. Extracting via HLS.")
+    # unless File.exists?(response[:source])
+      Rails.logger.warn("Masterfile DUH not found. Extracting via HLS.")
       begin
-        playlist_url = self.stream_details[:stream_hls].find { |d| d[:quality] == 'high' }[:url]
+        # playlist_url = self.stream_details[:stream_hls].find { |d| d[:quality] == 'high' }[:url]
+        
+
+        playlist_url = self.stream_details[:stream_hls].first[:url]
         secure_url = SecurityHandler.secure_url(playlist_url, target: self.id)
         playlist = Avalon::M3U8Reader.read(secure_url)
         details = playlist.at(options[:offset])
 
         # Fixes https://github.com/avalonmediasystem/avalon/issues/3474
         target_location = File.basename(details[:location]).split('?')[0]
+
+
+
         target = File.join(Dir.tmpdir, target_location)
         File.open(target,'wb') { |f| open(details[:location]) { |io| f.write(io.read) } }
         response = { source: target, offset: details[:offset], master: false }
       end
-    end
+    # end
     return response
   end
 
@@ -584,11 +591,16 @@ class MasterFile < ActiveFedora::Base
       raise RangeError, "Offset #{offset} not in range 0..#{self.duration}"
     end
 
-    frame_size = (options[:size].nil? or options[:size] == 'auto') ? self.original_frame_size : options[:size]
 
-    (new_width,new_height) = frame_size.split(/x/).collect(&:to_f)
-    new_height = (new_width/self.display_aspect_ratio.to_f).floor
-    new_height += 1 if new_height.odd?
+    # for now all our thumbnails are same size
+    # frame_size = (options[:size].nil? or options[:size] == 'auto') ? self.original_frame_size : options[:size]
+
+    # (new_width,new_height) = frame_size.split(/x/).collect(&:to_f)
+    # new_height = (new_width/self.display_aspect_ratio.to_f).floor
+    # new_height += 1 if new_height.odd?
+
+    new_width = 480
+    new_height = 360
     frame_source = find_frame_source(offset: offset)
     data = get_ffmpeg_frame_data(frame_source, new_width, new_height)
     raise RuntimeError, "Frame extraction failed. See log for details." if data.empty?
