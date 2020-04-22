@@ -32,11 +32,11 @@ class MarsIngestItemJob < ActiveJob::Base
 
     def ingest_payload(payload)
       logger.info "Trying to Ingest Payload"
-      port = '80'
+      host = Rails.env.development? ? 'mlavalon_avalon_1:3000' : '127.0.0.1:80'
 
       params = {
         method: :post,
-        url: "http://127.0.0.1:#{port}/media_objects.json",
+        url: "http://#{host}/media_objects.json",
         payload: payload,
         headers: {
           content_type: :json,
