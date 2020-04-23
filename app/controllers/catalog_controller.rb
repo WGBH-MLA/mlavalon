@@ -71,7 +71,7 @@ class CatalogController < ApplicationController
     #
     # :show may be set to false if you don't want the facet to be drawn in the
     # facet bar
-    config.add_facet_field 'avalon_resource_type_ssim', label: 'Format', limit: 5, collapse: false
+    config.add_facet_field 'avalon_resource_type_ssim', label: 'Audio/Video', limit: 5, collapse: false
     config.add_facet_field 'creator_ssim', label: 'Main Contributor', limit: 5, sort: 'index'
 
     # requires valid date format...

@@ -56,8 +56,12 @@ Unless required by applicable law or agreed to in writing, software distributed
   <% end %>
 </div>
 <% else %>
+
 <div id="sidebar" class="<%= sidebar_classes %>">
   <%= render 'search_sidebar' %>
+  <div class="sidebar-message">
+    Not All Records Contain Date Data, Facet Data May Be Incomplete
+  </div>
 </div>
 
 <div id="content" class="<%= main_content_classes %>">
