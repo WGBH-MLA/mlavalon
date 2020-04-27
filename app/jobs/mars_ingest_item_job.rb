@@ -50,7 +50,6 @@ class MarsIngestItemJob < ActiveJob::Base
 
       JSON.parse(RestClient::Request.execute(params))
     rescue Exception => e
-      # require('pry');binding.pry
       raise extract_error_message(e)
     end
 
