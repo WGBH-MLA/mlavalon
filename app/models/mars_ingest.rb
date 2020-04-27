@@ -1,5 +1,5 @@
 class MarsIngest < ActiveRecord::Base
-  validate :validate_manifest
+
 
   has_many :mars_ingest_items, -> { order('id ASC') }
 
@@ -15,15 +15,18 @@ class MarsIngest < ActiveRecord::Base
     update_columns(item_count: mars_ingest_items.count)
   end
 
-  def validate_manifest
-    unless manifest.valid?
-      manifest.errors.each do |_field, msgs|
-        errors.add(:manifest, msgs)
-      end
-    end
-  end
+  validates :manifest_url, presence: true
+  validate :validate_manifest
 
   private
+
+    def validate_manifest
+      unless manifest.valid?
+        manifest.errors.each do |_field, msgs|
+          errors.add(:manifest, msgs)
+        end
+      end
+    end
 
     def manifest
       @manifest ||= MarsManifest.new(url: manifest_url)
