@@ -122,6 +122,7 @@ group :development, :test do
   gem 'rb-readline'
   gem 'rspec-rails'
   gem 'solr_wrapper', '>= 0.16'
+  gem 'faker'
 end
 
 group :test do
@@ -131,7 +132,6 @@ group :test do
   gem 'email_spec'
   gem 'factory_bot_rails'
   gem 'fakefs', require: 'fakefs/safe'
-  gem 'faker'
   gem 'hashdiff'
   gem 'rails-controller-testing'
   gem 'rspec-retry'
