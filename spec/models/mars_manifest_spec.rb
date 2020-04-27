@@ -49,8 +49,18 @@ RSpec.describe MarsManifest do
         end
 
         context 'and when CSV has unrecognized headers' do
-          let(:subject) { FactoryBot.build(:mars_manifest, add_headers: "cheese") }
+          let(:subject) { FactoryBot.build(:mars_manifest, add_headers: 'cheese') }
           it { is_expected.to have_error_on(:headers, /cheese/) }
+        end
+
+        context 'and when CSV is missing required headers' do
+          it 'has errors on the missing required header' do
+            MarsManifest.required_headers.map do |required_header|
+              manifest = FactoryBot.build(:mars_manifest, remove_headers: required_header)
+              manifest.validate
+              expect(manifest).to have_error_on :headers, /#{required_header}/
+            end
+          end
         end
       end
     end
