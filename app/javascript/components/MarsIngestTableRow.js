@@ -3,7 +3,7 @@ import React from 'react';
 const MarsIngestTableRow = (props) => (
 
     <tr key={ props.id }>
-      <td scope='col'><a href={ "/mars_ingests/" + props.id }>{ props.id }</a></td>
+      <td scope='col'>{ props.id }</td>
       <td scope='col'><a href={ props.manifest_url }>{ props.manifest_url }</a></td>
       <td scope='col'>{ props.error_msg }</td>
       <td scope='col'>{ props.item_count }</td>

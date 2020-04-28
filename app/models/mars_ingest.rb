@@ -1,7 +1,7 @@
 class MarsIngest < ActiveRecord::Base
   validate :validate_manifest
 
-  has_many :mars_ingest_items
+  has_many :mars_ingest_items, -> { order('id ASC') }
 
   after_create do
     manifest.rows.each do |row|
