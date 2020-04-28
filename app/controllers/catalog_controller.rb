@@ -85,8 +85,20 @@ class CatalogController < ApplicationController
     config.add_facet_field "publisher_sim", label: 'Publishers', limit: 10, sort: 'index'
     config.add_facet_field "contributor_sim", label: "Contributors", limit: 10, sort: 'index'
     config.add_facet_field "subject_sim", label: "Subjects", limit: 10, sort: 'index'
-    config.add_facet_field "notes_sim", label: "Notes", limit: 10
-    config.add_facet_field "table_of_contents_sim", label: "Tables Of Contents", limit: 10, sort: 'index'
+    
+
+    # config.add_facet_field "notes_sim", label: "Good Old Reliable Notes", limit: 10
+    config.add_facet_field "general_note", label: "General Note", sort: 'index'
+    config.add_facet_field "awards_note", label: "Awards Note", sort: 'index'
+    config.add_facet_field "biographical_historical_note", label: "Biographical Note", sort: 'index'
+    config.add_facet_field "creation_production_credits_note", label: "Creation Note", sort: 'index'
+    config.add_facet_field "language_note", label: "Language Note", sort: 'index'
+    config.add_facet_field "local_note", label: "Local Note", sort: 'index'
+    config.add_facet_field "performers_note", label: "Performers Note", sort: 'index'
+    config.add_facet_field "statement_of_responsibility_note", label: "Statement Note", sort: 'index'
+    config.add_facet_field "venue_note", label: "Venue Note", sort: 'index'
+
+
     config.add_facet_field "location_sim", label: "Location", limit: 10, sort: 'index'
     config.add_facet_field "material_sim", label: "Material", limit: 10
     config.add_facet_field "subject_topic_sim", label: "Topical Subjects", limit: 10, sort: 'index'

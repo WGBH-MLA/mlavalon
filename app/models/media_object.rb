@@ -222,6 +222,7 @@ class MediaObject < ActiveFedora::Base
 
   def to_solr
     super.tap do |solr_doc|
+
       solr_doc[ActiveFedora.index_field_mapper.solr_name("workflow_published", :facetable, type: :string)] = published? ? 'Published' : 'Unpublished'
       solr_doc[ActiveFedora.index_field_mapper.solr_name("collection", :symbol, type: :string)] = collection.name if collection.present?
       solr_doc[ActiveFedora.index_field_mapper.solr_name("unit", :symbol, type: :string)] = collection.unit if collection.present?
@@ -242,6 +243,13 @@ class MediaObject < ActiveFedora::Base
       solr_doc['avalon_resource_type_ssim'] = self.avalon_resource_type.map(&:titleize)
       solr_doc['identifier_ssim'] = self.identifier.map(&:downcase)
       solr_doc['all_comments_sim'] = all_comments
+
+      # MLAVAPATCH
+      self.note.each do |nh|
+        # turn all nonword characters to _
+        solr_doc["#{nh[:type].gsub(/\W/, '_')}_note"] = nh[:note]
+      end
+
       #Add all searchable fields to the all_text_timv field
       all_text_values = []
       all_text_values << solr_doc["title_tesi"]
