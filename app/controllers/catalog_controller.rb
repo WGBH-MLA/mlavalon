@@ -100,7 +100,10 @@ class CatalogController < ApplicationController
 
 
     config.add_facet_field "location_sim", label: "Location", limit: 10, sort: 'index'
-    config.add_facet_field "material_sim", label: "Material", limit: 10
+
+    # commenting this out, because Avalon just fills this in as 'Digital'
+    # config.add_facet_field "material_sim", label: "Material", limit: 10
+    
     config.add_facet_field "subject_topic_sim", label: "Topical Subjects", limit: 10, sort: 'index'
     config.add_facet_field "subject_geographic_sim", label: "Geographic Subjects", limit: 10, sort: 'index'
     config.add_facet_field "subject_temporal_sim", label: "Temporal Subjects", limit: 10, sort: 'index'
