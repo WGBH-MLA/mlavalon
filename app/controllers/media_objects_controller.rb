@@ -40,7 +40,9 @@ class MediaObjectsController < ApplicationController
   is_editor_or_lti = proc { |ctx| (Avalon::Authentication::Providers.any? {|p| p[:provider] == :lti } && self.is_editor(ctx)) || self.is_lti_session(ctx) }
 
   add_conditional_partial :share, :share, partial: 'share_resource', if: is_editor_or_not_lti
-  add_conditional_partial :share, :embed, partial: 'embed_resource', if: is_editor_or_not_lti
+
+  # commenting this out disables displaying Embed option on record page, per casey
+  # add_conditional_partial :share, :embed, partial: 'embed_resource', if: is_editor_or_not_lti
   add_conditional_partial :share, :lti_url, partial: 'lti_url',  if: is_editor_or_lti
 
   def can_embed?
