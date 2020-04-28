@@ -15,9 +15,9 @@ ffmpeg:
   path: '/usr/local/bin/ffmpeg'
 email:
   mailer: :smtp
-  comments: 'avalon-comments@example.edu'
+  comments: 'archive_requests@wgbh.org'
   notification: 'avalon-notifications@example.edu'
-  support: 'avalon-support@example.edu'
+  support: 'archive_requests@wgbh.org'
 solr:
   configset: avalon
   configset_source_path: <%= File.join(Rails.root, 'solr', 'config') %>
