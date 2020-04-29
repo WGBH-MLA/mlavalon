@@ -15,7 +15,6 @@ class MarsIngestList extends Component {
   }
 
   componentDidMount() {
-    console.log('Mounted dat')
     this.retrieveResults();
   }
 
@@ -56,22 +55,22 @@ class MarsIngestList extends Component {
               <tr>
                 <th scope='col'>ID</th>
                 <th scope='col'>Manifest URL</th>
-                <th scope='col'>Status</th>
                 <th scope='col'>Error</th>
                 <th scope='col'>Item Count</th>
                 <th scope='col'>Created</th>
+                <th scope='col'></th>
               </tr>
             </thead>
             <tbody>
               { mars_ingest_data.map((row) => <MarsIngestTableRow
                   key={ row.id }
                   id={ row.id }
-                  status={ row.status }
                   error_msg={ row.error_msg }
-                  item_count={ row.count }
+                  item_count={ row.item_count }
                   manifest_url={ row.manifest_url }
                   created_at={ row.created_at }
                   loading={ isLoading }
+                  is_index= { true }
                 />
               )}
             </tbody>

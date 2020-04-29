@@ -1,6 +1,6 @@
 class MarsIngestsController < ApplicationController
   before_action :authenticate_user!
- 
+
   def index
     @mars_ingests = MarsIngest.all
 
@@ -15,7 +15,7 @@ class MarsIngestsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: @mars_ingest }
+      format.json { render json: @mars_ingest.to_json(:include => [:mars_ingest_items]) }
     end
   end
 
