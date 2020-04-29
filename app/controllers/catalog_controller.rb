@@ -79,6 +79,7 @@ class CatalogController < ApplicationController
     config.add_facet_field 'unit_ssim', label: 'Unit', limit: 5
     config.add_facet_field 'language_sim', label: 'Language', limit: 5
 
+    # Added by WGBH-MLA
     config.add_facet_field "system_modified_dtsi", label: 'Modified Date', limit: 10
     config.add_facet_field "publisher_sim", label: 'Publishers', limit: 10
     config.add_facet_field "contributor_sim", label: "Contributors", limit: 10
@@ -97,9 +98,6 @@ class CatalogController < ApplicationController
     config.add_facet_field "subject_title_sim", label: "Title Subjects", limit: 10
     config.add_facet_field "date_ssi", label: "Date", limit: 10
     config.add_facet_field  "all_comments_sim", label: "Comments", limit: 10
-
-
-
 
     # Hide these facets if not a Collection Manager
     config.add_facet_field 'workflow_published_sim', label: 'Published', limit: 5, if: Proc.new {|context, config, opts| Ability.new(context.current_user, context.user_session).can? :create, MediaObject}, group: "workflow"

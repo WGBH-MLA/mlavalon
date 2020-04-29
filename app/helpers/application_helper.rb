@@ -61,6 +61,13 @@ module ApplicationHelper
   # TODO: Fix me with latest changes from 5.1.4
   def image_for(document)
     master_file_id = document["section_id_ssim"].try :first
+
+    ###
+    # Begin WGBH-MLA customization
+    # We don't have actual files so #video_count and #audio_count were returning
+    # 0 for us, and so the method was returning nil. All we need it to do
+    # is return the string we're returning.
+    # TODO: Make this more upgrade-proof, perhaps in a monkey patch?
     return "https://avalon.wgbh.org/master_files/#{master_file_id}/thumbnail"
     # video_count = document["avalon_resource_type_ssim"].count{|m| m.start_with?('moving image'.titleize) } rescue 0
     # audio_count = document["avalon_resource_type_ssim"].count{|m| m.start_with?('sound recording'.titleize) } rescue 0
@@ -84,6 +91,8 @@ module ApplicationHelper
     #     nil
     #   end
     # end
+    # END WGBH-MLA CUSTOMIZATION
+    ###
   end
 
   def avalon_image_tag(document, image_options)

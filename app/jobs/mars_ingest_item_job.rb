@@ -26,7 +26,7 @@ class MarsIngestItemJob < ActiveJob::Base
 
     def update_status(status, error_msg='')
       raise ArgumentError, "Unrecognized status for MarsIngestItem: '#{status}'" unless MarsIngestItem::STATUSES.include? status
-      # TODO: Consider logging here as well, ad
+      # TODO: Consider logging here as well.
       MarsIngestItem.update(arguments.first, status: status, error: error_msg)
     end
 
@@ -42,22 +42,21 @@ class MarsIngestItemJob < ActiveJob::Base
           content_type: :json,
           accept: :json,
           # :'Avalon-Api-Key' => ENV['AVALON_API_KEY']
+          # TODO: go back to using ENV var. App initialization should ensure a
+          #  valid api key in both ENV and the database.
           :'Avalon-Api-Key' => '9fcee031d3f8daeb26f320b9f2e7927fc4261b667de8cc3706a9dcfec04b411414fee426140d3333819b064c9e74ee322bf81ae7524722d669c92d2e33724314'
         },
         verify_ssl: false,
         timeout: -1
       }
 
+      # Call the Avalon Ingest API with our payload.
       JSON.parse(RestClient::Request.execute(params))
-    rescue Exception => e
-      # require('pry');binding.pry
-      raise extract_error_message(e)
     end
 
-
-    # NOTE: this MUST not raise an exception, as it is used inside of the
-    # rescue_from block. This is only to extract a more meaninful error from
-    # a JSON resonse. But if we can't, then resort to the original error msg.
+    # @return [JSON, String] if the exception has a JSON response body with an
+    #   'errors' key, then fetch and return it. Otherwise, just return the
+    #   original exception message.
     def extract_error_message(exception)
       JSON.parse(exception.response.body)['errors'].to_json
     rescue

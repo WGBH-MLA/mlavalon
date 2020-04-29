@@ -549,6 +549,9 @@ class MasterFile < ActiveFedora::Base
   def find_frame_source(options={})
     options[:offset] ||= 2000
 
+    ###
+    # BEGIN WGBH-MLA CUSTOMIZATION
+    #
     # throw this away, only for grabbing files
     # source = FileLocator.new(working_file_path&.first || file_location)
     # options[:master] = true
@@ -558,12 +561,16 @@ class MasterFile < ActiveFedora::Base
     # end
     # response = { source: source&.location }.merge(options)
     # return response if response[:source].to_s =~ %r(^https?://)
+    #
+    # END WGBH-MLA CUSTOMIZATION
+    ###
 
+    # WGBH-MLA CUSTOMIZATION: COMMENT OUT
     # unless File.exists?(response[:source])
       Rails.logger.warn("Masterfile DUH not found. Extracting via HLS.")
       begin
+        # WGBH-MLA CUSTOMIZATION: COMMENT OUT
         # playlist_url = self.stream_details[:stream_hls].find { |d| d[:quality] == 'high' }[:url]
-        
 
         playlist_url = self.stream_details[:stream_hls].first[:url]
         secure_url = SecurityHandler.secure_url(playlist_url, target: self.id)
@@ -573,12 +580,11 @@ class MasterFile < ActiveFedora::Base
         # Fixes https://github.com/avalonmediasystem/avalon/issues/3474
         target_location = File.basename(details[:location]).split('?')[0]
 
-
-
         target = File.join(Dir.tmpdir, target_location)
         File.open(target,'wb') { |f| open(details[:location]) { |io| f.write(io.read) } }
         response = { source: target, offset: details[:offset], master: false }
       end
+    # WGBH-MLA CUSTOMIZATION: COMMENT OUT
     # end
     return response
   end
@@ -592,15 +598,19 @@ class MasterFile < ActiveFedora::Base
     end
 
 
+    ###
+    # BEGIN WGBH-MLA CUSTOMIZATION
     # for now all our thumbnails are same size
     # frame_size = (options[:size].nil? or options[:size] == 'auto') ? self.original_frame_size : options[:size]
 
     # (new_width,new_height) = frame_size.split(/x/).collect(&:to_f)
     # new_height = (new_width/self.display_aspect_ratio.to_f).floor
     # new_height += 1 if new_height.odd?
-
     new_width = 480
     new_height = 360
+    # END WGBH-MLA CUSTOMIZATION
+    ###
+    
     frame_source = find_frame_source(offset: offset)
     data = get_ffmpeg_frame_data(frame_source, new_width, new_height)
     raise RuntimeError, "Frame extraction failed. See log for details." if data.empty?

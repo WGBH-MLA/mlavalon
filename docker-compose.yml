@@ -163,7 +163,7 @@ services:
     command: minio server /data
     environment:
       MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: minio123      
+      MINIO_SECRET_KEY: minio123
     volumes:
       - data:/data
     ports:
