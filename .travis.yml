@@ -16,6 +16,8 @@ before_install:
   - sudo ln -s /usr/bin/lsof /usr/sbin/lsof
   - gem install bundler -v $BUNDLER_VERSION
   - bundle config without development:production
+  - nvm install 12
+  - echo "\n\n\nNode version..." && node -v && echo "\n\n\n"
 before_script:
   - rm config/database.yml
   - cp config/database.travis.yml config/database.yml
@@ -37,7 +39,7 @@ global_env:
   - JAVA_HOME=/home/travis/oraclejdk11  # just trying out, remove if doesn't work
 rvm:
   - 2.6
-node_js:
-  - 12
+# node_js:
+#   - "lts/*"
 dist: xenial
 sudo: required
