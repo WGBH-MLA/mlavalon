@@ -88,15 +88,20 @@ class CatalogController < ApplicationController
     
 
     # config.add_facet_field "notes_sim", label: "Good Old Reliable Notes", limit: 10
-    config.add_facet_field "general_note", label: "General Note", sort: 'index'
-    config.add_facet_field "awards_note", label: "Awards Note", sort: 'index'
-    config.add_facet_field "biographical_historical_note", label: "Biographical Note", sort: 'index'
-    config.add_facet_field "creation_production_credits_note", label: "Creation Note", sort: 'index'
-    config.add_facet_field "language_note", label: "Language Note", sort: 'index'
-    config.add_facet_field "local_note", label: "Local Note", sort: 'index'
-    config.add_facet_field "performers_note", label: "Performers Note", sort: 'index'
-    config.add_facet_field "statement_of_responsibility_note", label: "Statement Note", sort: 'index'
-    config.add_facet_field "venue_note", label: "Venue Note", sort: 'index'
+    # config.add_facet_field "general_note", label: "General Note", sort: 'index'
+    # config.add_facet_field "awards_note", label: "Awards Note", sort: 'index'
+    # config.add_facet_field "biographical_historical_note", label: "Biographical Note", sort: 'index'
+    # config.add_facet_field "creation_production_credits_note", label: "Creation Note", sort: 'index'
+    # config.add_facet_field "language_note", label: "Language Note", sort: 'index'
+    # config.add_facet_field "local_note", label: "Local Note", sort: 'index'
+    # config.add_facet_field "performers_note", label: "Performers Note", sort: 'index'
+    # config.add_facet_field "statement_of_responsibility_note", label: "Statement Note", sort: 'index'
+    # config.add_facet_field "venue_note", label: "Venue Note", sort: 'index'
+
+
+    config.add_facet_field "content_type_note", label: "Content Type", sort: 'index'
+    config.add_facet_field "technical_note", label: "Technical Notes", sort: 'index'
+    config.add_facet_field "item_type_note", label: "Item Type", sort: 'index'
 
 
     config.add_facet_field "location_sim", label: "Location", limit: 10, sort: 'index'
