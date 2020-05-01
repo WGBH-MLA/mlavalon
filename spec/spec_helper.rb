@@ -43,6 +43,9 @@ RSpec.configure do |config|
     ex.run_with_retry retry: 5
   end
 
+  config.example_status_persistence_file_path = 'tmp/rspec_status'
+
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
