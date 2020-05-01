@@ -11,6 +11,8 @@ class MarsIngestItem < ActiveRecord::Base
 
   belongs_to :mars_ingest
 
+  delegate :submitter, to: :mars_ingest
+
   before_save :create_payload
   def create_payload
     if csv_header_array && csv_value_array
@@ -68,8 +70,6 @@ class MarsIngestItem < ActiveRecord::Base
     filesets = []
     # indexes is array of filesetstart indexes
     indexes.each_with_index do |start_of_fileset, index|
-
-
       fileset = { 'files' => [{}] }
 
       # cut out section for this fileset
@@ -77,7 +77,6 @@ class MarsIngestItem < ActiveRecord::Base
 
       fileset_headers = csv_header_array.slice!(start_of_fileset...start_of_next_fileset)
       fileset_values = csv_value_array.slice!(start_of_fileset...start_of_next_fileset)
-
 
       # make this set into a hash
       fileset_headers.each_with_index do |header, i|
@@ -168,7 +167,7 @@ class MarsIngestItem < ActiveRecord::Base
 
         # collect all this junk in case we're creating the collection
         if header == 'Collection Name'
-          
+
           logger.info "COLLECTIONNAAMEHEADER  #{header}"
           logger.info "COLLECTIONVAL #{encoded_value}"
           collection_name = csv_value_array[index]
@@ -196,7 +195,7 @@ class MarsIngestItem < ActiveRecord::Base
 
 
     logger.info %(COLLECTION INFO #{collection_name} #{unit_name} #{collection_desc} #{collection_id})
-    row_hash['collection_id'] = collection_id || CollectionCreator.find_or_create_collection(collection_name, unit_name, collection_desc).id
+    row_hash['collection_id'] = collection_id || CollectionCreator.find_or_create_collection(collection_name, unit_name, collection_desc, submitter).id
 
     logger.info "ROW HAHS"
     logger.info row_hash.inspect
@@ -227,19 +226,19 @@ class MarsIngestItem < ActiveRecord::Base
     'Alternative Title' => MarsIngestFieldDef.new(:media_object_multi, 'alternative_title'),
     'Translated Title' => MarsIngestFieldDef.new(:media_object_multi, 'translated_title'),
     'Uniform Title' => MarsIngestFieldDef.new(:media_object_multi, 'uniform_title'),
-    
+
     'Note' => MarsIngestFieldDef.new(:media_object_multi, 'note'),
     'Note Type' => MarsIngestFieldDef.new(:media_object_multi, 'note_type'),
-    
+
     'Resource Type' => MarsIngestFieldDef.new(:media_object_multi, 'resource_type'),
     'Contributor' => MarsIngestFieldDef.new(:media_object_multi, 'contributor'),
     'Publisher' => MarsIngestFieldDef.new(:media_object_multi, 'publisher'),
     'Genre' => MarsIngestFieldDef.new(:media_object_multi, 'genre'),
     'Subject' => MarsIngestFieldDef.new(:media_object_multi, 'subject'),
-    
+
     'Related Item Label' => MarsIngestFieldDef.new(:media_object_multi, 'related_item_label'),
     'Related Item Url' => MarsIngestFieldDef.new(:media_object_multi, 'related_item_url'),
-    
+
     'Geographic Subject' => MarsIngestFieldDef.new(:media_object_multi, 'geographic_subject'),
     'Temporal Subject' => MarsIngestFieldDef.new(:media_object_multi, 'temporal_subject'),
     'Topical Subject' => MarsIngestFieldDef.new(:media_object_multi, 'topical_subject'),

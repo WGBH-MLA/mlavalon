@@ -1,6 +1,5 @@
 class MarsIngest < ActiveRecord::Base
-
-
+  belongs_to :submitter, class_name: 'User'
   has_many :mars_ingest_items, -> { order('id ASC') }
 
   after_create do
@@ -17,6 +16,8 @@ class MarsIngest < ActiveRecord::Base
 
   validates :manifest_url, presence: true
   validate :validate_manifest
+  
+  def submitter_email; submitter.email; end
 
   private
 

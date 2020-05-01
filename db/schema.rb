@@ -10,9 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_30_200944) do
+ActiveRecord::Schema.define(version: 2020_05_01_095531) do
 
-  create_table "active_encode_encode_records", force: :cascade do |t|
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
+  create_table "active_encode_encode_records", id: :serial, force: :cascade do |t|
     t.string "global_id"
     t.string "state"
     t.string "adapter"
@@ -29,9 +32,6 @@ ActiveRecord::Schema.define(version: 2020_03_30_200944) do
     t.index ["master_file_id"], name: "index_active_encode_encode_records_on_master_file_id"
     t.index ["media_object_id"], name: "index_active_encode_encode_records_on_media_object_id"
   end
-
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
 
   create_table "annotations", force: :cascade do |t|
     t.string "uuid"
@@ -54,12 +54,12 @@ ActiveRecord::Schema.define(version: 2020_03_30_200944) do
   end
 
   create_table "batch_entries", force: :cascade do |t|
-    t.integer "batch_registries_id"
-    t.text "payload", limit: 1073741823
+    t.bigint "batch_registries_id"
+    t.text "payload"
     t.boolean "complete", default: false, null: false
     t.boolean "error", default: false, null: false
     t.string "current_status"
-    t.text "error_message", limit: 65535
+    t.text "error_message"
     t.string "media_object_pid"
     t.integer "position"
     t.datetime "created_at", null: false
@@ -138,6 +138,8 @@ ActiveRecord::Schema.define(version: 2020_03_30_200944) do
     t.text "manifest_url", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "submitter_id"
+    t.index ["submitter_id"], name: "index_mars_ingests_on_submitter_id"
   end
 
   create_table "migration_statuses", force: :cascade do |t|
@@ -157,7 +159,7 @@ ActiveRecord::Schema.define(version: 2020_03_30_200944) do
     t.string "namespace", default: "default", null: false
     t.string "template", null: false
     t.text "counters"
-    t.integer "seq", default: 0
+    t.bigint "seq", default: 0
     t.binary "rand"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -217,13 +219,13 @@ ActiveRecord::Schema.define(version: 2020_03_30_200944) do
 
   create_table "timelines", force: :cascade do |t|
     t.string "title"
-    t.integer "user_id"
+    t.bigint "user_id"
     t.string "visibility"
     t.text "description"
     t.string "access_token"
     t.string "tags"
     t.string "source"
-    t.text "manifest", limit: 16777215
+    t.text "manifest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_timelines_on_user_id"
@@ -261,5 +263,6 @@ ActiveRecord::Schema.define(version: 2020_03_30_200944) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "mars_ingests", "users", column: "submitter_id"
   add_foreign_key "timelines", "users"
 end
