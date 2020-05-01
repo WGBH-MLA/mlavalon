@@ -3,6 +3,7 @@
     "@babel/core": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@rails/webpacker": "^5.1.1",
+    "babel": "^6.23.0",
     "babel-loader": "^8.1.0",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "cropperjs": "^1.5.5",
