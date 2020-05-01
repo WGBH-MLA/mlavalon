@@ -18,7 +18,7 @@ gem 'sass-rails', '~> 5.0'
 gem 'sass', '3.4.22'
 gem 'sprockets-es6'
 gem 'uglifier', '>= 1.3.0'
-gem 'webpacker', '~> 5.1.1'
+gem 'webpacker', '=4.2.2'
 
 # Core Samvera
 gem 'active-fedora', '~> 12.1'
