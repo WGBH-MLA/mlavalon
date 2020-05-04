@@ -64,6 +64,18 @@ class MarsIngestItem < ActiveRecord::Base
     csv_header_array.each_with_index.map {|f,i| i if f == fileset_start_name}.compact
   end
 
+  def convert_note_label_to_solr_field(note_label)
+    case note_label
+    when 'Content Type'
+      'content_type'
+    when 'Item Type'
+      'item_type'
+    when 'Technical Notes'
+      'technical'
+    else
+    end
+  end
+
   def pull_filesets(indexes)
     filesets = []
     # indexes is array of filesetstart indexes
@@ -77,7 +89,6 @@ class MarsIngestItem < ActiveRecord::Base
 
       fileset_headers = csv_header_array.slice!(start_of_fileset...start_of_next_fileset)
       fileset_values = csv_value_array.slice!(start_of_fileset...start_of_next_fileset)
-
 
       # make this set into a hash
       fileset_headers.each_with_index do |header, i|
@@ -149,7 +160,6 @@ class MarsIngestItem < ActiveRecord::Base
     # MediaObjectsController#media_object_parameters v
     # [{note: 'zesty' type: 'cool note'}, {note: 'wahhh', note_type: 'uncool note'}]
 
-
     csv_header_array.each_with_index do |header, index|
       ingest_api_header = convert_header(header)
       encoded_value = encode_value(csv_value_array[index])
@@ -158,6 +168,11 @@ class MarsIngestItem < ActiveRecord::Base
 
         # init array if missing
         row_hash['fields'][ingest_api_header] ||= []
+
+        # need to transform the ingest header labels for notes into the right solr field names
+        if ingest_api_header == 'note_type'
+          encoded_value = convert_note_label_to_solr_field(encoded_value)
+        end
 
         # shovel this
         row_hash['fields'][ingest_api_header] << encoded_value
@@ -222,6 +237,8 @@ class MarsIngestItem < ActiveRecord::Base
     'Terms Of Use' => MarsIngestFieldDef.new(:media_object, 'terms_of_use'),
     'Physical Description' => MarsIngestFieldDef.new(:media_object, 'physical_description'),
     'Statement Of Responsibility' => MarsIngestFieldDef.new(:media_object, 'statement_of_responsibility'),
+    'Thumbnail Offset' =>  MarsIngestFieldDef.new(:media_object, 'thumbnail_offset'),
+    'Poster Offset' =>  MarsIngestFieldDef.new(:media_object, 'poster_offset'),
 
     'Creator' => MarsIngestFieldDef.new(:media_object_multi, 'creator'),
     'Alternative Title' => MarsIngestFieldDef.new(:media_object_multi, 'alternative_title'),

@@ -88,6 +88,15 @@ class MarsManifest
     def validate_date(value, row_num, col_num)
       # TODO actually validate the value as a date, once we know the proper
       # format.
+      unless value =~ /\d{4}-\d{2}-\d{2}/
+        errors.add(:values, "Invalid date format for #{headers[col_num]} in column #{col_num + 1}, row #{row_num + 1}, required format is YYYY-MM-DD")
+      end
+    end
+
+    def validate_offset(value, row_num, col_num)
+      unless value =~ /\d+:\d{2}/
+        errors.add(:values, "Invalid offset format for #{headers[col_num]} in column #{col_num + 1}, row #{row_num + 1}, required format is MM:SS")        
+      end
     end
 
     # Adds an error message to a field idempotently (because errors.add is not
@@ -188,6 +197,8 @@ class MarsManifest
         "other identifier" => [],
         "other identifier type" => [],
         "comment" => [],
+        "thumbnail_offset" => [:validate_offset],
+        "poster_offset" => [:validate_offset],
         "file label" => [],
         "file title" => [],
         "instantiation label" => [],

@@ -189,7 +189,7 @@
     <field name="lng" type="tdouble" stored="true" indexed="true" multiValued="false"/>
 
     <!-- MLAvadded these -->
-    <field name="general_note" type="string" stored="true" indexed="true" multiValued="true"/>
+    <!-- <field name="general_note" type="string" stored="true" indexed="true" multiValued="true"/>
     <field name="awards_note" type="string" stored="true" indexed="true" multiValued="true"/>
     <field name="biographical_historical_note" type="string" stored="true" indexed="true" multiValued="true"/>
     <field name="creation_production_credits_note" type="string" stored="true" indexed="true" multiValued="true"/>
@@ -198,6 +198,10 @@
     <field name="performers_note" type="string" stored="true" indexed="true" multiValued="true"/>
     <field name="statement_of_responsibility_note" type="string" stored="true" indexed="true" multiValued="true"/>
     <field name="venue_note" type="string" stored="true" indexed="true" multiValued="true"/>
+     -->
+    <field name="content_type_note" type="string" stored="true" indexed="true" multiValued="true"/>
+    <field name="technical_note" type="string" stored="true" indexed="true" multiValued="true"/>
+    <field name="item_type_note" type="string" stored="true" indexed="true" multiValued="true"/>
 
 
 

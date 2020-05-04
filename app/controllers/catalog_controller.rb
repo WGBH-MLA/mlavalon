@@ -100,7 +100,6 @@ class CatalogController < ApplicationController
 
 
     config.add_facet_field "content_type_note", label: "Content Type", sort: 'index'
-    config.add_facet_field "technical_note", label: "Technical Notes", sort: 'index'
     config.add_facet_field "item_type_note", label: "Item Type", sort: 'index'
 
 
