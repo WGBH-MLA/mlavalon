@@ -32,7 +32,7 @@ class MarsManifest
   # the error message on the :csv field, invalidating the model instance.
   # @return Array parsed CSV data; nil if an error occcurs.
   def csv
-    @csv ||= CSV.parse(raw_data)
+    @csv ||= CSV.parse(clean_data)
   rescue => e
     add_error(:csv, "Data not recognized as CSV.")
     nil
@@ -54,6 +54,11 @@ class MarsManifest
       @raw_data ||= Net::HTTP.get(URI.parse(url))
     rescue => e
       add_error(:url, "Invalid Manifest URL: '#{url}'")
+    end
+
+    def clean_data
+      # remove vertical tabs and anything else that .. we dont want
+      raw_data.gsub(/\t/, ' ')
     end
 
     def validate_rows
@@ -176,8 +181,13 @@ class MarsManifest
         "date created" => [],
         "copyright date" => [],
         "abstract" => [],
-        "note" => [],
-        "note type" => [],
+        # specify whole note types as one column
+        # "note" => [],
+        # "note type" => [],
+        "content type" => [],
+        "item type" => [],
+        "technical notes" => [],
+
         "format" => [],
         "resource type" => [],
         "contributor" => [],

@@ -50,6 +50,10 @@ class MarsIngestItem < ActiveRecord::Base
     MARS_INGEST_API_SCHEMA.fetch(field_name).type == :media_object_multi
   end
 
+  def is_note_field?(field_name)
+    MARS_INGEST_API_SCHEMA.fetch(field_name).type == :media_object_note
+  end
+
   def is_instantiation_field?(field_name)
     # ['Instantiation Label','Instantiation Id','Instantiation Streaming URL','Instantiation Streaming URL','Instantiation Duration','Instantiation Mime Type','Instantiation Audio Bitrate','Instantiation Audio Codec','Instantiation Video Bitrate','Instantiation Video Codec','Instantiation Width','Instantiation Height'].include?(field_name)
     MARS_INGEST_API_SCHEMA.fetch(field_name).type == :instantiation
@@ -148,11 +152,8 @@ class MarsIngestItem < ActiveRecord::Base
     filesets = pull_filesets(indexes)
     row_hash['files'] = filesets
 
-    # paired fields will work correctly as long as THE COLUMNS APPEAR IN PAIRS
-    # Note,Note Type,Note,Note Type
-    # zesty,cool note,wahhh,uncool note
-
-    # should become
+    # NOTE MAPPINGS -> two columns (cool note => zesty, uncool note => wahhh) should become
+    
     # payload['note'] => ['zesty','wahhh']
     # payload['note_type'] => ['cool note','uncool note']
 
@@ -179,6 +180,16 @@ class MarsIngestItem < ActiveRecord::Base
       elsif is_single_field?(header)
 
         row_hash['fields'][ingest_api_header] = encoded_value
+      elsif is_note_field?(header)
+
+        # inishyalize it, dooont criticize it
+        row_hash['fields']['note_type'] ||= []
+        row_hash['fields']['note'] ||= []
+
+        # the mapping spits out the correct note_type value here
+        row_hash['fields']['note_type'] << ingest_api_header
+        # the value of this column will be the note's text
+        row_hash['fields']['note'] << encoded_value
       elsif is_collection_field?(header)
 
         # collect all this junk in case we're creating the collection
@@ -245,8 +256,13 @@ class MarsIngestItem < ActiveRecord::Base
     'Translated Title' => MarsIngestFieldDef.new(:media_object_multi, 'translated_title'),
     'Uniform Title' => MarsIngestFieldDef.new(:media_object_multi, 'uniform_title'),
     
-    'Note' => MarsIngestFieldDef.new(:media_object_multi, 'note'),
-    'Note Type' => MarsIngestFieldDef.new(:media_object_multi, 'note_type'),
+    # 'Note' => MarsIngestFieldDef.new(:media_object_multi, 'note'),
+    # 'Note Type' => MarsIngestFieldDef.new(:media_object_multi, 'note_type'),
+
+    # THESE ARE NOT REAL FIELD NAMES - THEY ARE 'note_type' field values, that will be paired with a 'note' field value for the note's text
+    'Content Type' => MarsIngestFieldDef.new(:media_object_note, 'content_type'),
+    'Item Type' => MarsIngestFieldDef.new(:media_object_note, 'item_type'),
+    'Technical Notes' => MarsIngestFieldDef.new(:media_object_note, 'technical'),
     
     'Resource Type' => MarsIngestFieldDef.new(:media_object_multi, 'resource_type'),
     'Contributor' => MarsIngestFieldDef.new(:media_object_multi, 'contributor'),
