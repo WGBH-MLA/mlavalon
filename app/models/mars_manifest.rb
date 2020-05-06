@@ -223,5 +223,74 @@ class MarsManifest
     def normalize_header(header)
       header.to_s.downcase.gsub(/ +/, ' ').strip
     end
-  end
+
+    def collection_header?(header)
+      collection_headers.include? normalize_header(header)
+    end
+
+    def collection_headers
+      [ 'collection name', 'collection description', 'collection id',
+        'unit name' ]
+    end
+
+    def media_object_header?(header)
+      media_object_headers.include? normalize_header(header)
+    end
+
+    def media_object_headers
+      [ "title", "date issued", "creator", "alternative title", "translated
+        title", "uniform title", "statement of responsibility", "date created",
+        "copyright date", "abstract", "note", "note type", "format", "resource
+        type", "contributor", "publisher", "genre", "subject", "related item
+        label", "related item url", "geographic subject", "temporal subject",
+        "topical subject", "bibliographic id", "language", "terms of use",
+        "table of contents", "physical description", "other identifier", "other
+        identifier type", "comment" ]
+    end
+
+    def file_header?(header)
+      file_headers.include? normalize_header(header)
+    end
+
+    def file_headers
+      [ "file label", "file title", "instantiation label", "instantiation id",
+        "instantiation streaming url", "file location", "file checksum",
+        "file size", "file duration", "file aspect ratio", "file frame size",
+        "file format", "file date digitized", "file caption text",
+        "file caption type", "file other id", "file comment" ]
+    end
+
+    def initial_file_header?(header)
+      initial_file_headers.include? normalize_header(header)
+    end
+
+    def initial_file_headers
+      ['file label', 'file title']
+    end
+
+    def instantiation_header?(header)
+      instantiation_headers.include? normalize_header(header)
+    end
+
+    def instantiation_headers
+      [ "instantiation duration", "instantiation mime type",
+        "instantiation audio bitrate", "instantiation audio codec",
+        "instantiation video bitrate", "instantiation video codec",
+        "instantiation width", "instantiation height" ]
+    end
+
+    def multivalued?(header)
+      multivalued_headers.include? normalize_header(header)
+    end
+
+    def multivalued_headers
+      [ 'creator', 'alternative title', 'translated title', 'uniform title',
+        'note', 'note type', 'resource type', 'contributor', 'publisher',
+        'genre', 'subject', 'related item label', 'related item url',
+        'geographic subject', 'temporal subject', 'topical subject', 'language',
+        'table of contents', 'other identifier type', 'other identifier',
+        'comment' ]
+    end
+
+  end # end class << self
 end

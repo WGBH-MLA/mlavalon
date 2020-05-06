@@ -1,0 +1,181 @@
+class ManifestToPayloadMapper
+  # Field struct combines header with value.
+  Field = Struct.new(:header, :value)
+
+  delegate :collection_header?, :media_object_header?, :file_header?,
+    :initial_file_header?, :instantiation_header?, :normalize_header,
+    :multivalued?, to: MarsManifest
+
+  delegate :api_field_name_for, to: :class
+
+  attr_reader :headers, :row_data
+
+  def initialize(headers, row_data)
+    @headers = headers
+    @row_data = row_data
+  end
+
+  def payload
+    @payload ||= {}.tap do |p|
+      p.merge! media_object_hash
+      p['files'] = file_hashes
+    end
+  end
+
+  # Converts collection fields into a hash.
+  # Similar to fields_to_hash, but collection fields do not have
+  # corresponding api field names, nor are any of them multivalued.
+  def collection_hash
+    collection_field_pairs = collection_fields.map do |field|
+      [ normalize_header(field.header), field.value ]
+    end
+    Hash[ collection_field_pairs ]
+  end
+
+  private
+
+    # Combines headers/value pairs into a single struct for easier handling.
+    def fields
+      @fields = headers.map.with_index do |header, index|
+        Field.new(header, row_data[index])
+      end
+    end
+
+    # Selects collection fields.
+    def collection_fields
+      fields.select { |field| collection_header?(field.header) }
+    end
+
+    # Converts media object fields into a hash.
+    def media_object_hash
+      fields_to_hash media_object_fields
+    end
+
+    # Selects media object fields.
+    def media_object_fields
+      fields.select { |field| media_object_header?(field.header) }
+    end
+
+    # Converts files/instantiation fields into hashes.
+    def file_hashes
+      @file_hashes ||= file_field_sets.map do |file_field_set|
+        instantiation_fields, file_fields = file_field_set.partition do |field|
+          instantiation_header?(field.header)
+        end
+        fields_to_hash(file_fields).merge( { 'files' => fields_to_hash(instantiation_fields) } )
+      end
+    end
+
+    # Returns an array of arrays: groups of file/instantiation fields.
+    def file_field_sets
+      @file_field_sets ||= begin
+        # Select only file and instantiation fields.
+        file_and_instantiation_fields = fields.select { |field| file_header?(field.header) || instantiation_header?(field.header) }
+
+        # Slice the selected fields into field sets for each file.
+        file_and_instantiation_fields.slice_when do |prev_field, field|
+          initial_file_header?(field.header) && !initial_file_header?(prev_field.header)
+        end
+      end
+    end
+
+    # Converts these fields into a hash for the payload.
+    def fields_to_hash(these_fields)
+      combined_fields = combine_multivalued_fields(these_fields)
+      combined_pairs = combined_fields.map do |field|
+        key = api_field_name_for(field.header) || normalize_header(field.header)
+        [ key, encode_value(field.value) ]
+      end
+      Hash[ combined_pairs ]
+    end
+
+    def encode_value(str)
+      return if str.nil?
+      str.to_s.force_encoding('UTF-8')
+    end
+
+    # Checks for multivalued fields, turns them into arrays, and combines
+    # all the values for the repeatable header.
+    def combine_multivalued_fields(uncombined_fields)
+      combined_fields = {}
+      uncombined_fields.each do |field|
+        normalized_header = normalize_header(field.header)
+        if multivalued?(normalized_header)
+          combined_fields[normalized_header] ||= Field.new(field.header, [])
+          combined_fields[normalized_header].value << field.value
+        else
+          combined_fields[normalized_header] ||= Field.new(field.header, field.value)
+        end
+      end
+      combined_fields.values
+    end
+
+  class << self
+    delegate :normalize_header, to: MarsManifest
+
+    def api_field_name_for(header)
+      map = {
+        'collection id' => 'collection_id',
+        'title' => 'title',
+        'date issued' => 'date_issued',
+        'statement of' => 'statement_of_responsibility',
+        'date created' => 'date_created',
+        'copyright date' => 'copyright_date',
+        'abstract' => 'abstract',
+        'format' => 'format',
+        'bibliographic id' => 'bibliographic_id',
+        'terms of use' => 'terms_of_use',
+        'physical description' => 'physical_description',
+        'statement of responsibility' => 'statement_of_responsibility',
+        'creator' => 'creator',
+        'alternative title' => 'alternative_title',
+        'translated title' => 'translated_title',
+        'uniform title' => 'uniform_title',
+        'note' => 'note',
+        'note type' => 'note_type',
+        'resource type' => 'resource_type',
+        'contributor' => 'contributor',
+        'publisher' => 'publisher',
+        'genre' => 'genre',
+        'subject' => 'subject',
+        'related item label' => 'related_item_label',
+        'related item url' => 'related_item_url',
+        'geographic subject' => 'geographic_subject',
+        'temporal subject' => 'temporal_subject',
+        'topical subject' => 'topical_subject',
+        'language' => 'language',
+        'table of contents' => 'table_of_contents',
+        'other identifier type' => 'other_identifier_type',
+        'other identifier' => 'other_identifier',
+        'comment' => 'comment',
+        'instantiation label' => 'label',
+        'instantiation id' => 'id',
+        # 'instantiation streaming url' => 'url',
+        'instantiation streaming url' => 'hls_url',
+        'instantiation duration' => 'duration',
+        'instantiation mime type' => 'mime_type',
+        'instantiation audio bitrate' => 'audio_bitrate',
+        'instantiation audio codec' => 'audio_codec',
+        'instantiation video bitrate' => 'video_bitrate',
+        'instantiation video codec' => 'video_codec',
+        'instantiation width' => 'width',
+        'instantiation height' => 'height',
+        'file label' => 'label',
+        'file title' => 'title',
+        'file location' => 'file_location',
+        'file checksum' => 'file_checksum',
+        'file size' => 'file_size',
+        'file duration' => 'duration',
+        'file aspect ratio' => 'display_aspect_ratio',
+        'file frame size' => 'original_frame_size',
+        'file format' => 'file_format',
+        'file caption text' => 'captions',
+        'file caption type' => 'captions_type',
+        'file other id' => 'other_identifier',
+        'file comment' => 'comment',
+        'file date digitized' => 'date_digitized'
+      }
+      map[normalize_header(header)]
+    end
+  end
+end

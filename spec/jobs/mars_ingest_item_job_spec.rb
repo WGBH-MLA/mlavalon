@@ -6,7 +6,15 @@ describe MarsIngestItemJob, type: :job do
     ActiveJob::Base.queue_adapter = :test
   end
 
-  let(:mars_ingest_item) { FactoryBot.create(:mars_ingest_item) }
+  let(:mars_ingest_item) do
+    mii = FactoryBot.build(:mars_ingest_item)
+    mii.csv_header_array = mii.mars_ingest.manifest.headers
+    mii.csv_value_array = mii.mars_ingest.manifest.rows.first
+    mii.save!
+    require "pry"; binding.pry
+    mii
+  end
+
   let(:job) { described_class.new(mars_ingest_item.id) }
 
   describe '.perform_later' do
@@ -15,6 +23,9 @@ describe MarsIngestItemJob, type: :job do
     end
 
     it 'enqueues the job and sets the status of the MarsIngestItem to "enqueued"' do
+
+      require "pry"; binding.pry
+
       expect(described_class).to have_been_enqueued.exactly(:once).with(mars_ingest_item.id)
       expect(mars_ingest_item.reload.status).to eq 'enqueued'
     end

@@ -1008,7 +1008,7 @@ DEPENDENCIES
   web-console
   webdrivers (~> 3.0)
   webmock (~> 3.5.1)
-  webpacker
+  webpacker (= 4.0.2)
   whenever (~> 0.11)
   with_locking
   xray-rails

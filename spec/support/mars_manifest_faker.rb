@@ -94,7 +94,7 @@ class MarsManifestFaker
         repeat(0..1) { "Collection Description" },
         "Unit Name",
         repeat(0..1) { "Collection ID" },
-        repeat(1..4) { "Title" },
+        "Title",
         repeat(0..1) { "Date Issued" },
         repeat(0..4) { "Creator" },
         repeat(0..2) { "Alternative Title" },
@@ -123,7 +123,7 @@ class MarsManifestFaker
         repeat(0..4) { ["Other Identifier", "Other Identifier Type"] },
         repeat(0..3) { "Comment" },
         repeat(1..4) { [
-          "File Label",
+          repeat(0..1) { "File Label" },
           "File Title",
           "Instantiation Label",
           repeat(0..1) { "Instantiation Id" },
@@ -164,7 +164,7 @@ class MarsManifestFaker
       when "collection description", "abstract"
         description
       when "unit name"
-        [ Faker::Job.field, Faker::Company.industry ].sample
+        Avalon::ControlledVocabulary.vocabulary[:units].sample
       when "date issued", "date created", "copyright date", "file date digitized"
         ( Time.now - rand(10000).days ).strftime date_formats.sample
       when "creator", "contributor"

@@ -1,3 +1,5 @@
+require_relative '../support/mars_manifest_faker'
+
 FactoryBot.define do
   factory :mars_manifest, class: MarsManifest do
     url { 'http://foo.edu/fake_manifest.csv'}
