@@ -220,7 +220,5 @@ Rails.application.routes.draw do
   get '/jobs(.:format)', to: redirect('/')
 
   # TODO Add this route for dev env only?
-  if Rails.env.development?
-    resources :fake_mars_manifests, only: [:index], controller: 'fake_mars_manifests', format: 'csv'
-  end
+  resources :fake_mars_manifests, only: [:index], controller: 'fake_mars_manifests', format: 'csv'
 end

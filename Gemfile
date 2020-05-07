@@ -98,6 +98,9 @@ gem 'parallel'
 gem 'whenever', '~> 0.11', require: false
 gem 'with_locking'
 
+# Used for endpoint that generates sample CSV Mars Manifests.
+gem 'faker'
+
 group :development do
   gem 'capistrano', '~>3.6'
   gem 'capistrano-passenger', require: false
@@ -131,7 +134,6 @@ group :test do
   gem 'email_spec'
   gem 'factory_bot_rails'
   gem 'fakefs', require: 'fakefs/safe'
-  gem 'faker'
   gem 'hashdiff'
   gem 'rails-controller-testing'
   gem 'rspec-retry'
