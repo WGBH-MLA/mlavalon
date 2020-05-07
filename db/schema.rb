@@ -124,7 +124,7 @@ ActiveRecord::Schema.define(version: 2020_05_01_095531) do
 
   create_table "mars_ingest_items", force: :cascade do |t|
     t.integer "mars_ingest_id"
-    t.string "row_payload"
+    t.json "row_payload"
     t.string "error"
     t.string "status"
     t.datetime "created_at", null: false

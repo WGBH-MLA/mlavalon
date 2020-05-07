@@ -2,53 +2,68 @@ require 'json'
 require 'uri'
 
 class MarsIngestItem < ActiveRecord::Base
-  STATUSES = %w(enqueued processing failed succeeded)
+  STATUSES = %w(unprocessed enqueued processing failed succeeded)
 
   # csv row object
-  attr_accessor :csv_header_array
-  attr_accessor :csv_value_array
+  # attr_accessor :csv_header_array
+  # attr_accessor :csv_value_array
 
   belongs_to :mars_ingest
 
   delegate :submitter, to: :mars_ingest
 
+  validates :status, inclusion: STATUSES
   validates :row_payload, presence: true
+  validate :validate_payload
 
-  # before_save :create_payload
-  # def create_payload
+  after_initialize do |*args|
+    # Set default status to initial state of 'unprocessed' ONLY if it doesn't
+    # already have a status saved in the DB.
+    self.status ||= 'unprocessed'
+  end
+
+
+  private
+
+    # Ensure required payload values are present.
+    def validate_payload
+      missing_required_fields = required_payload_fields - row_payload.keys
+      if missing_required_fields.present?
+        errors.add(:row_payload, "Missing required payload field(s): '#{missing_required_fields.join("', '")}'")
+      end
+    end
+
+    def required_payload_fields
+      ['collection_id', 'title', 'files']
+    end
+
+
+  # before_save do
   #   if csv_header_array && csv_value_array
-  #     self.row_payload = create_row_hash.to_json
+  #     self.row_payload = mapper.payload.merge(collection_id: collection.id)
   #   end
   # end
 
   # Disallow writing directly to row_payload. It is defined from CSV header
   # and values arrays, and validated elsewhere.
-  def row_payload=(*args)
-    raise 'Cannot assign values directly to @row_payload'
-  end
+  # def row_payload=(*args)
+  #   raise 'Cannot assign values directly to @row_payload'
+  # end
 
-  def row_payload
-    @row_payload ||= mapper.payload.merge(collection_id: collection.id)
-  end
+  # def row_payload
+  #   self[:row_payload] ||= mapper.payload.merge(collection_id: collection.id)
+  #   require "pry"; binding.pry
+  #   self[:row_payload]
+  # end
 
-  def mapper
-
-    require "pry"; binding.pry
-
-    @mapper ||= ManifestToPayloadMapper.new(csv_header_array, csv_value_array)
-  end
+  # def mapper
+  #   @mapper ||= ManifestToPayloadMapper.new(csv_header_array, csv_value_array)
+  # end
 
   # TODO: Handle case if Collection ID is passed in. Do we allow editing of the
   # other attributes? What if there is a mismatch? Should we just disallow
   # collection ID and lookup collection exclusively by name?
-  def collection
-    @collection ||= CollectionCreator.find_or_create_collection(
-      mapper.collection_hash['collection name'],
-      mapper.collection_hash['unit name'],
-      mapper.collection_hash['collection description'],
-      submitter.user_key
-    )
-  end
+
 
   # validates do
   #   # runs the marsingestrow validations
@@ -56,7 +71,7 @@ class MarsIngestItem < ActiveRecord::Base
 
   # validates :mars_ingest_id, presence: true
   # validates :row_payload, presence: true
-  validates :status, inclusion: STATUSES
+  # validates :status, inclusion: STATUSES
   # validate :valid_json_parse
 
   # def valid_json_parse

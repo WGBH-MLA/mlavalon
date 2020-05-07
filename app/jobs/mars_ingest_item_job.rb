@@ -15,9 +15,6 @@ class MarsIngestItemJob < ActiveJob::Base
   end
 
   def perform(id)
-
-    require "pry"; binding.pry
-
     ingest_item = MarsIngestItem.find(id)
     logger.info "started job, found #{ingest_item.inspect}"
     ingest_item.update(job_id: self.job_id) if ingest_item.job_id == nil

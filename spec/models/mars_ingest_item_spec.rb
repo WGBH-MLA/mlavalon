@@ -1,28 +1,40 @@
 require 'rails_helper'
 
 RSpec.describe MarsIngestItem do
-
-  # let(:unsaved_item) { FactoryBot.build(:mars_ingest_item) }
-  let (:enqueued_item) { FactoryBot.create(:mars_ingest_item) }
-  # let (:processing_item) { FactoryBot.create(:mars_ingest_item, :processing) }
-
-  # let(:bad_payload) { %({ "not : "cool man"}) }
-
-  # it 'is linked to a mars ingest' do
-  #   expect(enqueued_item).mars_ingest.class.to eq(MarsIngest)
-  # end
+  # Note: use :mars_ingest factory rather than :mars_ingest_item factory.
+  # It's more overhead, but less confusing than having to mock all the
+  # dependencies.
+  subject { FactoryBot.create(:mars_ingest).mars_ingest_items.first }
 
   describe 'validations' do
+    # Verify we're valid before hand, then test validity of specific changes.
+    before { expect(subject).to be_valid }
+
     it 'does accept valid statuses' do
-      %w(enqueued processing failed succeeded).each do |status|
-        enqueued_item.status = status
-        expect(enqueued_item.valid?).to eq(true)
+      %w(unprocessed enqueued processing failed succeeded).each do |status|
+        subject.status = status
+        expect(subject).to be_valid
       end
     end
 
     it 'doesnt accept bogus status' do
-      enqueued_item.status = 'straight_gumbo'
-      expect{ enqueued_item.save! }.to raise_error(ActiveRecord::RecordInvalid)
+      subject.status = 'straight_gumbo'
+      expect(subject).not_to be_valid
+    end
+
+    it 'row_payload requires a "collection_id" key' do
+      subject.row_payload.delete('collection_id')
+      expect(subject).not_to be_valid
+    end
+
+    it 'row_payload requires a "title" key' do
+      subject.row_payload.delete('title')
+      expect(subject).not_to be_valid
+    end
+
+    it 'row_payload requires a "files" key' do
+      subject.row_payload.delete('files')
+      expect(subject).not_to be_valid
     end
   end
 end

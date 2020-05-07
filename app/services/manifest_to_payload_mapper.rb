@@ -8,31 +8,46 @@ class ManifestToPayloadMapper
 
   delegate :api_field_name_for, to: :class
 
-  attr_reader :headers, :row_data
+  attr_reader :headers, :row_data, :submitter_user_key
 
-  def initialize(headers, row_data)
+  def initialize(headers, row_data, submitter_user_key)
     @headers = headers
     @row_data = row_data
+    # needed for creating a new collection if necessary
+    @submitter_user_key = submitter_user_key
   end
 
   def payload
     @payload ||= {}.tap do |p|
+      p['collection_id'] = collection.id
       p.merge! media_object_hash
       p['files'] = file_hashes
     end
   end
 
-  # Converts collection fields into a hash.
-  # Similar to fields_to_hash, but collection fields do not have
-  # corresponding api field names, nor are any of them multivalued.
-  def collection_hash
-    collection_field_pairs = collection_fields.map do |field|
-      [ normalize_header(field.header), field.value ]
-    end
-    Hash[ collection_field_pairs ]
-  end
-
   private
+
+    # Returns a found (or new) collection based on the collection fields and
+    # the submitter's email.
+    def collection
+      @collection ||= CollectionCreator.find_or_create_collection(
+        collection_hash['collection name'],
+        collection_hash['unit name'],
+        collection_hash['collection description'],
+        submitter_user_key
+      )
+    end
+
+    # Converts collection fields into a hash.
+    # Similar to fields_to_hash, but collection fields do not have
+    # corresponding api field names, nor are any of them multivalued.
+    def collection_hash
+      collection_field_pairs = collection_fields.map do |field|
+        [ normalize_header(field.header), field.value ]
+      end
+      Hash[ collection_field_pairs ]
+    end
+
 
     # Combines headers/value pairs into a single struct for easier handling.
     def fields

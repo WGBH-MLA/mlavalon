@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :mars_ingest_item do
     mars_ingest
-    status { 'enqueued' }
 
     # generate with real methods
     error { nil }
@@ -13,18 +12,5 @@ FactoryBot.define do
       status { 'processing'}
       job_id { 'bip bip bip' }
     end
-
-    after(:build) do |mars_ingest_item, evaluator|
-      # 
-      # require "pry"; binding.pry
-      #
-      # mars_ingest_item.csv_header_array = evaluator.mars_ingest.send(:manifest).headers.clone
-      # mars_ingest_item.csv_value_array = evaluator.mars_ingest.send(:manifest).rows.first
-      #
-      # require "pry"; binding.pry
-      # mars_ingest_item
-
-    end
-
   end
 end
