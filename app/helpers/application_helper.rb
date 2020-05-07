@@ -68,7 +68,7 @@ module ApplicationHelper
     # 0 for us, and so the method was returning nil. All we need it to do
     # is return the string we're returning.
     # TODO: Make this more upgrade-proof, perhaps in a monkey patch?
-    return "https://avalon.wgbh.org/master_files/#{master_file_id}/thumbnail"
+    return "/master_files/#{master_file_id}/thumbnail"
     # video_count = document["avalon_resource_type_ssim"].count{|m| m.start_with?('moving image'.titleize) } rescue 0
     # audio_count = document["avalon_resource_type_ssim"].count{|m| m.start_with?('sound recording'.titleize) } rescue 0
 
