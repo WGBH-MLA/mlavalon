@@ -17,7 +17,8 @@ before_install:
   - gem install bundler -v $BUNDLER_VERSION
   - bundle config without development:production
   - nvm install 12
-  - echo "\n\n\nNode version..." && node -v && echo "\n\n\n"
+  - node -v
+  - npm -v
 before_script:
   - rm config/database.yml
   - cp config/database.travis.yml config/database.yml
