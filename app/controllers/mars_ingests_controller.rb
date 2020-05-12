@@ -21,6 +21,8 @@ class MarsIngestsController < ApplicationController
 
   def create
     @mars_ingest = MarsIngest.new params.require(:mars_ingest).permit(:manifest_url)
+    @mars_ingest.submitter_id = current_user.id
+
     if @mars_ingest.save
       start_ingest(@mars_ingest)
       render json: { id: @mars_ingest.id }, status: 200
