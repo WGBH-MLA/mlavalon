@@ -51,7 +51,8 @@ class MarsManifest
     # @return String the raw data fetched from the URL in the @url attribute;
     #   nil if an error occurs.
     def raw_data
-      @raw_data ||= Net::HTTP.get(URI.parse(url))
+      # TODO: Stop bypassing SSL check.
+      @raw_data ||=  open(url, { ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE }).read
     rescue => e
       add_error(:url, "Invalid Manifest URL: '#{url}'")
     end
