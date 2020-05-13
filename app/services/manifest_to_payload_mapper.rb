@@ -1,5 +1,4 @@
 class ManifestToPayloadMapper
-  # Field struct combines header with value.
   Field = Struct.new(:header, :value)
 
   delegate :collection_header?, :media_object_header?, :file_header?,
@@ -20,9 +19,23 @@ class ManifestToPayloadMapper
   def payload
     @payload ||= {}.tap do |p|
       p['collection_id'] = collection.id
-      p.merge! media_object_hash
+      p['fields'] = media_object_hash
       p['files'] = file_hashes
     end
+
+    @payload = compact_payload(@payload)
+  end
+
+  def compact_payload(payload)
+    # cleaning up the mess
+    clean_payload = payload.clone
+    clean_payload['files'] = compact_key(payload['files'])
+    clean_payload['fields'] = compact_key(payload['fields'])
+    clean_payload
+  end
+
+  def compact_key(hash)
+    hash.delete_if {|header, value| (value == "" || value.nil? || (value.is_a?(Array) && value.all? {|v| v.nil? || v == "" }) )  }
   end
 
   private
@@ -98,15 +111,24 @@ class ManifestToPayloadMapper
     def fields_to_hash(these_fields)
       combined_fields = combine_multivalued_fields(these_fields)
       combined_pairs = combined_fields.map do |field|
+
+        # does the normalize_ case ever happen?
         key = api_field_name_for(field.header) || normalize_header(field.header)
         [ key, encode_value(field.value) ]
       end
       Hash[ combined_pairs ]
     end
 
-    def encode_value(str)
-      return if str.nil?
-      str.to_s.force_encoding('UTF-8')
+    def encode_values(val)
+      if val.is_a?(String)
+        encode_value(val)
+      elsif val.is_a?(Array)
+        val.map {|v| encode_value(v) }
+      end
+    end
+
+    def encode_value(val)
+      val.to_s.force_encoding('UTF-8')
     end
 
     # Checks for multivalued fields, turns them into arrays, and combines
