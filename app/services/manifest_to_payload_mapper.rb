@@ -114,7 +114,7 @@ class ManifestToPayloadMapper
 
         # does the normalize_ case ever happen?
         key = api_field_name_for(field.header) || normalize_header(field.header)
-        [ key, encode_value(field.value) ]
+        [ key, encode_values(field.value) ]
       end
       Hash[ combined_pairs ]
     end
