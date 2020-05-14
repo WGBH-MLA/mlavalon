@@ -104,7 +104,9 @@ class MarsManifestFaker
         repeat(0..1) { "Date Created" },
         repeat(0..1) { "Copyright Date" },
         repeat(0..1) { "Abstract" },
-        repeat(0..3) { "Note" },
+        repeat(0..3) { "Content Type" },
+        repeat(0..3) { "Item Type" },
+        repeat(0..3) { "Technical Notes" },
         repeat(0..1) { "Format" },
         repeat(0..4) { "Resource Type" },
         repeat(0..3) { "Contributor" },
@@ -147,7 +149,9 @@ class MarsManifestFaker
           repeat(0..1) { "File Caption Text" },
           repeat(0..1) { "File Caption Type" },
           repeat(0..1) { "File Other Id" },
-          repeat(0..1) { "File Comment" }
+          repeat(0..1) { "File Comment" },
+          repeat(0..1) { "File Thumbnail Offset" },
+          repeat(0..1) { "File Poster Offset" }
         ] }
       ].flatten.compact
     end
@@ -172,9 +176,9 @@ class MarsManifestFaker
       when "publisher"
         Faker::Book.publisher
       when "genre", "subject", "geographic subject", "temporal subject",
-           "topical subject"
+           "topical subject", "item type", "content type"
         topic
-      when "statement of responsibility", "terms of use", "note", "file comment",
+      when "statement of responsibility", "terms of use", "technical notes", "file comment",
            "comment"
         quote
       when "instantiation audio codec"
@@ -188,7 +192,8 @@ class MarsManifestFaker
       when "instantiation video bitrate"
         "#{ [ 1, 1.5, 2.5, 4, 5, 7.5, 8, 12, 16, 24 ].sample } Mbps"
       when "instantiation audio bitrate"
-        "#{ [ 64, 96, 128, 256 ].sample } kbps"
+      when "file thumbnail offset", "file poster offset"
+        "#{ "%02d" % rand(60) }:#{ "%02d" % rand(60) }"
       when "instantiation streaming url", "related item url"
         Faker::Internet.url
       when "file location"
