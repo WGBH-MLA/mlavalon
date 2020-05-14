@@ -20,11 +20,11 @@ Unless required by applicable law or agreed to in writing, software distributed
     <ul>
       <li class="footer-logo">
         <%= image_tag "AvalonMediaSystem_Logo_A.png", alt: "Avalon Media System - #{t(:release_label)} #{Avalon::VERSION}" %>
-      <li><a href="http://www.avalonmediasystem.org">Avalon Media System Project Website</a> </li>
+      <li><a href="https://www.wgbh.org/foundation/what-we-do/media-library-and-archives">WGBH MLA</a> </li>
       <li><%= link_to "Contact Us", main_app.comments_path %></li>
     </ul>
     <div class="release">
-      <%=release_text%>
+      <a href="http://www.avalonmediasystem.org">Powered By <%=release_text%></a>
       <%= git_commit_info(" (%s %s [%s])") if Rails.env == 'development' %>
     </div>
   </footer>

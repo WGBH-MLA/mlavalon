@@ -87,10 +87,16 @@ class MarsManifest
     end
 
     def validate_date(value, row_num, col_num)
-      # TODO actually validate the value as a date, once we know the proper
-      # format.
+      unless value =~ /\d{4}-\d{2}-\d{2}/
+        errors.add(:values, "Invalid date format for #{headers[col_num]} in column #{col_num + 1}, row #{row_num + 1}, required format is YYYY-MM-DD")
+      end
     end
-
+    
+    def validate_offset(value, row_num, col_num)
+      unless value =~ /\d+:\d{2}/
+        errors.add(:values, "Invalid offset format for #{headers[col_num]} in column #{col_num + 1}, row #{row_num + 1}, required format is MM:SS")        
+      end
+    end
     # Adds an error message to a field idempotently (because errors.add is not
     # idempotent, and you can end up with a field having duplicate errors).
     # @param field [Symbol] the field name.
@@ -168,8 +174,16 @@ class MarsManifest
         "date created" => [],
         "copyright date" => [],
         "abstract" => [],
-        "note" => [],
-        "note type" => [],
+
+        # "note" => [],
+        # "note type" => [],
+        "content type" => [],
+        "item type" => [],
+        "technical notes" => [],
+
+        "thumbnail offset" => [],
+        "poster offset" => [],
+
         "format" => [],
         "resource type" => [],
         "contributor" => [],
@@ -246,7 +260,15 @@ class MarsManifest
         label", "related item url", "geographic subject", "temporal subject",
         "topical subject", "bibliographic id", "language", "terms of use",
         "table of contents", "physical description", "other identifier", "other
-        identifier type", "comment" ]
+        identifier type", "comment", "thumbnail offset", "poster offset" ]
+    end
+
+    def notes_header?(header)
+      notes_headers.include? normalize_header(header)
+    end
+
+    def notes_headers
+      [ "content type", "item type", "technical notes" ]
     end
 
     def file_header?(header)

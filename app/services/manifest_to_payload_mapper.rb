@@ -20,6 +20,7 @@ class ManifestToPayloadMapper
     @payload ||= {}.tap do |p|
       p['collection_id'] = collection.id
       p['fields'] = media_object_hash
+      p['fields'].merge!( notes_hash )
       p['files'] = file_hashes
     end
 
@@ -82,6 +83,24 @@ class ManifestToPayloadMapper
     # Selects media object fields.
     def media_object_fields
       fields.select { |field| media_object_header?(field.header) }
+    end
+
+    def notes_fields
+      fields.select {|field| notes_header?(field.header)}
+    end
+
+    def notes_hash
+      notes = {
+        'note_type' => [],
+        'note' => []
+      }
+
+      notes_fields.each do |note|
+        notes['note_type'] << api_field_name_for(note.header)
+        notes['note'] << note.value
+      end
+
+      notes
     end
 
     # Converts files/instantiation fields into hashes.
@@ -168,8 +187,17 @@ class ManifestToPayloadMapper
         'alternative title' => 'alternative_title',
         'translated title' => 'translated_title',
         'uniform title' => 'uniform_title',
-        'note' => 'note',
-        'note type' => 'note_type',
+        # 'note' => 'note',
+        # 'note type' => 'note_type',
+
+        # not real API field names, these are values for note_type
+        'content type' => 'content_type',
+        'item type' => 'item_type',
+        'technical notes' => 'technical',
+
+        'thumbnail offset' => 'thumbnail_offset',
+        'poster offset' => 'poster_offset',
+
         'resource type' => 'resource_type',
         'contributor' => 'contributor',
         'publisher' => 'publisher',
@@ -187,7 +215,6 @@ class ManifestToPayloadMapper
         'comment' => 'comment',
         'instantiation label' => 'label',
         'instantiation id' => 'id',
-        # 'instantiation streaming url' => 'url',
         'instantiation streaming url' => 'hls_url',
         'instantiation duration' => 'duration',
         'instantiation mime type' => 'mime_type',
