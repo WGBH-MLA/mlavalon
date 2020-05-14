@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe MarsIngestsController, type: :controller do
-
   # Fake Mars Manifest URL.
   let(:manifest_url) { 'http://foo.edu/manifest.csv' }
 
@@ -10,8 +9,6 @@ describe MarsIngestsController, type: :controller do
 
   # Tie the fake URL and fake CSV response together.
   before do
-    WebMock.enable!
-
     stub_request(:get, manifest_url).
            with(
              headers: {

@@ -18,17 +18,7 @@ FactoryBot.define do
       fake_manifest = MarsManifestFaker.new size: evaluator.size
       fake_manifest.add_headers(evaluator.add_headers) if evaluator.add_headers
       fake_manifest.remove_headers(evaluator.remove_headers) if evaluator.remove_headers
-
-      # Mock the URL to return the value given for the CSV.
-      WebMock.stub_request(:get, mars_manifest.url).
-              with(
-                headers: {
-               	  'Accept' => '*/*',
-               	  'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-               	  'Host' => URI.parse(mars_manifest.url).host,
-               	  'User-Agent' => 'Ruby'
-                }).
-              to_return(status: 200, body: fake_manifest.to_s, headers: {})
+      allow_any_instance_of(MarsManifest).to receive(:csv).and_return CSV.parse(fake_manifest.to_s)
     end
   end
 end
