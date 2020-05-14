@@ -181,9 +181,6 @@ class MarsManifest
         "item type" => [],
         "technical notes" => [],
 
-        "thumbnail offset" => [],
-        "poster offset" => [],
-
         "format" => [],
         "resource type" => [],
         "contributor" => [],
@@ -227,7 +224,9 @@ class MarsManifest
         "file caption text" => [],
         "file caption type" => [],
         "file other id" => [],
-        "file comment" => []
+        "file comment" => [],
+        "file thumbnail offset" => [],
+        "file poster offset" => []
       }
     end
 
@@ -280,7 +279,7 @@ class MarsManifest
         "instantiation streaming url", "file location", "file checksum",
         "file size", "file duration", "file aspect ratio", "file frame size",
         "file format", "file date digitized", "file caption text",
-        "file caption type", "file other id", "file comment" ]
+        "file caption type", "file other id", "file comment", "file thumbnail offset", "file poster offset" ]
     end
 
     def initial_file_header?(header)

@@ -195,9 +195,6 @@ class ManifestToPayloadMapper
         'item type' => 'item_type',
         'technical notes' => 'technical',
 
-        'thumbnail offset' => 'thumbnail_offset',
-        'poster offset' => 'poster_offset',
-
         'resource type' => 'resource_type',
         'contributor' => 'contributor',
         'publisher' => 'publisher',
@@ -237,7 +234,10 @@ class ManifestToPayloadMapper
         'file caption type' => 'captions_type',
         'file other id' => 'other_identifier',
         'file comment' => 'comment',
-        'file date digitized' => 'date_digitized'
+        'file date digitized' => 'date_digitized',
+        'file thumbnail offset' => 'thumbnail_offset',
+        'file poster offset' => 'poster_offset'
+
       }
       map[normalize_header(header)]
     end
