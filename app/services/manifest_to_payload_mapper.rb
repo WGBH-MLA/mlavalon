@@ -1,7 +1,7 @@
 class ManifestToPayloadMapper
   Field = Struct.new(:header, :value)
 
-  delegate :collection_header?, :media_object_header?, :file_header?,
+  delegate :collection_header?, :media_object_header?, :notes_header?, :file_header?,
     :initial_file_header?, :instantiation_header?, :normalize_header,
     :multivalued?, to: MarsManifest
 
