@@ -76,7 +76,7 @@ module Avalon
       files.each do |f|
 
         # WGBH-MLA CUSTOM -> big big duration if one was not provided
-        f[:duration] ||= 86400
+        f[:duration] ||= 86400000
         duration =  f[:duration] * 1000
         # END
 
