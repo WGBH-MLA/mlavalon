@@ -24,20 +24,72 @@ class ManifestToPayloadMapper
       p['files'] = file_hashes
     end
 
-    @payload = compact_payload(@payload)
+    # @payload = compact_payload(@payload)
+    pl = @payload.clone
+    @payload = compact_hash(pl)
   end
 
-  def compact_payload(payload)
-    # cleaning up the mess
-    clean_payload = payload.clone
-    clean_payload['files'] = compact_key(payload['files'])
-    clean_payload['fields'] = compact_key(payload['fields'])
-    clean_payload
+  # def compact_payload(payload)
+  #   # cleaning up the mess
+  #   clean_payload = payload.clone
+  #   clean_payload['files'] = compact_filearray(payload['files'])
+  #   clean_payload['fields'] = compact_key(payload['fields'])
+  #   clean_payload
+  # end
+
+  # def compact_filearray(filearray)
+  #   filearray.map do |file|
+
+  #     # compact the inner files
+  #     newfilefiles = file['files'].map { |ff| compact_key(ff) }
+  #     # compact the outer files
+  #     newfile = compact_key(file)
+  #     # reassign the inner files
+  #     newfile['files'] = newfilefiles
+
+  #     newfile
+  #   end
+  # end
+
+  # def compact_key(hash)
+  #   hash.delete_if {|header, value| value == "" || value.nil? || (value.is_a?(Array) && value.all? {|v| v.nil? || v == "" })  }
+  # end
+
+  def compact_hash(hash)
+    newhash = {}
+    hash.each do |k,v|
+
+      if v.is_a?(Array)
+
+        # if its an array of nils or ""s, don't pass this key on at all
+        unless v.all? {|element| element == "" || element.nil?}
+
+          # if array of hashes, do it again for next layer
+          if v.all? {|element| element.is_a?(Hash) }
+
+            newhash[k] = v.map {|h| compact_hash(h) }
+          else
+
+            # its a multivalued field, pass on the actual values in this array
+            newhash[k] = v.reject { |value| value == "" || value.nil? }
+          end
+
+        end
+      elsif v.is_a?(String)
+
+        # its a single value field, only pass key through if value
+        newhash[k] = v unless v == "" || v.nil?
+      elsif v.is_a?(Hash)
+
+        # this key is a hash do it again for this layer
+        newhash[k] = compact_hash(v)
+      end
+
+    end
+
+    newhash
   end
 
-  def compact_key(hash)
-    hash.delete_if {|header, value| (value == "" || value.nil? || (value.is_a?(Array) && value.all? {|v| v.nil? || v == "" }) )  }
-  end
 
   private
 
@@ -109,7 +161,11 @@ class ManifestToPayloadMapper
         instantiation_fields, file_fields = file_field_set.partition do |field|
           instantiation_header?(field.header)
         end
-        fields_to_hash(file_fields).merge( { 'files' => fields_to_hash(instantiation_fields) } )
+
+        file_hash = fields_to_hash(file_fields)
+        file_hash['files'] = [fields_to_hash(instantiation_fields)]
+
+        file_hash
       end
     end
 

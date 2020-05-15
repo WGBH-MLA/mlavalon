@@ -245,6 +245,9 @@ class MediaObjectsController < ApplicationController
           # this is not getting mapped properly, hardcoding for now
           master_file.workflow_name = 'avalon' unless master_file.workflow_name
           # need to persist this before saving derivative
+
+          # spoof this in for offsets if not present!
+          master_file.duration = 86400 unless master_file.duration
           master_file.save
           # END WGBH-MLA CUSTOMIZATION
           ###

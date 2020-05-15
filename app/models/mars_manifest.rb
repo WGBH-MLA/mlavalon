@@ -92,11 +92,6 @@ class MarsManifest
       end
     end
     
-    def validate_offset(value, row_num, col_num)
-      unless value =~ /\d+:\d{2}/
-        errors.add(:values, "Invalid offset format for #{headers[col_num]} in column #{col_num + 1}, row #{row_num + 1}, required format is MM:SS")        
-      end
-    end
     # Adds an error message to a field idempotently (because errors.add is not
     # idempotent, and you can end up with a field having duplicate errors).
     # @param field [Symbol] the field name.
@@ -275,8 +270,7 @@ class MarsManifest
     end
 
     def file_headers
-      [ "file label", "file title", "instantiation label", "instantiation id",
-        "instantiation streaming url", "file location", "file checksum",
+      [ "file label", "file title", "file location", "file checksum",
         "file size", "file duration", "file aspect ratio", "file frame size",
         "file format", "file date digitized", "file caption text",
         "file caption type", "file other id", "file comment", "file thumbnail offset", "file poster offset" ]
@@ -298,7 +292,8 @@ class MarsManifest
       [ "instantiation duration", "instantiation mime type",
         "instantiation audio bitrate", "instantiation audio codec",
         "instantiation video bitrate", "instantiation video codec",
-        "instantiation width", "instantiation height" ]
+        "instantiation width", "instantiation height", "instantiation label",
+        "instantiation id", "instantiation streaming url" ]
     end
 
     def multivalued?(header)
