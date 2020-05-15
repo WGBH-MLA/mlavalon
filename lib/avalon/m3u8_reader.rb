@@ -74,7 +74,12 @@ module Avalon
       raise RangeError, "Offset out of range" if offset < 0
       elapsed = 0.0
       files.each do |f|
-        duration = f[:duration] * 1000
+
+        # WGBH-MLA CUSTOM -> big big duration if one was not provided
+        f[:duration] ||= 86400
+        duration =  f[:duration] * 1000
+        # END
+
         if elapsed + duration > offset
           location = @base.is_a?(URI) ? @base.merge(f[:filename]).to_s : File.expand_path(f[:filename], @base.to_s)
           return { location: location, filename: f[:filename], offset: offset - elapsed }
