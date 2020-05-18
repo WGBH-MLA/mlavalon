@@ -245,6 +245,8 @@ class MediaObject < ActiveFedora::Base
 
       # WGBH MLAVAPATCH
       self.note.each do |nh|
+        # whitelist our custom note types
+        if ['content_type','item_type','technical'].include?(nh[:type])
         # turn all nonword characters in note type to _
         solr_doc["#{nh[:type].gsub(/\W/, '_')}_note"] = nh[:note]
       end
