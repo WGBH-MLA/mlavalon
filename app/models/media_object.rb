@@ -247,8 +247,9 @@ class MediaObject < ActiveFedora::Base
       self.note.each do |nh|
         # whitelist our custom note types
         if ['content_type','item_type','technical'].include?(nh[:type])
-        # turn all nonword characters in note type to _
-        solr_doc["#{nh[:type].gsub(/\W/, '_')}_note"] = nh[:note]
+          # turn all nonword characters in note type to _
+          solr_doc["#{nh[:type].gsub(/\W/, '_')}_note"] = nh[:note]
+        end
       end
 
       #Add all searchable fields to the all_text_timv field
