@@ -192,8 +192,11 @@ class MarsManifest
         "terms of use" => [],
         "table of contents" => [],
         "physical description" => [],
-        "other identifier" => [],
-        "other identifier type" => [],
+
+        # "other identifier" => [],
+        # "other identifier type" => [],
+        "mla barcode" => [],
+
         "comment" => [],
         "file label" => [],
         "file title" => [],
@@ -263,6 +266,14 @@ class MarsManifest
 
     def notes_headers
       [ "content type", "item type", "technical notes" ]
+    end
+
+    def other_id_header?(header)
+      other_id_headers.include? normalize_header(header)
+    end
+
+    def other_id_headers
+      [ "mla barcode" ]
     end
 
     def file_header?(header)

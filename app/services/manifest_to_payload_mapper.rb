@@ -21,6 +21,7 @@ class ManifestToPayloadMapper
       p['collection_id'] = collection.id
       p['fields'] = media_object_hash
       p['fields'].merge!( notes_hash )
+      p['fields'].merge!( other_id_hash )
       p['files'] = file_hashes
     end
 
@@ -137,6 +138,24 @@ class ManifestToPayloadMapper
       fields.select { |field| media_object_header?(field.header) }
     end
 
+    def other_id_fields
+      fields.select {|field| other_id_header?(field.header)}
+    end
+
+    def other_id_hash
+      other_id = {
+        'other_identifier_type' => [],
+        'other_identifier' => []
+      }
+
+      other_id_fields.each do |other_id|
+        other_id['other_identifier_type'] << api_field_name_for(other_id.header)
+        other_id['other_identifier'] << other_id.value
+      end
+
+      other_id
+    end
+
     def notes_fields
       fields.select {|field| notes_header?(field.header)}
     end
@@ -243,9 +262,9 @@ class ManifestToPayloadMapper
         'alternative title' => 'alternative_title',
         'translated title' => 'translated_title',
         'uniform title' => 'uniform_title',
+
         # 'note' => 'note',
         # 'note type' => 'note_type',
-
         # not real API field names, these are values for note_type
         'content type' => 'content_type',
         'item type' => 'item_type',
@@ -263,8 +282,12 @@ class ManifestToPayloadMapper
         'topical subject' => 'topical_subject',
         'language' => 'language',
         'table of contents' => 'table_of_contents',
-        'other identifier type' => 'other_identifier_type',
-        'other identifier' => 'other_identifier',
+        
+        # 'other identifier type' => 'other_identifier_type',
+        # 'other identifier' => 'other_identifier',
+        # not real API field names, these are values for other_identifier_type        
+        'mla barcode' => 'videorecording identifier'
+
         'comment' => 'comment',
         'instantiation label' => 'label',
         'instantiation id' => 'id',
