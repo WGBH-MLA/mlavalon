@@ -286,7 +286,7 @@ class ManifestToPayloadMapper
         # 'other identifier type' => 'other_identifier_type',
         # 'other identifier' => 'other_identifier',
         # not real API field names, these are values for other_identifier_type        
-        'mla barcode' => 'videorecording identifier'
+        'mla barcode' => 'videorecording identifier',
 
         'comment' => 'comment',
         'instantiation label' => 'label',
