@@ -2,7 +2,7 @@ class ManifestToPayloadMapper
   Field = Struct.new(:header, :value)
 
   delegate :collection_header?, :media_object_header?, :notes_header?, :file_header?,
-    :initial_file_header?, :instantiation_header?, :normalize_header,
+    :initial_file_header?, :instantiation_header?, :other_id_header?, :normalize_header,
     :multivalued?, to: MarsManifest
 
   delegate :api_field_name_for, to: :class
@@ -148,9 +148,9 @@ class ManifestToPayloadMapper
         'other_identifier' => []
       }
 
-      other_id_fields.each do |other_id|
-        other_id['other_identifier_type'] << api_field_name_for(other_id.header)
-        other_id['other_identifier'] << other_id.value
+      other_id_fields.each do |other_id_field|
+        other_id['other_identifier_type'] << api_field_name_for(other_id_field.header)
+        other_id['other_identifier'] << other_id_field.value
       end
 
       other_id
