@@ -27,8 +27,8 @@ RSpec.describe MarsIngestItem do
       expect(subject).not_to be_valid
     end
 
-    it 'row_payload requires a "title" key' do
-      subject.row_payload.delete('title')
+    it 'row_payload requires a "fields" key' do
+      subject.row_payload.delete('fields')
       expect(subject).not_to be_valid
     end
 
