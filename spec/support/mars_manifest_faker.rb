@@ -122,7 +122,8 @@ class MarsManifestFaker
         repeat(0..1) { "Terms Of Use" },
         repeat(0..1) { "Table Of Contents" },
         repeat(0..1) { "Physical Description" },
-        repeat(0..4) { ["Other Identifier", "Other Identifier Type"] },
+        repeat(0..1) { "MLA Barcode" },
+        
         repeat(0..3) { "Comment" },
         repeat(1..4) { [
           repeat(0..1) { "File Label" },
@@ -206,11 +207,10 @@ class MarsManifestFaker
         rand(10**5..10**8)
       when "file checksum"
         Digest::MD5.hexdigest rand.to_s
-      when "other identifier type"
+      when "mla barcode"
         Avalon::ControlledVocabulary.vocabulary[:identifier_types].values.sample
-      when 'collection id', "format", "resource type", "bibliographic id",
-           "table of contents", "other identifier",
-           "file label", "file title", "instantiation label",
+      when "collection id", "format", "resource type", "bibliographic id",
+           "table of contents", "file label", "file title", "instantiation label",
            "instantiation id", "instantiation duration", "instantiation mime type",
            "instantiation width", "instantiation height", "file location",
            "file size", "file duration", "file aspect ratio",
