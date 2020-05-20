@@ -23,7 +23,7 @@ describe 'homepage' do
     expect(page).to have_content('Featured Collection')
     expect(page).to have_content('Featured Video')
     expect(page).to have_content('Featured Audio')
-    expect(page).to have_link('Avalon Media System Project Website')
+    expect(page).to have_link('WGBH MLA')
     expect(page).to have_link('Contact Us')
     expect(page).to have_content('Avalon Media System Release')
     expect(page).to have_content('Search')
