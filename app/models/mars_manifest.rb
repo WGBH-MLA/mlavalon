@@ -91,7 +91,7 @@ class MarsManifest
         errors.add(:values, "Invalid date format for #{headers[col_num]} in column #{col_num + 1}, row #{row_num + 1}, required format is YYYY-MM-DD")
       end
     end
-    
+
     # Adds an error message to a field idempotently (because errors.add is not
     # idempotent, and you can end up with a field having duplicate errors).
     # @param field [Symbol] the field name.
@@ -200,7 +200,7 @@ class MarsManifest
         "comment" => [],
         "file label" => [],
         "file title" => [],
-        "instantiation label" => [],
+        "instantiation label" => [:validate_presence],
         "instantiation id" => [],
         "instantiation streaming url" => [],
         "instantiation duration" => [],

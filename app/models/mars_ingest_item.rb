@@ -34,6 +34,6 @@ class MarsIngestItem < ActiveRecord::Base
     end
 
     def required_payload_fields
-      ['collection_id', 'fields', 'files']
+      ['collection_id', 'title', 'fields', 'files']
     end
 end
