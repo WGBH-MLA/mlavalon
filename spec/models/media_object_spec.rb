@@ -17,7 +17,7 @@ require 'cancan/matchers'
 
 describe MediaObject do
   let(:media_object) { FactoryBot.create(:media_object) }
-  
+
   it 'assigns a noid id' do
     media_object = MediaObject.new
     expect { media_object.assign_id! }.to change { media_object.id }.from(nil).to(String)
@@ -108,7 +108,7 @@ describe MediaObject do
     describe 'notes' do
       it 'should validate notes with types in controlled vocabulary' do
         media_object.descMetadata.note = ['Test Note']
-        media_object.descMetadata.note.type = ['general']
+        media_object.descMetadata.note.type = ['technical']
         expect(media_object.valid?).to be_truthy
         expect(media_object.errors[:note]).to be_empty
       end

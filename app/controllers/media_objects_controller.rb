@@ -40,7 +40,9 @@ class MediaObjectsController < ApplicationController
   is_editor_or_lti = proc { |ctx| (Avalon::Authentication::Providers.any? {|p| p[:provider] == :lti } && self.is_editor(ctx)) || self.is_lti_session(ctx) }
 
   add_conditional_partial :share, :share, partial: 'share_resource', if: is_editor_or_not_lti
-  add_conditional_partial :share, :embed, partial: 'embed_resource', if: is_editor_or_not_lti
+
+  # commenting this out disables displaying Embed option on record page, per casey
+  # add_conditional_partial :share, :embed, partial: 'embed_resource', if: is_editor_or_not_lti
   add_conditional_partial :share, :lti_url, partial: 'lti_url',  if: is_editor_or_lti
 
   def can_embed?
@@ -233,8 +235,23 @@ class MediaObjectsController < ApplicationController
         master_file.date_digitized = DateTime.parse(file_spec[:date_digitized]).to_time.utc.iso8601 if file_spec[:date_digitized].present?
         master_file.identifier += Array(params[:files][index][:other_identifier])
         master_file.comment += Array(params[:files][index][:comment])
+
+
         master_file._media_object = @media_object
         if file_spec[:files].present?
+
+          ####
+          # BEGIN WGBH-MLA CUSTOMIZATION
+          # this is not getting mapped properly, hardcoding for now
+          master_file.workflow_name = 'avalon' unless master_file.workflow_name
+          # need to persist this before saving derivative
+
+          # spoof this in for offsets if not present!
+          master_file.duration = 86400 unless master_file.duration
+          master_file.save
+          # END WGBH-MLA CUSTOMIZATION
+          ###
+
           if master_file.update_derivatives(file_spec[:files], false)
             master_file.update_stills_from_offset!
             WaveformJob.perform_later(master_file.id)
@@ -276,6 +293,7 @@ class MediaObjectsController < ApplicationController
         end
       end
     end
+
     if error_messages.empty?
       render json: {id: @media_object.id}, status: 200
     else

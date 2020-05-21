@@ -17,4 +17,6 @@
   - solr_backup
   - update_dependent_permalinks
   - waveform
+  - mars_ingest_item_job
 :max_retries: 14
+:concurrency: 1

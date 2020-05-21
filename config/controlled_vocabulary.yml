@@ -8,18 +8,21 @@ identifier_types:
   issue number: Issue Number
   matrix number: Matrix Number
   music publisher: Music Publisher/Label
-  videorecording identifier: Videorecording Identifier
+  videorecording identifier: MLA Barcode
   other: Other
 note_types:
-  general: General Note
-  awards: Awards
-  biographical/historical: Bibliographical/Historical Note
-  creation/production credits: Creation/Production Credits
-  language: Language Note
-  local: Local Note
-  performers: Performers
-  statement of responsibility: Statement of Responsibility
-  venue: Venue/Event Date
+  # general: General Note
+  # awards: Awards
+  # biographical/historical: Bibliographical/Historical Note
+  # creation/production credits: Creation/Production Credits
+  # language: Language Note
+  # local: Local Note
+  # performers: Performers
+  # statement of responsibility: Statement of Responsibility
+  # venue: Venue/Event Date
+  content_type: Content Type
+  technical: Technical Notes
+  item_type: Item Type
 rights_statements:
   http://rightsstatements.org/vocab/InC/1.0/: In Copyright
   http://rightsstatements.org/vocab/InC-OW-EU/1.0/: In Copyright - EU Orphan Work

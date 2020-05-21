@@ -41,6 +41,10 @@ Unless required by applicable law or agreed to in writing, software distributed
   <div class="col-sm-4" id="right-column">
     <div id="metadata_container" class="">
       <section id="metadata"><%= render "metadata_display" %></section>
+
+      <% if @media_object.collection.description.present? %>
+        <%= render partial: 'series_description' %>
+      <% end %>
     </div>
   </div>
 

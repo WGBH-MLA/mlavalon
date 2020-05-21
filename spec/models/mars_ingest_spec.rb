@@ -1,40 +1,34 @@
 require 'rails_helper'
 
 describe MarsIngest do
-  before do
-    allow_any_instance_of(MarsIngest).to receive(:manifest_url_status).and_return(["200", "OK"])
-    allow_any_instance_of(MarsIngest).to receive(:valid_manifest_data?).and_return(true)
-  end
 
-  describe '#save' do
+  describe 'validation' do
     subject { FactoryBot.build(:mars_ingest) }
 
-    it 'persists with a manifest_url' do
-      subject.save
-      subject.reload
-      expect(subject.manifest_url).to be_present
-      expect(subject.item_count).to be_present
-      expect(subject.error_msg).not_to be_present
+    # Verify subject valid before hand and test validity after specific changes.
+    before { expect(subject).to be_valid }
+
+    it 'validates the presence of :manifest_url' do
+      subject.manifest_url = nil
+      subject.validate
+      expect(subject).to have_error_on :manifest_url, /required/
     end
 
-    it 'will not persist without manifest_url' do
-      ingest = FactoryBot.build(:mars_ingest, manifest_url: nil)
-      expect{ ingest.save! }.to raise_error(ActiveRecord::RecordInvalid, /is required/)
-    end
+    context 'when the manifest is invalid, with errors' do
+      let(:manifest_errors) {
+        { foo: ["Alpha", "Bravo"], bar: ["Charlie", "Delta"] }
+      }
 
-    it 'validates the file type' do
-      ingest_invalid_file_type = FactoryBot.build(:mars_ingest, manifest_url: 'https://s3-bos.wgbh.org/nehdigitization/manifest.xsls')
-      expect { ingest_invalid_file_type.save! }.to raise_error(ActiveRecord::RecordInvalid, /is not an expected file type. Expected extensions are:/)
-    end
+      before do
+        allow(subject.manifest).to receive(:errors).and_return(manifest_errors)
+        subject.validate
+      end
 
-    it 'returns expected error for unreachable manifest' do
-      allow_any_instance_of(MarsIngest).to receive(:manifest_url_status).and_return(["404", "Not Found"])
-      expect{ subject.save! }.to raise_error(ActiveRecord::RecordInvalid, /could not be reached and returns a status code of: 404, Not Found/)
-    end
-
-    it 'rescues and reports from a SocketError for unreachable manifest' do
-      allow_any_instance_of(MarsIngest).to receive(:manifest_url_status).and_raise(SocketError)
-      expect{ subject.save! }.to raise_error(ActiveRecord::RecordInvalid, /SocketError: failed to open connection to manifest_url/)
+      it 'adds all errors from the manifest onto the :manifest error' do
+        manifest_errors.values.each do |error_msgs|
+          expect(subject.errors[:manifest]).to include error_msgs
+        end
+      end
     end
   end
 end

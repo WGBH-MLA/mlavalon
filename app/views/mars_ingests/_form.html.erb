@@ -1,0 +1,38 @@
+<div id="new_mars_ingest" class="modal fade" role="dialog" data-backdrop="true" data-submit_url="<%= 'create' %>">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+            class="sr-only">Close</span></button>
+        <h4 class='modal-title'><%= modal_title %></h4>
+      </div>
+      <%= bootstrap_form_for @mars_ingest, remote: true, html: { modal: true }, format: 'json' do |f| %>
+      <div class="modal-body">
+        <%= f.text_field :manifest_url %>
+      </div>
+      <div class="modal-footer">
+        <a href="#" data-dismiss="modal" aria-hidden="true" class="btn btn-default">Cancel</a>
+        <%= f.submit class: 'btn btn-primary btn-stateful-loading', data: {loading_text: 'Saving...'} %>
+      </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% content_for :page_scripts do %>
+<script>
+  function inject_alert(message) {
+    $('.navbar-header').closest('.container').after(
+      '<div class="container-fluid" id="alerts"><div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
+      message + '</div></div>');
+  }
+
+  $('form[data-remote][modal]').on('ajax:complete', function (jq_event, xhr) {
+    if (xhr.responseJSON.hasOwnProperty('errors')) {
+      $(this).closest('.modal').modal('hide')
+      inject_alert(xhr.responseJSON['errors'].join('<br/>'));
+      $('.btn-stateful-loading').button('reset')
+    } else window.location = '/mars_ingests/' + encodeURIComponent(xhr.responseJSON['id']);
+  });
+</script>
+<% end %>

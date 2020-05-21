@@ -242,6 +242,16 @@ class MediaObject < ActiveFedora::Base
       solr_doc['avalon_resource_type_ssim'] = self.avalon_resource_type.map(&:titleize)
       solr_doc['identifier_ssim'] = self.identifier.map(&:downcase)
       solr_doc['all_comments_sim'] = all_comments
+
+      # WGBH MLAVAPATCH
+      self.note.each do |nh|
+        # whitelist our custom note types
+        if ['content_type','item_type','technical'].include?(nh[:type])
+          # turn all nonword characters in note type to _
+          solr_doc["#{nh[:type].gsub(/\W/, '_')}_note"] = nh[:note]
+        end
+      end
+
       #Add all searchable fields to the all_text_timv field
       all_text_values = []
       all_text_values << solr_doc["title_tesi"]

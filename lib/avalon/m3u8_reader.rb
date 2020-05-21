@@ -24,7 +24,10 @@ module Avalon
         new(io.read, recursive: recursive)
       elsif io.is_a?(String)
         if io =~ /^https?:/
+
+          io = io.gsub('https://avalon.wgbh.org', 'http://127.0.0.1')
           open(io, "Referer" => Rails.application.routes.url_helpers.root_url) { |resp| new(resp, URI.parse(io), recursive: recursive) }
+
         elsif io =~ /\.m3u8?$/i
           new(File.read(io), io, recursive: recursive)
         else
@@ -71,7 +74,12 @@ module Avalon
       raise RangeError, "Offset out of range" if offset < 0
       elapsed = 0.0
       files.each do |f|
-        duration = f[:duration] * 1000
+
+        # WGBH-MLA CUSTOM -> big big duration if one was not provided
+        f[:duration] ||= 86400
+        duration =  f[:duration] * 1000
+        # END
+
         if elapsed + duration > offset
           location = @base.is_a?(URI) ? @base.merge(f[:filename]).to_s : File.expand_path(f[:filename], @base.to_s)
           return { location: location, filename: f[:filename], offset: offset - elapsed }

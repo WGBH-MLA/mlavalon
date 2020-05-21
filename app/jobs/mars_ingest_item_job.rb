@@ -1,72 +1,62 @@
 class MarsIngestItemJob < ActiveJob::Base
+  MLAVALON_HOST = "mlavalon_avalon_1"
   queue_as :mars_ingest_item_job
 
-  before_perform do
-    set_processing_status
-  end
+  after_enqueue { update_status 'enqueued' }
 
-  after_enqueue do
-    set_enqueued_status
-  end
+  before_perform { update_status 'processing' }
 
-  after_perform do
-    set_final_status
-  end
+  after_perform { update_status 'succeeded' }
 
   rescue_from(StandardError) do |exception|
-    ingest_item = MarsIngestItem.find(id)
-
-    raise exception unless ingest_item
-
-    error_msg = exception.message
-    error_msg += "\n\n#{exception.backtrace.join("\n")}" if Rails.env == "development"
-    ingest_item.update(status: 'failed', error: error_msg)
+    error_message = extract_error_message(exception)
+    logger.error "#{error_message}\n\n#{exception.backtrace.join("\n")}"
+    update_status 'failed', error_message
   end
 
   def perform(id)
     ingest_item = MarsIngestItem.find(id)
+    logger.info "started job, found #{ingest_item.inspect}"
     ingest_item.update(job_id: self.job_id) if ingest_item.job_id == nil
-
-    ingest_one_record(ingest_item, ingest_item.row_payload)
+    logger.info "updated job with #{self.job_id}"
+    ingest_payload(ingest_item.row_payload)
   end
 
-  def set_processing_status
-    ingest_item = MarsIngestItem.find(arguments.first)
-    ingest_item.update(status: 'processing')
-  end
+  private
 
-  def set_enqueued_status
-    ingest_item = MarsIngestItem.find(arguments.first)
-    ingest_item.update(status: 'enqueued')
-  end
+    def update_status(status, error_msg='')
+      raise ArgumentError, "Unrecognized status for MarsIngestItem: '#{status}'" unless MarsIngestItem::STATUSES.include? status
+      # TODO: Consider logging here as well.
+      MarsIngestItem.update(arguments.first, status: status, error: error_msg)
+    end
 
-  def set_final_status
-    ingest_item = MarsIngestItem.find(arguments.first)
-    return ingest_item.update(status: 'failed') if ingest_item.error.present?
-    ingest_item.update(status: 'succeeded')
-  end
+    def ingest_payload(payload)
+      logger.info "Trying to Ingest Payload"
+      host = Rails.env.development? ? 'mlavalon_avalon_1:3000' : '127.0.0.1:80'
 
-  def ingest_one_record(ingest_item, payload)
-    port = '3000'
-    params = {
-      method: :post,
-      url: "http://localhost:#{port}/media_objects.json",
-      payload: payload,
-      headers: {
-        content_type: :json,
-        accept: :json,
-        :'Avalon-Api-Key' => ENV['AVALON_API_KEY']
-      },
-      verify_ssl: false,
-      timeout: 15
-    }
+      params = {
+        method: :post,
+        url: "http://#{host}/media_objects.json",
+        payload: payload,
+        headers: {
+          content_type: :json,
+          accept: :json,
+          # :'Avalon-Api-Key' => ENV['AVALON_API_KEY']
+          :'Avalon-Api-Key' => '9fcee031d3f8daeb26f320b9f2e7927fc4261b667de8cc3706a9dcfec04b411414fee426140d3333819b064c9e74ee322bf81ae7524722d669c92d2e33724314'
+        },
+        verify_ssl: false,
+        timeout: -1
+      }
+      # Call the Avalon Ingest API with our payload.
+      JSON.parse(RestClient::Request.execute(params))
+    end
 
-    send_request(ingest_item, params)
-  end
-
-  def send_request(ingest_item, params)
-    JSON.parse(RestClient::Request.execute(params))
-  rescue => e
-    ingest_item.update(error: "#{e.class}: #{e.message}\n API Response: #{e.response}")
-  end
+    # @return [JSON, String] if the exception has a JSON response body with an
+    #   'errors' key, then fetch and return it. Otherwise, just return the
+    #   original exception message.
+    def extract_error_message(exception)
+      JSON.parse(exception.response.body)['errors'].to_json
+    rescue
+      exception.message
+    end
 end

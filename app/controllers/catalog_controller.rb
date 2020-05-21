@@ -71,13 +71,37 @@ class CatalogController < ApplicationController
     #
     # :show may be set to false if you don't want the facet to be drawn in the
     # facet bar
-    config.add_facet_field 'avalon_resource_type_ssim', label: 'Format', limit: 5, collapse: false
-    config.add_facet_field 'creator_ssim', label: 'Main contributor', limit: 5
+    config.add_facet_field 'avalon_resource_type_ssim', label: 'Audio/Video', limit: 5, collapse: false
+    config.add_facet_field 'creator_ssim', label: 'Main Contributor', limit: 5, sort: 'index'
+
+    # requires valid date format...
+    # config.add_facet_field 'date_sim', label: 'Date', limit: 5, date: true
+
     config.add_facet_field 'date_sim', label: 'Date', limit: 5
-    config.add_facet_field 'genre_sim', label: 'Genres', limit: 5
-    config.add_facet_field 'collection_ssim', label: 'Collection', limit: 5
-    config.add_facet_field 'unit_ssim', label: 'Unit', limit: 5
-    config.add_facet_field 'language_sim', label: 'Language', limit: 5
+    config.add_facet_field 'genre_sim', label: 'Genres', limit: 5, sort: 'index'
+    config.add_facet_field 'collection_ssim', label: 'Collection', limit: 5, sort: 'index'
+    config.add_facet_field 'language_sim', label: 'Language', limit: 5, sort: 'index'
+
+    config.add_facet_field "publisher_sim", label: 'Publishers', limit: 10, sort: 'index'
+    config.add_facet_field "contributor_sim", label: "Contributors", limit: 10, sort: 'index'
+    config.add_facet_field "subject_sim", label: "Subjects", limit: 10, sort: 'index'
+
+    # WGBH new note types
+    config.add_facet_field "content_type_note", label: "Content Type", sort: 'index'
+    config.add_facet_field "item_type_note", label: "Item Type", sort: 'index'
+
+    config.add_facet_field "location_sim", label: "Location", limit: 10, sort: 'index'
+    # removing, because Avalon just fills this in as 'Digital'
+    # config.add_facet_field "material_sim", label: "Material", limit: 10
+    config.add_facet_field "subject_topic_sim", label: "Topical Subjects", limit: 10, sort: 'index'
+    config.add_facet_field "subject_geographic_sim", label: "Geographic Subjects", limit: 10, sort: 'index'
+    config.add_facet_field "subject_temporal_sim", label: "Temporal Subjects", limit: 10, sort: 'index'
+    config.add_facet_field "subject_occupation_sim", label: "Occupation Subjects", limit: 10, sort: 'index'
+    config.add_facet_field "subject_person_sim", label: "Personal Subjects", limit: 10, sort: 'index'
+    config.add_facet_field "subject_corporate_sim", label: "Corporate Subjects", limit: 10, sort: 'index'
+    config.add_facet_field "subject_family_sim", label: "Family Subjects", limit: 10, sort: 'index'
+    config.add_facet_field "subject_title_sim", label: "Title Subjects", limit: 10, sort: 'index'
+
     # Hide these facets if not a Collection Manager
     config.add_facet_field 'workflow_published_sim', label: 'Published', limit: 5, if: Proc.new {|context, config, opts| Ability.new(context.current_user, context.user_session).can? :create, MediaObject}, group: "workflow"
     config.add_facet_field 'avalon_uploader_ssi', label: 'Created by', limit: 5, if: Proc.new {|context, config, opts| Ability.new(context.current_user, context.user_session).can? :create, MediaObject}, group: "workflow"

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import Axios from 'axios';
 import PropTypes from 'prop-types';
+import MarsIngestTableRow from './MarsIngestTableRow';
 import LoadingSpinner from './ui/LoadingSpinner';
-import MarsIngest from './MarsIngest';
 
 class MarsIngestList extends Component {
   constructor(props) {
@@ -45,34 +45,36 @@ class MarsIngestList extends Component {
     let isLoading = this.state.isLoading;
 
     return (
-      <div className={'mars-ingest-list table-responsive'}>
 
-        <table className={'table table-condensed'}>
-          <thead>
-            <tr>
-              <th scope='col'>ID</th>
-              <th scope='col'>Manifest URL</th>
-              <th scope='col'>Status</th>
-              <th scope='col'>Error</th>
-              <th scope='col'>Item Count</th>
-              <th scope='col'>Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading && <LoadingSpinner isLoading={isLoading} />}
+      <div className={'mars-ingest-list table-responsive col-md-12'}>
 
-            { mars_ingest_data.map((row) => <MarsIngest
-                key={ row.id }
-                id={ row.id }
-                status={ row.status }
-                error_msg={ row.error_msg }
-                item_count={ row.count }
-                manifest_url={ row.manifest_url }
-                created_at={ row.created_at }
-              />
-            )}
-          </tbody>
-        </table>
+          {isLoading && <LoadingSpinner isLoading={isLoading} />}
+
+          <table className={'table table-condensed'}>
+            <thead>
+              <tr>
+                <th scope='col'>ID</th>
+                <th scope='col'>Manifest URL</th>
+                <th scope='col'>Error</th>
+                <th scope='col'>Item Count</th>
+                <th scope='col'>Created</th>
+                <th scope='col'></th>
+              </tr>
+            </thead>
+            <tbody>
+              { mars_ingest_data.map((row) => <MarsIngestTableRow
+                  key={ row.id }
+                  id={ row.id }
+                  error_msg={ row.error_msg }
+                  item_count={ row.item_count }
+                  manifest_url={ row.manifest_url }
+                  created_at={ row.created_at }
+                  loading={ isLoading }
+                  is_index= { true }
+                />
+              )}
+            </tbody>
+          </table>
       </div>
     );
   }

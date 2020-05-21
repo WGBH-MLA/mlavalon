@@ -43,7 +43,7 @@ Unless required by applicable law or agreed to in writing, software distributed
 <% content_for :page_scripts do %>
 <script>
   function inject_alert(message) {
-    $('#header-navbar').closest('.container-fluid').after(
+    $('.navbar-header').closest('.container').after(
       '<div class="container-fluid" id="alerts"><div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
       message + '</div></div>');
   }

@@ -15,7 +15,32 @@ class MarsIngestsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: @mars_ingest }
+      format.json { render json: @mars_ingest.to_json(:include => [:mars_ingest_items]) }
     end
   end
+
+  def create
+    @mars_ingest = MarsIngest.new params.require(:mars_ingest).permit(:manifest_url)
+    @mars_ingest.submitter_id = current_user.id
+
+    if @mars_ingest.save
+      start_ingest(@mars_ingest)
+      render json: { id: @mars_ingest.id }, status: 200
+    else
+      render json: { errors: @mars_ingest.errors.messages.values.flatten }, status: 422
+    end
+  rescue => e
+    error_msg = "Unexpected Error: #{e.class}: #{e.message}"
+    Rails.logger.error("#{e.class}: #{e.message}\n\nBacktrace:\n#{e.backtrace.join("\n")}")
+    render json: { errors: [error_msg] }, status: 422
+  end
+
+  private
+
+    def start_ingest(mars_ingest)
+      mars_ingest.mars_ingest_items.each do |mars_ingest_item|
+        job_id = MarsIngestItemJob.perform_later(mars_ingest_item.id)
+        Rails.logger.info("Started MarsIngestItemJob with jid #{job_id} from MarsIngestItem #{mars_ingest_item.id}")
+      end
+    end
 end

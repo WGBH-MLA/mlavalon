@@ -19,7 +19,7 @@ module Demo
 
     def api_token
       # Don't memoize. Depends on the state of the user, which may change.
-      ApiToken.find_or_create_by(username: user.username, email: user.email).token
+      ApiToken.find_or_create_by(username: user.username, email: user.email, token: '9fcee031d3f8daeb26f320b9f2e7927fc4261b667de8cc3706a9dcfec04b411414fee426140d3333819b064c9e74ee322bf81ae7524722d669c92d2e33724314').token
     end
 
     def reset_user

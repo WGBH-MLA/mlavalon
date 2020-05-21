@@ -2,6 +2,7 @@
 
 <div class="page-title-wrapper">
   <h1 class="page-title">Mars Ingest</h1>
+  <a href="/mars_ingests">Return to Mars Ingests</a>
 </div>
 
-<%= react_component("MarsIngestList", { baseUrl: mars_ingest_url(id: @mars_ingest.id, format: :json) }) %>
+<%= react_component("MarsIngest", { baseUrl: mars_ingest_url(id: @mars_ingest.id, format: :json) }) %>

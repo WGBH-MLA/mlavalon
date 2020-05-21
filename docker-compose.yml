@@ -46,6 +46,8 @@ services:
     volumes:
       - ./solr/config:/opt/solr/avalon_conf
       - solr:/opt/solr/server/solr/mycores
+    ports:
+      - '8983:8983'
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
@@ -111,9 +113,9 @@ services:
       - SETTINGS__MINIO__SECRET=minio123
       - SETTINGS__ENCODING__MASTERFILE_BUCKET=masterfiles
       - SETTINGS__ENCODING__DERIVATIVE_BUCKET=derivatives
-      - SETTINGS__DROPBOX__PATH=s3://masterfiles/dropbox/
-      - SETTINGS__DROPBOX__UPLOAD_URI=s3://masterfiles/dropbox/
-      - SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://preserves/
+      # - SETTINGS__DROPBOX__PATH=s3://masterfiles/dropbox/
+      # - SETTINGS__DROPBOX__UPLOAD_URI=s3://masterfiles/dropbox/
+      # - SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://preserves/
       - SETTINGS__MASTER_FILE_MANAGEMENT__STRATEGY=MOVE
       - SETTINGS__STREAMING__CONTENT_PATH=/derivatives/
       - SETTINGS__STREAMING__STREAM_DEFAULT_QUALITY=medium
@@ -155,6 +157,8 @@ services:
     <<: *avalon
     command: dumb-init -- bash -c "bundle install && bundle exec sidekiq -C config/sidekiq.yml"
     ports: []
+    # environment:
+    #   AVALON_API_KEY: 9fcee031d3f8daeb26f320b9f2e7927fc4261b667de8cc3706a9dcfec04b411414fee426140d3333819b064c9e74ee322bf81ae7524722d669c92d2e33724314
 
   minio:
     image: minio/minio:RELEASE.2019-10-12T01-39-57Z

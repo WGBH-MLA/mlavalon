@@ -95,7 +95,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :mars_ingests, only: [:index, :show]
+  resources :mars_ingests, only: [:index, :show, :create]
 
   resources :media_objects, except: [:create, :update] do
     member do
@@ -218,4 +218,7 @@ Rails.application.routes.draw do
     mount Sidekiq::Web, at: '/jobs', as: 'jobs'
   end
   get '/jobs(.:format)', to: redirect('/')
+
+  # TODO Add this route for dev env only?
+  resources :fake_mars_manifests, only: [:index], controller: 'fake_mars_manifests', format: 'csv'
 end
