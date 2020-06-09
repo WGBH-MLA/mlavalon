@@ -94,7 +94,9 @@ class CatalogController < ApplicationController
     # removing, because Avalon just fills this in as 'Digital'
     # config.add_facet_field "material_sim", label: "Material", limit: 10
     config.add_facet_field "subject_topic_sim", label: "Topical Subjects", limit: 10, sort: 'index'
-    config.add_facet_field "subject_geographic_sim", label: "Geographic Subjects", limit: 10, sort: 'index'
+
+    # removing for mlavalon implementation
+    # config.add_facet_field "subject_geographic_sim", label: "Geographic Subjects", limit: 10, sort: 'index'
     config.add_facet_field "subject_temporal_sim", label: "Temporal Subjects", limit: 10, sort: 'index'
     config.add_facet_field "subject_occupation_sim", label: "Occupation Subjects", limit: 10, sort: 'index'
     config.add_facet_field "subject_person_sim", label: "Personal Subjects", limit: 10, sort: 'index'
