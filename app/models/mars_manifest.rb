@@ -52,7 +52,9 @@ class MarsManifest
     #   nil if an error occurs.
     def raw_data
       # TODO: Stop bypassing SSL check.
-      @raw_data ||=  open(url, { ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE }).read
+
+      # sub out vertical tabs, they are expected in mars exports
+      @raw_data ||=  open(url, { ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE }).read.gsub(/\t/, "\n")
     rescue => e
       add_error(:url, "Invalid Manifest URL: '#{url}'")
     end
@@ -84,6 +86,41 @@ class MarsManifest
       if value.to_s.strip.empty?
         errors.add(:values, "Value required for #{headers[col_num]} in column #{col_num + 1}, row #{row_num + 1}")
       end
+    end
+
+    # in order to determine whether a file field's presence is required, we need to verify that there is some sort of data elsewhere in the file field's fileset
+    def validate_presence_within_fileset(value, row_num, col_num)
+      this_row = rows[row_num]
+
+      found_data_in_this_fileset = false
+
+      # go left
+      found_data_in_this_fileset = scan_for_value(this_row, col_num, -1)
+
+      # go right
+      found_data_in_this_fileset = scan_for_value(this_row, col_num, 1) unless found_data_in_this_fileset
+
+      if found_data_in_this_fileset
+        validate_presence(value, row_num, col_num)
+      end
+    end
+
+    def scan_for_value(row, index, increment)
+      found_data = false
+      while !found_data
+        # left or right by 1 cell, depending on value passed in
+        index += increment
+
+        # record if we found data, which will break while loop 
+        puts "I looked at #{index} (#{headers[index]}) and found #{row[index].to_s.strip} #{row[index].to_s.strip.present?}"
+        found_data = row[index].to_s.strip.present?
+        break if found_data
+
+        # just exit if we hit the beginning of the current fileset (left), or the beginning of the next one (right)
+        break if MarsManifest.initial_file_header?(headers[index]) || !MarsManifest.instantiation_header?(headers[index]) || !MarsManifest.file_header?(headers[index])
+      end
+
+      found_data
     end
 
     def validate_date(value, row_num, col_num)
@@ -141,7 +178,9 @@ class MarsManifest
   class << self
     def required_headers
       validation_methods.select do |field, validations|
-        validations.include? :validate_presence
+        # validations.include? :validate_presence
+        (validations & [:validate_presence, :validate_presence_within_fileset]).present?
+
       end.keys
     end
 
@@ -199,8 +238,8 @@ class MarsManifest
 
         "comment" => [],
         "file label" => [],
-        "file title" => [],
-        "instantiation label" => [:validate_presence],
+        "file title" => [:validate_presence_within_fileset],
+        "instantiation label" => [:validate_presence_within_fileset],
         "instantiation id" => [],
         "instantiation streaming url" => [],
         "instantiation duration" => [],
@@ -288,12 +327,12 @@ class MarsManifest
     end
 
     def initial_file_header?(header)
-      initial_file_headers.include? normalize_header(header)
+      normalize_header(header) == 'file title'
     end
 
-    def initial_file_headers
-      ['file label', 'file title']
-    end
+    # def initial_file_headers
+    #   ['file label', 'file title']
+    # end
 
     def instantiation_header?(header)
       instantiation_headers.include? normalize_header(header)
