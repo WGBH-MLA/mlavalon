@@ -222,7 +222,7 @@ class ManifestToPayloadMapper
     end
 
     def encode_value(val)
-      val.to_s.force_encoding('UTF-8')
+      val.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
     end
 
     # Checks for multivalued fields, turns them into arrays, and combines
