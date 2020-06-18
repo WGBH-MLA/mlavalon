@@ -27,34 +27,9 @@ class ManifestToPayloadMapper
 
     # @payload = compact_payload(@payload)
     pl = @payload.clone
-    @payload = compact_hash(pl)
+    pl = compact_hash(pl)
+    @payload = deep_correct_encoding(pl)
   end
-
-  # def compact_payload(payload)
-  #   # cleaning up the mess
-  #   clean_payload = payload.clone
-  #   clean_payload['files'] = compact_filearray(payload['files'])
-  #   clean_payload['fields'] = compact_key(payload['fields'])
-  #   clean_payload
-  # end
-
-  # def compact_filearray(filearray)
-  #   filearray.map do |file|
-
-  #     # compact the inner files
-  #     newfilefiles = file['files'].map { |ff| compact_key(ff) }
-  #     # compact the outer files
-  #     newfile = compact_key(file)
-  #     # reassign the inner files
-  #     newfile['files'] = newfilefiles
-
-  #     newfile
-  #   end
-  # end
-
-  # def compact_key(hash)
-  #   hash.delete_if {|header, value| value == "" || value.nil? || (value.is_a?(Array) && value.all? {|v| v.nil? || v == "" })  }
-  # end
 
   def compact_hash(hash)
     newhash = {}
@@ -91,7 +66,18 @@ class ManifestToPayloadMapper
     newhash
   end
 
-
+  def deep_correct_encoding(hash)
+    hash.transform_values do |v|
+      if v.is_a?(Hash)
+        deep_correct_encoding(v)
+      elsif v.is_a?(Array)
+        v.map {|ele| ele.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?').force_encoding('UTF-8')}
+      else
+        v.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?').force_encoding('UTF-8')
+      end
+    end
+  end
+  
   private
 
     # Returns a found (or new) collection based on the collection fields and

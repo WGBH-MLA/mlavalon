@@ -112,7 +112,6 @@ class MarsManifest
         index += increment
 
         # record if we found data, which will break while loop 
-        puts "I looked at #{index} (#{headers[index]}) and found #{row[index].to_s.strip} #{row[index].to_s.strip.present?}"
         found_data = row[index].to_s.strip.present?
         break if found_data
 
