@@ -5,10 +5,6 @@ class MarsIngest < ActiveRecord::Base
   after_create do
     manifest.rows.each do |row|
       payload = ManifestToPayloadMapper.new(manifest.headers, row, submitter.user_key).payload
-
-      # # deep correct encoding of every field in hash, and sub out utf8-invalid characters
-      # payload = deep_correct_encoding(payload)
-
       mars_ingest_item = MarsIngestItem.new(row_payload: payload)
       mars_ingest_item.mars_ingest_id = id
       mars_ingest_item.save!
