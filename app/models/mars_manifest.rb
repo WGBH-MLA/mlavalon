@@ -71,6 +71,7 @@ class MarsManifest
     end
 
     def validate_value_has_header(value, row_num, col_num)
+      # ignore blank 'fields' that also have a blank header -> no need to police extra commas at the end of headers or rows
       if headers[col_num].to_s.empty?
         errors.add(:rows, "No header for value '#{value}', column #{col_num + 1}, row #{row_num + 1}.")
       end
@@ -100,6 +101,8 @@ class MarsManifest
       # go right
       found_data_in_this_fileset = scan_for_value(this_row, col_num, 1) unless found_data_in_this_fileset
 
+
+
       if found_data_in_this_fileset
         validate_presence(value, row_num, col_num)
       end
@@ -108,15 +111,24 @@ class MarsManifest
     def scan_for_value(row, index, increment)
       found_data = false
       while !found_data
+        # if we START on File Title, we have to exit or else we're going into the next fileset 
+        break if MarsManifest.initial_file_header?(headers[index])
+
         # left or right by 1 cell, depending on value passed in
         index += increment
 
-        # record if we found data, which will break while loop 
+        # exit if this is not a fileset header, otherwise infinite loop :(
+        break unless MarsManifest.instantiation_header?(headers[index]) || MarsManifest.file_header?(headers[index])
+
+        # stop our checking now if we're going to the right -> we hit the next file title
+        break if (MarsManifest.initial_file_header?(headers[index]) && increment == 1)
+
+        # record if we found data, which will break while loop
         found_data = row[index].to_s.strip.present?
         break if found_data
 
-        # just exit if we hit the beginning of the current fileset (left), or the beginning of the next one (right)
-        break if MarsManifest.initial_file_header?(headers[index]) || !MarsManifest.instantiation_header?(headers[index]) || !MarsManifest.file_header?(headers[index])
+        # we need to stop, we're going left and we hit File Title (beginning of fileset)
+        break if MarsManifest.initial_file_header?(headers[index]) && increment == -1
       end
 
       found_data
