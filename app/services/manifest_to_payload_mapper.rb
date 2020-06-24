@@ -25,42 +25,64 @@ class ManifestToPayloadMapper
       p['files'] = file_hashes
     end
 
-    # @payload = compact_payload(@payload)
     pl = @payload.clone
     pl = compact_hash(pl)
-    @payload = deep_correct_encoding(pl)
+    zl = pl.clone
+    @payload = deep_correct_encoding(zl)
+  end
+
+  def contains_truth?(ele)
+    return false if ele == ""
+    return false if ele.nil?
+    return false if ele == [{}]
+    return false if ele == {}
+    return false if ele == []
+    
+    if ele.is_a?(Hash)
+      return false unless ele.values.any? {|v| contains_truth?(v) }
+    end
+    
+    if ele.is_a?(Array)
+      return false unless ele.any? {|element| contains_truth?(element) }
+    end
+
+    true
   end
 
   def compact_hash(hash)
     newhash = {}
     hash.each do |k,v|
 
+      # skip this element unless there is something, somewhere, inside
+      next unless contains_truth?(v)
+
       if v.is_a?(Array)
 
-        # if its an array of nils or ""s, don't pass this key on at all
-        unless v.all? {|element| element == "" || element.nil?}
+        if v.all? {|element| element.is_a?(Hash) }
 
-          # if array of hashes, do it again for next layer
-          if v.all? {|element| element.is_a?(Hash) }
+          v.each do |hashito|
 
-            newhash[k] = v.map {|h| compact_hash(h) }
-          else
-
-            # its a multivalued field, pass on the actual values in this array
-            newhash[k] = v.reject { |value| value == "" || value.nil? }
+            # if array of hashes, do it again for next layer, IF theres actually something in the hash
+            if contains_truth?(hashito)
+              newhash[k] ||= []
+              newhash[k] << compact_hash(hashito)
+            end
           end
+        else
 
+          # its a multivalued field, pass on the real values in this array
+          newhash[k] = v.select { |value| contains_truth?(value) }
         end
+
       elsif v.is_a?(String)
 
         # its a single value field, only pass key through if value
-        newhash[k] = v unless v == "" || v.nil?
+        newhash[k] = v
       elsif v.is_a?(Hash)
 
-        # this key is a hash do it again for this layer
+        # this key is a hash, with SOMETHING init, do it again for this layer
         newhash[k] = compact_hash(v)
       end
-
     end
 
     newhash
