@@ -93,7 +93,14 @@ class ManifestToPayloadMapper
       if v.is_a?(Hash)
         deep_correct_encoding(v)
       elsif v.is_a?(Array)
-        v.map {|ele| ele.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?').force_encoding('UTF-8')}
+
+        if v.all? {|ele| ele.is_a?(Hash) }
+        
+          v.map { |ele| deep_correct_encoding(ele) }
+        else
+        
+          v.map {|ele| ele.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?').force_encoding('UTF-8')}
+        end
       else
         v.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?').force_encoding('UTF-8')
       end
