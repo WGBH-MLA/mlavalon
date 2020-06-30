@@ -7,6 +7,9 @@ gem 'rails', '=5.2.3'
 gem 'sprockets', '~>3.7.2'
 gem 'sqlite3'
 
+gem 'execjs'
+gem 'therubyracer'
+
 # Assets
 gem 'coffee-rails', '~> 4.2.0'
 gem 'jquery-datatables'
