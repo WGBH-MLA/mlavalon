@@ -28,11 +28,7 @@ COPY        Gemfile.lock ./Gemfile.lock
 COPY        package.json ./package.json
 RUN         bundle config build.nokogiri --use-system-libraries \
          && bundle install --with aws development test postgres --without production 
-
-RUN yarn install
-RUN cp config/controlled_vocabulary.yml.example config/controlled_vocabulary.yml
-
-CMD export HOME=/home/app && rm -f tmp/pids/server.pid && bundle exec rake db:migrate && bin/rails server -b 0.0.0.0
+# CMD export HOME=/home/app && rm -f tmp/pids/server.pid && bundle exec rake db:migrate && bin/rails server -b 0.0.0.0
 
 
 # Download stage takes advantage of parallel build
@@ -88,9 +84,9 @@ COPY        --from=download /usr/bin/dockerize /usr/bin/
 WORKDIR     /home/app/avalon
 ADD         docker_init.sh /
 
-# RUN apt-get -y install git nodejs yarn libxslt1-dev libpq-dev build-essential ruby-dev libxml2-dev dumb-init
+RUN apt-get -y install git nodejs yarn libxslt1-dev libpq-dev build-essential ruby-dev libxml2-dev dumb-init
 # RUN yarn install
 # RUN ls && bundle config build.nokogiri --use-system-libraries && bundle install
 # RUN cp config/controlled_vocabulary.yml.example config/controlled_vocabulary.yml
 
-# CMD export HOME=/home/app && rm -f tmp/pids/server.pid && bundle exec rake db:migrate && bin/rails server -b 0.0.0.0
+CMD export HOME=/home/app && rm -f tmp/pids/server.pid && bundle exec rake db:migrate && yarn install && bin/rails server -b 0.0.0.0

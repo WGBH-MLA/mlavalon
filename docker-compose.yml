@@ -80,9 +80,9 @@ services:
 
   avalon: &avalon
     # image: avalonmediasystem/avalon:7.1-slim-dev-20200514
-    image: mlavalon:1.0
+    image: mlavalon:coolest
     build: .
-    command: bash -c "/docker_init.sh && bin/rails server -b 0.0.0.0"
+    # command: bash -c "/docker_init.sh && bin/rails server -b 0.0.0.0"
     depends_on:
       - db
       - fedora
@@ -156,7 +156,7 @@ services:
 
   worker:
     <<: *avalon
-    command: ./worker-init.sh && dumb-init -- bash -c "bundle install && bundle exec sidekiq -C config/sidekiq.yml"
+    command: dumb-init -- bash -c "bundle install && bundle exec sidekiq -C config/sidekiq.yml"
     ports: []
     # environment:
     #   AVALON_API_KEY: 9fcee031d3f8daeb26f320b9f2e7927fc4261b667de8cc3706a9dcfec04b411414fee426140d3333819b064c9e74ee322bf81ae7524722d669c92d2e33724314
