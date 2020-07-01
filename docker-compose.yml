@@ -135,24 +135,24 @@ services:
     stdin_open: true
     tty: true
 
-  # test:
-  #   <<: *avalon
-  #   command: >
-  #     bash -c "/docker_init.sh && tail -f /dev/null"
-  #   depends_on:
-  #     - db-test
-  #     - fedora-test
-  #     - solr-test
-  #     - redis-test
-  #   environment:
-  #     - DATABASE_URL=postgresql://postgres:whatever@db-test/avalon
-  #     - REDIS_HOST=redis-test
-  #     - FEDORA_URL=http://fedora-test:8080/fedora/rest
-  #     - SOLR_URL=http://solr-test:8983/solr/avalon
-  #     - RAILS_ENV=test
-  #     - BUNDLE_FLAGS=--with aws test postgres --without production
-  #     - DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true
-  #   ports: []
+  test:
+    <<: *avalon
+    command: >
+      bash -c "/docker_init.sh && tail -f /dev/null"
+    depends_on:
+      - db-test
+      - fedora-test
+      - solr-test
+      - redis-test
+    environment:
+      - DATABASE_URL=postgresql://postgres:whatever@db-test/avalon
+      - REDIS_HOST=redis-test
+      - FEDORA_URL=http://fedora-test:8080/fedora/rest
+      - SOLR_URL=http://solr-test:8983/solr/avalon
+      - RAILS_ENV=test
+      - BUNDLE_FLAGS=--with aws test postgres --without production
+      - DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true
+    ports: []
 
   worker:
     <<: *avalon
