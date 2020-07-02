@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
 
   def default_url_options
     if Rails.env.production?
-      {:host => "avalon.wgbh.org"}
+      {:host => ENV['SETTINGS__DOMAIN'] }
     else  
       {}
     end
