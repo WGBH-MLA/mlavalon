@@ -114,18 +114,23 @@ module ApplicationHelper
   end
 
   def search_result_label item
+
     if item['title_tesi'].present?
-      label = truncate(item['title_tesi'], length: 100)
+      # WGBH-MLA CUSTO -> show item type note along with title
+      title_and_item_type = item['title_tesi']
+      title_and_item_type += %( - #{item['item_type_note'].first}) if item['item_type_note'].first
+      label = truncate(title_and_item_type, length: 100)
     else
       label = item[:id]
     end
 
-    if item['duration_ssi'].present?
-      duration = item['duration_ssi']
-      if duration.respond_to?(:to_i) && duration.to_i > 0
-        label += " (#{milliseconds_to_formatted_time(duration.to_i, false)})"
-      end
-    end
+    # WGBH-MLA CUSTO -> because of bogus duration to make thumbnail generation work, dont show in the title
+    # if item['duration_ssi'].present?
+    #   duration = item['duration_ssi']
+    #   if duration.respond_to?(:to_i) && duration.to_i > 0
+    #     label += " (#{milliseconds_to_formatted_time(duration.to_i, false)})"
+    #   end
+    # end
 
     label
   end
