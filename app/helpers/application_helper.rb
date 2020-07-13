@@ -118,7 +118,7 @@ module ApplicationHelper
     if item['title_tesi'].present?
       # WGBH-MLA CUSTO -> show item type note along with title
       title_and_item_type = item['title_tesi']
-      title_and_item_type += %( - #{item['item_type_note'].first}) if item['item_type_note'].first
+      title_and_item_type += %( - #{item['item_type_note'].first}) if item['item_type_note'] && item['item_type_note'].first
       label = truncate(title_and_item_type, length: 100)
     else
       label = item[:id]
