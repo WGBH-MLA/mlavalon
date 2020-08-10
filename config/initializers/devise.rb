@@ -309,12 +309,23 @@ Devise.setup do |config|
                                })
     end
     params = provider[:params]
+
+    # Is there a better way?
+    if provider[:provider] == :oktaoauth
+      okta_params = params.delete(:oauth_credentials)
+      params[:strategy_class] = params[:strategy_class].constantize if params.has_key?(:strategy_class)
+      okta_params << params
+      params = okta_params
+    end
+
     params = [params] unless params.is_a?(Array)
+
     begin
       require "omniauth/#{provider[:provider]}"
     rescue LoadError
       require "omniauth-#{provider[:provider]}"
     end
+
     config.omniauth provider[:provider], *params
   end
 

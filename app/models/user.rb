@@ -29,7 +29,10 @@ class User < ActiveRecord::Base
   devise_list = [ :database_authenticatable, :invitable, :omniauthable,
                   :recoverable, :rememberable, :trackable, :validatable ]
   devise_list << :registerable if Settings.auth.registerable
-  devise_list << { authentication_keys: [:login] }
+
+  # Does this have to be one or the other?
+  devise_list << { authentication_keys: [:login] } unless Settings.auth.configuration[0].provider
+  devise_list <<  { omniauth_providers: [:oktaoauth] } if Settings.auth.configuration[0].provider
 
   devise(*devise_list)
 
