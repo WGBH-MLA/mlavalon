@@ -310,7 +310,7 @@ Devise.setup do |config|
     end
     params = provider[:params]
 
-    # Is there a better way?
+    # Sets up params as expected by the omniauth-oktaoauth gem
     if provider[:provider] == :oktaoauth
       okta_params = params.delete(:oauth_credentials)
       params[:strategy_class] = params[:strategy_class].constantize if params.has_key?(:strategy_class)

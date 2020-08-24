@@ -30,7 +30,6 @@ class User < ActiveRecord::Base
                   :recoverable, :rememberable, :trackable, :validatable ]
   devise_list << :registerable if Settings.auth.registerable
 
-  # Does this have to be one or the other?
   devise_list << { authentication_keys: [:login] } if Settings.auth.configuration.nil?
   devise_list <<  { omniauth_providers: [:oktaoauth] } unless Settings.auth.configuration.nil?
 
