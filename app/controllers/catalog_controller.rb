@@ -77,7 +77,7 @@ class CatalogController < ApplicationController
     # requires valid date format...
     # config.add_facet_field 'date_sim', label: 'Date', limit: 5, date: true
 
-    config.add_facet_field 'date_sim', label: 'Date', limit: 5
+    config.add_facet_field 'date_sim', label: 'Date', limit: 5, sort: 'index'
     config.add_facet_field 'genre_sim', label: 'Genres', limit: 5, sort: 'index'
     config.add_facet_field 'collection_ssim', label: 'Collection', limit: 5, sort: 'index'
     config.add_facet_field 'language_sim', label: 'Language', limit: 5, sort: 'index'
