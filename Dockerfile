@@ -1,5 +1,5 @@
 # Base stage for building gems
-FROM        ruby:2.5.5-stretch as base
+FROM        ruby:2.5.8-stretch as base
 ENV         BUNDLER_VERSION 2.0.2
 RUN         echo "deb http://deb.debian.org/debian stretch-backports main" >> /etc/apt/sources.list \
          && apt-get update && apt-get upgrade -y build-essential \
@@ -32,7 +32,7 @@ RUN         bundle config build.nokogiri --use-system-libraries \
 
 
 # Download stage takes advantage of parallel build
-FROM        ruby:2.5.5-stretch as download
+FROM        ruby:2.5.8-stretch as download
 RUN         curl https://chromedriver.storage.googleapis.com/2.46/chromedriver_linux64.zip -o /usr/local/bin/chromedriver \
          && chmod +x /usr/local/bin/chromedriver \
          && curl -L https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz | tar xvz -C /usr/bin/ \
@@ -42,7 +42,7 @@ RUN         curl https://chromedriver.storage.googleapis.com/2.46/chromedriver_l
 
 
 # Dev stage for building dev image
-FROM        ruby:2.5.5-slim-stretch as dev
+FROM        ruby:2.5.8-slim-stretch as dev
 ENV         BUNDLER_VERSION 2.0.2
 RUN         apt-get update && apt-get install -y --no-install-recommends curl gnupg2 \
          && curl -sL http://deb.nodesource.com/setup_8.x | bash - \
@@ -82,7 +82,6 @@ COPY        --from=download /usr/bin/ff* /usr/bin/
 COPY        --from=download /usr/bin/dockerize /usr/bin/
 
 WORKDIR     /home/app/avalon
-ADD         docker_init.sh /
 
 RUN apt-get -y install git nodejs yarn libxslt1-dev libpq-dev build-essential ruby-dev libxml2-dev dumb-init
 # RUN yarn install
