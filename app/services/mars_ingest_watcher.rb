@@ -4,7 +4,10 @@ class MarsIngestWatcher
     url = get_manifest
 
     if url
+      Rails.logger.info "Got a manifest at #{url}, lets go!"
       run_manifest(url)
+    else
+      Rails.logger.info "It aint no manifests.. Bye!"
     end
   end
 
@@ -26,6 +29,7 @@ class MarsIngestWatcher
     # if anything
       # ingest first one
       # url = "https://mlavalon.s3.amazonaws.com/export_2020-06-24_300_allQCd-httpsfix-SMALLCUT.csv"
+      return nil unless csv_key
       Rails.logger.info "I got #{csv_key}"
       # move ingest to processed s3 folder
 
@@ -46,6 +50,9 @@ class MarsIngestWatcher
     Rails.logger.info "Checking for presence of #{output_key}"
     if client.head_object({bucket: "mlavalon", key: output_key})
       # 404 if not
+
+      # need to make copy public so that ingest machinery can download the manifest
+      client.put_object_acl({ acl: "public-read", bucket: "mlavalon", key: output_key })
       Rails.logger.info "Now deleting #{input_key}..."
       client.delete_object({bucket: "mlavalon", key: input_key })
     end
