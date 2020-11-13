@@ -82,7 +82,6 @@ COPY        --from=download /usr/bin/ff* /usr/bin/
 COPY        --from=download /usr/bin/dockerize /usr/bin/
 
 WORKDIR     /home/app/avalon
-ADD         docker_init.sh /
 
 RUN apt-get -y install git nodejs yarn libxslt1-dev libpq-dev build-essential ruby-dev libxml2-dev dumb-init
 # RUN yarn install
