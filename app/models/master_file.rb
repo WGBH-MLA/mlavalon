@@ -153,11 +153,23 @@ class MasterFile < ActiveFedora::Base
       end
     end
   end
-  validates_each :poster_offset, :thumbnail_offset do |record, attr, value|
-    unless value.nil? or value.to_i.between?(0,record.duration.to_i)
-      record.errors.add attr, "must be between 0 and #{record.duration}"
-    end
-  end
+
+  ###
+  # BEGIN WGBH-MLA CUSTOMIZATION
+  # Commenting out this validation since we don't have always duration information and
+  # spoof it. If offeset is outside of actual range, the poster and thumbnails
+  # just won't be updated.
+
+  # validates_each :poster_offset, :thumbnail_offset do |record, attr, value|
+  #   unless value.nil? or value.to_i.between?(0,record.duration.to_i)
+  #     record.errors.add attr, "must be between 0 and #{record.duration}"
+  #   end
+  # end
+
+  # END WGBH-MLA CUSTOMIZATION
+  ###
+
+
   # validates :file_format, presence: true, exclusion: { in: ['Unknown'], message: "The file was not recognized as audio or video." }
 
   after_save :update_stills_from_offset!, if: Proc.new { |mf| mf.previous_changes.include?("poster_offset") || mf.previous_changes.include?("thumbnail_offset") }
@@ -593,13 +605,17 @@ class MasterFile < ActiveFedora::Base
     return unless is_video?
 
     offset = options[:offset].to_i
-    unless offset.between?(0,self.duration.to_i)
-      raise RangeError, "Offset #{offset} not in range 0..#{self.duration}"
-    end
-
 
     ###
     # BEGIN WGBH-MLA CUSTOMIZATION
+
+    # Commenting out this RangeError check since we don't have always duration information
+    # and spoof it. If offeset is outside of actual range, the image just won't be updated.
+
+    # unless offset.between?(0,self.duration.to_i)
+    #   raise RangeError, "Offset #{offset} not in range 0..#{self.duration}"
+    # end
+
     # for now all our thumbnails are same size
     # frame_size = (options[:size].nil? or options[:size] == 'auto') ? self.original_frame_size : options[:size]
 
@@ -610,7 +626,7 @@ class MasterFile < ActiveFedora::Base
     new_height = 360
     # END WGBH-MLA CUSTOMIZATION
     ###
-    
+
     frame_source = find_frame_source(offset: offset)
     data = get_ffmpeg_frame_data(frame_source, new_width, new_height)
     raise RuntimeError, "Frame extraction failed. See log for details." if data.empty?
