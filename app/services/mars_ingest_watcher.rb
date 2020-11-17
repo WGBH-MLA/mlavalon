@@ -1,12 +1,13 @@
 class MarsIngestWatcher
   def self.run
     Rails.logger.info "Hello!"
-    url = get_manifest
+    key = get_manifest
 
-    if url
-      Rails.logger.info "Got a manifest at #{url}, lets go!"
+    if key
+      Rails.logger.info "Got a manifest at #{key}, lets go!"
+      url = move_manifest(key)
       run_manifest(url)
-    else
+    else 
       Rails.logger.info "It aint no manifests.. Bye!"
     end
   end
@@ -25,6 +26,7 @@ class MarsIngestWatcher
     client = get_s3_client
     objs = client.list_objects({bucket: "mlavalon", prefix: "ingestion-inbox"})
     csv_key = objs.contents.map(&:key).find {|obj_key| obj_key != "ingestion-inbox/" }
+
 
     # if anything
       # ingest first one
@@ -52,9 +54,13 @@ class MarsIngestWatcher
       # 404 if not
 
       # need to make copy public so that ingest machinery can download the manifest
+      Rails.logger.info "Adding public acl to #{output_key}"
       client.put_object_acl({ acl: "public-read", bucket: "mlavalon", key: output_key })
       Rails.logger.info "Now deleting #{input_key}..."
       client.delete_object({bucket: "mlavalon", key: input_key })
+
+      # tis is the (now public) url we're actually going to hit for the ingest
+      return output_key
     end
 
   end
@@ -66,7 +72,6 @@ class MarsIngestWatcher
     mi = MarsIngest.new(manifest_url: url, submitter_id: user.id)
     if mi.save
       Rails.logger.info "Ok, looks like the manifest was valid!"
-      move_manifest(key)
       
       mi.mars_ingest_items.each do |mars_ingest_item|
         job_id = MarsIngestItemJob.perform_later(mars_ingest_item.id)
