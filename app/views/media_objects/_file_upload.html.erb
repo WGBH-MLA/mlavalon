@@ -101,6 +101,9 @@ Unless required by applicable law or agreed to in writing, software distributed
                 <%= text_field_tag "master_files[#{part.id}][date_digitized]", part.date_digitized, class: 'date-input' %>
               </div>
             </div>
+            <!-- Commenting out since this fails when our ingested media object is
+              missing duration in the metadata -->
+            <!--
             <div class="col-sm-3">
               <div class="form-group">
                 <label>Thumbnail</label>
@@ -112,6 +115,7 @@ Unless required by applicable law or agreed to in writing, software distributed
                 <% end %>
               </div>
             </div>
+            -->
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Permalink</label>
