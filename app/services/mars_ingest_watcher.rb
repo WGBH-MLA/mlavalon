@@ -1,14 +1,14 @@
 class MarsIngestWatcher
   def self.run
-    puts  "Hello!"
+    puts "Hello!"
     key = get_manifest
 
     if key
-      puts  "Got a manifest at #{key}, lets go!"
+      puts "Got a manifest at #{key}, lets go!"
       url = move_manifest(key)
       run_manifest(url)
     else 
-      puts  "It aint no manifests.. Bye!"
+      puts "It aint no manifests.. Bye!"
     end
   end
 
@@ -21,7 +21,7 @@ class MarsIngestWatcher
   end
 
   def self.get_manifest
-    puts  "Let me check those manifests for you..."
+    puts "Let me check those manifests for you..."
     # list unprocessed s3 folder
     client = get_s3_client
     objs = client.list_objects({bucket: "mlavalon", prefix: "ingestion-inbox"})
@@ -32,7 +32,7 @@ class MarsIngestWatcher
       # ingest first one
       # url = "https://mlavalon.s3.amazonaws.com/export_2020-06-24_300_allQCd-httpsfix-SMALLCUT.csv"
       return nil unless csv_key
-      puts  "I got #{csv_key}"
+      puts "I got #{csv_key}"
       # move ingest to processed s3 folder
 
     return csv_key
@@ -47,16 +47,16 @@ class MarsIngestWatcher
     # destination = "https://mlavalon.s3.amazonaws.com/ingestion-outbox/" + File.basename(key)
 
     output_key = "ingestion-outbox/" + File.basename(input_key)
-    puts  "Now copying #{input_key} to #{output_key}..."
+    puts "Now copying #{input_key} to #{output_key}..."
     client.copy_object({bucket: "mlavalon", key: output_key, copy_source: "mlavalon/" + input_key})
-    puts  "Checking for presence of #{output_key}"
+    puts "Checking for presence of #{output_key}"
     if client.head_object({bucket: "mlavalon", key: output_key})
       # 404 if not
 
       # need to make copy public so that ingest machinery can download the manifest
-      puts  "Adding public acl to #{output_key}"
+      puts "Adding public acl to #{output_key}"
       client.put_object_acl({ acl: "public-read", bucket: "mlavalon", key: output_key })
-      puts  "Now deleting #{input_key}..."
+      puts "Now deleting #{input_key}..."
       client.delete_object({bucket: "mlavalon", key: input_key })
 
       # tis is the (now public) url we're actually going to hit for the ingest
@@ -71,7 +71,7 @@ class MarsIngestWatcher
 
     mi = MarsIngest.new(manifest_url: url, submitter_id: user.id)
     if mi.save
-      puts  "Ok, looks like the manifest was valid!"
+      puts "Ok, looks like the manifest was valid!"
       
       mi.mars_ingest_items.each do |mars_ingest_item|
         job_id = MarsIngestItemJob.perform_later(mars_ingest_item.id)
