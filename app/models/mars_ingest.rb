@@ -20,6 +20,10 @@ class MarsIngest < ActiveRecord::Base
     @manifest ||= MarsManifest.new(url: manifest_url)
   end
 
+  def in_progress?
+    mars_ingest_items.present? && mars_ingest_items.any? { |mii| ['completed', 'failed'].exclude?(mii.status) }
+  end
+
   private
 
     def validate_manifest

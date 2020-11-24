@@ -20,6 +20,12 @@ class MarsIngestsController < ApplicationController
   end
 
   def create
+    unless MarsIngest.where(completed: false).count < 6
+      Rails.logger.info "Too Many MarsIngests currently running (#{micount})"
+      render json: { errors: ["Too Many MarsIngests currently running (#{micount})"]}, status: 503 
+    end
+
+
     @mars_ingest = MarsIngest.new params.require(:mars_ingest).permit(:manifest_url)
     @mars_ingest.submitter_id = current_user.id
 
