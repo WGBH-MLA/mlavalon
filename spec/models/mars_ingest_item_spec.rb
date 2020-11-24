@@ -38,7 +38,7 @@ RSpec.describe MarsIngestItem do
     end
 
     it 'row_payload includes the publish flag' do
-      expect(subject.row_payload.keys).to include("publish")
+      expect(subject.row_payload["publish"]).to eq("true")
     end
   end
 end
