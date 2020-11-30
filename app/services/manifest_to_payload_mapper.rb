@@ -23,6 +23,7 @@ class ManifestToPayloadMapper
       p['fields'].merge!( notes_hash )
       p['fields'].merge!( other_id_hash )
       p['files'] = file_hashes
+      p['publish'] = "true"
     end
 
     pl = @payload.clone
@@ -37,11 +38,11 @@ class ManifestToPayloadMapper
     return false if ele == [{}]
     return false if ele == {}
     return false if ele == []
-    
+
     if ele.is_a?(Hash)
       return false unless ele.values.any? {|v| contains_truth?(v) }
     end
-    
+
     if ele.is_a?(Array)
       return false unless ele.any? {|element| contains_truth?(element) }
     end
@@ -95,10 +96,10 @@ class ManifestToPayloadMapper
       elsif v.is_a?(Array)
 
         if v.all? {|ele| ele.is_a?(Hash) }
-        
+
           v.map { |ele| deep_correct_encoding(ele) }
         else
-        
+
           v.map {|ele| ele.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?').force_encoding('UTF-8')}
         end
       else
@@ -106,7 +107,7 @@ class ManifestToPayloadMapper
       end
     end
   end
-  
+
   private
 
     # Returns a found (or new) collection based on the collection fields and
@@ -297,10 +298,10 @@ class ManifestToPayloadMapper
         'topical subject' => 'topical_subject',
         'language' => 'language',
         'table of contents' => 'table_of_contents',
-        
+
         # 'other identifier type' => 'other_identifier_type',
         # 'other identifier' => 'other_identifier',
-        # not real API field names, these are values for other_identifier_type        
+        # not real API field names, these are values for other_identifier_type
         'mla barcode' => 'videorecording identifier',
 
         'comment' => 'comment',

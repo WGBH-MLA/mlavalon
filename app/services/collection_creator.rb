@@ -6,6 +6,6 @@ class CollectionCreator
     collection = Admin::Collection.where(name_uniq_si: collection_name.to_s.downcase.gsub(/\s/, '')).first
 
     return collection if collection
-    Admin::Collection.create!({name: collection_name, unit: unit_name, description: collection_desc, managers: [manager_user_key]})
+    Admin::Collection.create!({name: collection_name, unit: unit_name, description: collection_desc, managers: [manager_user_key], default_visibility: Hydra::AccessControls::AccessRight::VISIBILITY_TEXT_VALUE_AUTHENTICATED})
   end
 end
