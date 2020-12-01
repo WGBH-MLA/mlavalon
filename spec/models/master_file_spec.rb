@@ -159,13 +159,17 @@ describe MasterFile do
         expect(master_file).to be_valid
       end
 
-      it "should complain if value < 0" do
+      # xiting since we're skipping this validation for WGBH.
+      # we don't always have a duration value on ingest.
+      xit "should complain if value < 0" do
         master_file.poster_offset = -1
         expect(master_file).not_to be_valid
         expect(master_file.errors[:poster_offset].first).to eq("must be between 0 and #{master_file.duration}")
       end
 
-      it "should complain if value > duration" do
+      # xiting since we're skipping this validation for WGBH
+      # we don't always have a duration value on ingest.
+      xit "should complain if value > duration" do
         offset = master_file.duration.to_i + rand(32514) + 500
         master_file.poster_offset = offset
         expect(master_file).not_to be_valid
@@ -181,7 +185,9 @@ describe MasterFile do
         expect(master_file).to be_valid
       end
 
-      it "should complain if value > duration" do
+      # xiting since we're skipping this validation for WGBH
+      # we don't always have a duration value on ingest.
+      xit "should complain if value > duration" do
         offset = master_file.duration.to_i + rand(32514) + 500
         master_file.poster_offset = offset.to_hms
         expect(master_file).not_to be_valid
@@ -378,11 +384,11 @@ describe MasterFile do
         class TestEncode < ActiveEncode::Base
         end
       end
-  
+
       after :all do
         Object.send(:remove_const, :TestEncode)
       end
-  
+
       it "should find the encoder class" do
         expect(Settings.encoding.engine_adapter).to eq "test"
         expect(subject.encoder_class).to eq(TestEncode)
