@@ -78,7 +78,7 @@ class MarsIngestWatcher
         puts ("Started MarsIngestItemJob with jid #{job_id} from MarsIngestItem #{mars_ingest_item.id}")
       end
     else
-      require('pry');binding.pry
+      puts "Darn! Manifest invalid! #{mi.errors.messages.values.flatten}"
     end
   end
 
