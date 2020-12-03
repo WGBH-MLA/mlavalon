@@ -30,7 +30,6 @@ RUN         bundle config build.nokogiri --use-system-libraries \
          && bundle install --with aws development test postgres --without production 
 # CMD export HOME=/home/app && rm -f tmp/pids/server.pid && bundle exec rake db:migrate && bin/rails server -b 0.0.0.0
 
-
 # Download stage takes advantage of parallel build
 FROM        ruby:2.5.8-stretch as download
 RUN         curl https://chromedriver.storage.googleapis.com/2.46/chromedriver_linux64.zip -o /usr/local/bin/chromedriver \
