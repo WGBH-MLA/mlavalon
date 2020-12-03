@@ -8,13 +8,14 @@ class MarsIngestItemJob < ActiveJob::Base
 
   after_perform do
     update_status 'succeeded'
-    check_ingest_for_completion( MarsIngestItem.find(arguments.first).mars_ingest )
+    update_ingest_if_concluded( MarsIngestItem.find(arguments.first).mars_ingest )
   end
 
   rescue_from(StandardError) do |exception|
     error_message = extract_error_message(exception)
     logger.error "#{error_message}\n\n#{exception.backtrace.join("\n")}"
     update_status 'failed', error_message
+    update_ingest_if_concluded( MarsIngestItem.find(arguments.first).mars_ingest )
   end
 
   def perform(id)
@@ -26,7 +27,7 @@ class MarsIngestItemJob < ActiveJob::Base
   end
 
   private
-    def check_ingest_for_completion(mars_ingest)
+    def update_ingest_if_concluded(mars_ingest)
       mars_ingest.update(completed: true) unless mars_ingest.in_progress?
     end
 
