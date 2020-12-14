@@ -54,7 +54,10 @@ class MarsManifest
       # TODO: Stop bypassing SSL check.
 
       # sub out vertical tabs, they are expected in mars exports
-      @raw_data ||= open(url, { ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE }).read.gsub(/[\t\v]/, " ").gsub(%(’), %(')).gsub(%(‘), %(')).gsub(/“”/, %('))
+      # grand opening, grand closing
+      @raw_data ||= open(url, { encoding: Encoding::UTF_8, ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE }).read.gsub(/[\t\v]/, " ").gsub(/\xE2\x80\x98/, %(')).gsub(/\xE2\x80\x99/, %(')).gsub(/\xE2\x80\x9C/, %(")).gsub(/\xE2\x80\x9D/, %("))
+      # FM export comes in as UTF-8, but pasting actual curly quotes into a gsub misinterprets the utf-8 byte sequence and spits out 3 invalid characters, crashing the ingest
+      # so, explicitly sub out the offending byte sequences themselves to non-hated characters
     rescue => e
       add_error(:url, "Invalid Manifest URL: '#{url}'")
     end
