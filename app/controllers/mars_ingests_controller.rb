@@ -20,7 +20,8 @@ class MarsIngestsController < ApplicationController
   end
 
   def create
-    unless MarsIngest.where(completed: false).count < 3
+    micount = MarsIngest.where(completed: false).count
+    unless micount < 3
       Rails.logger.info "Too Many MarsIngests currently running (#{micount})"
       render json: { errors: ["Too Many MarsIngests currently running (#{micount})"]}, status: 503 
     end
