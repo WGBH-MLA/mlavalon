@@ -14,7 +14,5 @@ class CollectionCreator
     rescue Exception => e
       Rails.logger.error "XXXXXXXXX FAILED TO CREATE #{e.message} #{e.backtrace}"
     end
-
-    c
   end
 end
