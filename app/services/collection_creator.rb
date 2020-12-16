@@ -7,7 +7,7 @@ class CollectionCreator
     Rails.logger.info "XXXXXX PARAMS - #{collection_name} #{unit_name} #{collection_desc} #{manager_user_key}"
 
     allc = Admin::Collection.all
-    Rails.logger.info "XXXXXXX #{allc}"
+    Rails.logger.info "XXXXXXX #{allc.inspect}"
 
     collection = Admin::Collection.where(name_uniq_si: collection_name.to_s.downcase.gsub(/\s/, '')).first
     Rails.logger.info "XXXXXX EXISTIN COLLECTION #{collection}"
@@ -17,7 +17,7 @@ class CollectionCreator
       c=Admin::Collection.create!({name: collection_name, unit: unit_name, description: collection_desc, managers: [manager_user_key]})
     rescue Exception => e
       Rails.logger.error "XXXXXXXXX FAILED TO CREATE #{e.message} #{e.backtrace}"
-      false
+      raise e
     end
   end
 end

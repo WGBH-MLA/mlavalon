@@ -108,6 +108,9 @@ gem 'aws-sdk', '~> 2.0'
 # Used for endpoint that generates sample CSV Mars Manifests.
 gem 'faker'
 
+
+gem 'pry-byebug'
+
 group :development do
   gem 'capistrano', '~>3.6'
   gem 'capistrano-passenger', require: false
