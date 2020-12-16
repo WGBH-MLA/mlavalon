@@ -6,7 +6,7 @@ class CollectionCreator
 
     Rails.logger.info "XXXXXX PARAMS - #{collection_name} #{unit_name} #{collection_desc} #{manager_user_key}"
     collection = Admin::Collection.where(name_uniq_si: collection_name.to_s.downcase.gsub(/\s/, '')).first
-    Rails.logger.info = "XXXXXX EXISTIN COLLECTION #{collection}"
+    Rails.logger.info "XXXXXX EXISTIN COLLECTION #{collection}"
 
     return collection if collection
     begin
