@@ -112,6 +112,8 @@ class ManifestToPayloadMapper
     # Returns a found (or new) collection based on the collection fields and
     # the submitter's email.
     def collection
+      Rails.logger.info "XXXXX COLLECTION NAME #{collection_hash['collection name']}"
+
       @collection ||= CollectionCreator.find_or_create_collection(
         collection_hash['collection name'],
         collection_hash['unit name'],
