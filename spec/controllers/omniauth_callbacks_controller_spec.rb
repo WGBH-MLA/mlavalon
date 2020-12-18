@@ -135,5 +135,23 @@ describe Users::OmniauthCallbacksController, type: :controller do
         expect(response).to redirect_to(root_path)
       end
     end
+
+    context 'when oktaoauth fails' do
+      def stub_route_as(path)
+        allow(@routes).to receive(:generate_extras) { [path, []] }
+      end
+
+      it 'redirects to root path' do
+        request.env['omniauth.error'] = OmniAuth::Strategies::OAuth2::CallbackError.new("User is not assigned to the client application.")
+        request.env['omniauth.error.strategy'] = OmniAuth::Strategies::Oktaoauth.new(nil)
+        stub_route_as('/users/auth/oktaoauth')
+
+        post :failure
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to match(/Unable to authorize because \"User is not assigned to the client application.\"/)
+      end
+
+    end
   end
 end

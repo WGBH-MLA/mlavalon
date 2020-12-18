@@ -36,5 +36,9 @@ RSpec.describe MarsIngestItem do
       subject.row_payload.delete('files')
       expect(subject).not_to be_valid
     end
+
+    it 'row_payload includes the publish flag' do
+      expect(subject.row_payload["publish"]).to eq("true")
+    end
   end
 end

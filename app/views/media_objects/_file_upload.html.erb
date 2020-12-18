@@ -101,17 +101,6 @@ Unless required by applicable law or agreed to in writing, software distributed
                 <%= text_field_tag "master_files[#{part.id}][date_digitized]", part.date_digitized, class: 'date-input' %>
               </div>
             </div>
-            <div class="col-sm-3">
-              <div class="form-group">
-                <label>Thumbnail</label>
-                <% if part.is_video? %>
-                <%= text_field_tag "master_files[#{part.id}][poster_offset]",
-                  part.poster_offset.to_i.to_hms, class: 'input-small' %>
-                <% else %>
-                <span class="input-small">n/a</span>
-                <% end %>
-              </div>
-            </div>
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Permalink</label>

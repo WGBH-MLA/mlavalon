@@ -140,8 +140,6 @@ services:
 
   test:
     <<: *avalon
-    command: >
-      bash -c "/docker_init.sh && tail -f /dev/null"
     depends_on:
       - db-test
       - fedora-test
