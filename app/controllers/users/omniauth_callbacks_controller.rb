@@ -26,6 +26,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def after_omniauth_failure_path_for(scope)
+    logger.debug "OAuth failed for #{failed_strategy.name}"
     case failed_strategy.name
     when 'lti'
       default_msg = I18n.t 'devise.omniauth_callbacks.failure', reason: failure_message
@@ -33,6 +34,9 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       uri = URI.parse request['launch_presentation_return_url']
       uri.query = {lti_errormsg: msg}.to_query
       uri.to_s
+    when 'oktaoauth'
+      msg = I18n.t 'devise.omniauth_callbacks.failure', reason: failure_message
+      root_path
     else
       new_user_session_path(scope)
     end
@@ -48,6 +52,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def find_user(auth_type)
+    logger.debug "Finding User for #{auth_type}"
     auth_type.downcase!
     find_method = "find_for_#{auth_type}".to_sym
     find_method = :find_for_generic unless User.respond_to?(find_method)
