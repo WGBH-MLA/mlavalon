@@ -53,8 +53,8 @@ class MarsManifest
     def raw_data
       # TODO: Stop bypassing SSL check.
 
-      # sub out vertical tabs, they are expected in mars exports
-      @raw_data ||=  open(url, { ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE }).read.gsub(/[\t\v]/, " ")
+      # grand opening, grand closing
+      @raw_data ||= open(url, { encoding: Encoding::UTF_8, ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE }).read
     rescue => e
       add_error(:url, "Invalid Manifest URL: '#{url}'")
     end

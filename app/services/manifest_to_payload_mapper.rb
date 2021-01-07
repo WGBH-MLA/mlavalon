@@ -113,6 +113,8 @@ class ManifestToPayloadMapper
     # Returns a found (or new) collection based on the collection fields and
     # the submitter's email.
     def collection
+      Rails.logger.info "XXXXX COLLECTION NAME #{collection_hash['collection name']}"
+
       @collection ||= CollectionCreator.find_or_create_collection(
         collection_hash['collection name'],
         collection_hash['unit name'],
@@ -238,7 +240,9 @@ class ManifestToPayloadMapper
     end
 
     def encode_value(val)
-      val.to_s.force_encoding('UTF-8')
+      # sub out vertical tabs, they are expected in mars exports
+      # for evil quotes, explicitly sub out the offending byte sequences themselves to non-hated characters
+      val.to_s.force_encoding('UTF-8').gsub(/[\t\v]/, " ").gsub(/\xE2\x80\x98/, %(')).gsub(/\xE2\x80\x99/, %(')).gsub(/\xE2\x80\x9C/, %(")).gsub(/\xE2\x80\x9D/, %("))
     end
 
     # Checks for multivalued fields, turns them into arrays, and combines

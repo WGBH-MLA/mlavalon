@@ -20,6 +20,12 @@ class MarsIngestsController < ApplicationController
   end
 
   def create
+    micount = MarsIngest.where(completed: false).count
+    unless micount < 3
+      Rails.logger.info "Too Many MarsIngests currently running (#{micount})"
+      return render json: { errors: ["Too Many MarsIngests currently running (#{micount})"]}, status: 503 
+    end
+
     @mars_ingest = MarsIngest.new params.require(:mars_ingest).permit(:manifest_url)
     @mars_ingest.submitter_id = current_user.id
 
@@ -27,6 +33,7 @@ class MarsIngestsController < ApplicationController
       start_ingest(@mars_ingest)
       render json: { id: @mars_ingest.id }, status: 200
     else
+      Rails.logger.info "MarsIngest could not be saved: (#{ @mars_ingest.errors.messages.values.flatten })"
       render json: { errors: @mars_ingest.errors.messages.values.flatten }, status: 422
     end
   rescue => e

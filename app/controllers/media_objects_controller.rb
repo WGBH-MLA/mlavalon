@@ -247,7 +247,13 @@ class MediaObjectsController < ApplicationController
           # need to persist this before saving derivative
 
           # spoof this in for offsets if not present!
-          master_file.duration = 86400 unless master_file.duration
+
+          # THIS SPOOF DURATION MUST BE EXPRESSED IN MILLISECONDS
+          # THE VALUE PASSED IN FOR "FILE THUMBNAIL OFFSET" MUST BE IN INTEGER SECONDS, BECAUSE:
+          # THIS THUMBNAIL VALUE WILL BE MULTIPLIED BY 1000 (BY AVALON) BEFORE IT IS COMPARED WITH THIS DURATION VALUE
+          # IF THE SUBMITTED VALUE FOR THUMBNAIL OFFSET IS NOT BETWEEN 0 AND WHATEVER NUMBER WE SET BELOW, MASTERFILE WILL BE INVALID AND NOT SAVE
+          # WE DO NOT APPEAR TO BE GETTING ANY REAL DURATION VALUES IN INPUT DATA THUSFAR 12-14-20  
+          master_file.duration = 86400000 unless master_file.duration
           master_file.save
           # END WGBH-MLA CUSTOMIZATION
           ###

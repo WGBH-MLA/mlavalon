@@ -102,8 +102,14 @@ gem 'parallel'
 gem 'whenever', '~> 0.11', require: false
 gem 'with_locking'
 
+gem 'aws-sdk', '~> 2.0'
+
+
 # Used for endpoint that generates sample CSV Mars Manifests.
 gem 'faker'
+
+
+gem 'pry-byebug'
 
 group :development do
   gem 'capistrano', '~>3.6'
@@ -157,7 +163,6 @@ end
 # Install the bundle --with aws when running on Amazon Elastic Beanstalk
 group :aws, optional: true do
   gem 'active_elastic_job', '~> 2.0'
-  gem 'aws-sdk', '~> 2.0'
   gem 'aws-sdk-rails'
   gem 'cloudfront-signer'
   gem 'zk'

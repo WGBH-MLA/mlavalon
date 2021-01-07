@@ -6,12 +6,16 @@ class MarsIngestItemJob < ActiveJob::Base
 
   before_perform { update_status 'processing' }
 
-  after_perform { update_status 'succeeded' }
+  after_perform do
+    update_status 'succeeded'
+    update_ingest_if_concluded( MarsIngestItem.find(arguments.first).mars_ingest )
+  end
 
   rescue_from(StandardError) do |exception|
     error_message = extract_error_message(exception)
     logger.error "#{error_message}\n\n#{exception.backtrace.join("\n")}"
     update_status 'failed', error_message
+    update_ingest_if_concluded( MarsIngestItem.find(arguments.first).mars_ingest )
   end
 
   def perform(id)
@@ -23,6 +27,9 @@ class MarsIngestItemJob < ActiveJob::Base
   end
 
   private
+    def update_ingest_if_concluded(mars_ingest)
+      mars_ingest.update(completed: true) unless mars_ingest.in_progress?
+    end
 
     def update_status(status, error_msg='')
       raise ArgumentError, "Unrecognized status for MarsIngestItem: '#{status}'" unless MarsIngestItem::STATUSES.include? status
