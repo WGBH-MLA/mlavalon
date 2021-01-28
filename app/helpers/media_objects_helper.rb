@@ -59,7 +59,7 @@ module MediaObjectsHelper
           [media_object[:document]['date_ssi'], media_object[:document]['date_created_ssi']]
         end
         result = issued
-        result += " (Creation date: #{created})" if created.present?
+        result += " (Date Created: #{created})" if created.present?
         result
       end
 

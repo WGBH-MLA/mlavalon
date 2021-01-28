@@ -71,29 +71,43 @@ class CatalogController < ApplicationController
     #
     # :show may be set to false if you don't want the facet to be drawn in the
     # facet bar
-    config.add_facet_field 'avalon_resource_type_ssim', label: 'Audio/Video', limit: 5, collapse: false
-    config.add_facet_field 'creator_ssim', label: 'Main Contributor', limit: 5, sort: 'index'
 
+    config.add_facet_field 'collection_ssim', label: 'Collection', limit: 5, sort: 'index'
+    config.add_facet_field "item_type_note", label: "Item Type", sort: 'index'
+
+    # WGBH new note type
+    config.add_facet_field "content_type_note", label: "Content Type", sort: 'index'
+
+    # Date Created
+    config.add_facet_field 'date_created_ssi', label: 'Date Created', limit: 5, sort: 'index'
+    # Date Digitized/Issued
+    config.add_facet_field 'date_sim', label: 'Date Digitized', limit: 5, sort: 'index'
+    # config.add_facet_field 'date_sim', label: 'Date', limit: 5, sort: 'index'
+
+    config.add_facet_field 'creator_ssim', label: 'Creator', limit: 5, sort: 'index'
+    config.add_facet_field "contributor_sim", label: "Contributors", limit: 10, sort: 'index'
+
+    # rename to "Subjects" due to removal of Subjects
+    config.add_facet_field "subject_topic_sim", label: "Subjects", limit: 10, sort: 'index'
+
+    # WGBH new note type
+    config.add_facet_field "location_sim", label: "Location", limit: 10, sort: 'index'
+
+    config.add_facet_field 'avalon_resource_type_ssim', label: 'Media Type', limit: 5, collapse: false
     # requires valid date format...
     # config.add_facet_field 'date_sim', label: 'Date', limit: 5, date: true
 
-    config.add_facet_field 'date_sim', label: 'Date', limit: 5, sort: 'index'
+
     config.add_facet_field 'genre_sim', label: 'Genres', limit: 5, sort: 'index'
-    config.add_facet_field 'collection_ssim', label: 'Collection', limit: 5, sort: 'index'
     config.add_facet_field 'language_sim', label: 'Language', limit: 5, sort: 'index'
 
     config.add_facet_field "publisher_sim", label: 'Publishers', limit: 10, sort: 'index'
-    config.add_facet_field "contributor_sim", label: "Contributors", limit: 10, sort: 'index'
-    config.add_facet_field "subject_sim", label: "Subjects", limit: 10, sort: 'index'
+    
+    # hide this because its a mash-up of other "x subjects" fields
+    # config.add_facet_field "subject_sim", label: "Subjects", limit: 10, sort: 'index'
 
-    # WGBH new note types
-    config.add_facet_field "content_type_note", label: "Content Type", sort: 'index'
-    config.add_facet_field "item_type_note", label: "Item Type", sort: 'index'
-
-    config.add_facet_field "location_sim", label: "Location", limit: 10, sort: 'index'
     # removing, because Avalon just fills this in as 'Digital'
     # config.add_facet_field "material_sim", label: "Material", limit: 10
-    config.add_facet_field "subject_topic_sim", label: "Topical Subjects", limit: 10, sort: 'index'
 
     # removing for mlavalon implementation
     # config.add_facet_field "subject_geographic_sim", label: "Geographic Subjects", limit: 10, sort: 'index'
