@@ -80,8 +80,8 @@ class CatalogController < ApplicationController
 
     # Date Created
     config.add_facet_field 'date_created_ssi', label: 'Date Created', limit: 5, sort: 'index'
-    # Date Digitized/Issued
-    config.add_facet_field 'date_sim', label: 'Date Digitized', limit: 5, sort: 'index'
+    
+    # Catch-all multidate field - hide this because it emcompasses multiple date fields in a way that isnt useful
     # config.add_facet_field 'date_sim', label: 'Date', limit: 5, sort: 'index'
 
     config.add_facet_field 'creator_ssim', label: 'Creator', limit: 5, sort: 'index'
