@@ -58,6 +58,10 @@ class MarsIngestItemJob < ActiveJob::Base
       JSON.parse(RestClient::Request.execute(params))
     end
 
+    def record_exists?(media_pim_id)
+      MediaObject.where(media_pim_id: media_pim_id).present?
+    end
+
     # @return [JSON, String] if the exception has a JSON response body with an
     #   'errors' key, then fetch and return it. Otherwise, just return the
     #   original exception message.
