@@ -14,6 +14,7 @@ class MarsIngestItem < ActiveRecord::Base
 
   validates :status, inclusion: STATUSES
   validates :row_payload, presence: true
+  validates :media_pim_id, presence: true
   validate :validate_payload
 
   after_initialize do |*args|

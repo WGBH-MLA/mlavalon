@@ -23,6 +23,31 @@ class MarsIngestItemJob < ActiveJob::Base
     logger.info "started job, found #{ingest_item.inspect}"
     ingest_item.update(job_id: self.job_id) if ingest_item.job_id == nil
     logger.info "updated job with #{self.job_id}"
+
+
+    media_object_id = existing_record?(ingest_item.media_pim_id)
+    if(media_object_id)
+      # delete the record if we found an old version
+      mo = MediaObject.find(media_object_id)
+      if mo.master_files.present?
+        mo.master_files.each do |mf|
+          if mf.derivatives.present?
+            mf.derivatives.each do |dr|
+              puts "Destroy DR"
+              dr.destroy
+            end
+          end
+
+          puts "Destroy MF"
+          mf.destroy
+        end
+      end
+
+      puts "Destroy MO #{media_object_id}"
+      mo.destroy
+    end
+
+    # create new record
     ingest_payload(ingest_item.row_payload)
   end
 
@@ -58,8 +83,9 @@ class MarsIngestItemJob < ActiveJob::Base
       JSON.parse(RestClient::Request.execute(params))
     end
 
-    def record_exists?(media_pim_id)
-      MediaObject.where(media_pim_id: media_pim_id).present?
+    def existing_record?(media_pim_id)
+      mo = MediaObject.where(media_pim_id: media_pim_id)
+      mo.first.id if mo.present?
     end
 
     # @return [JSON, String] if the exception has a JSON response body with an

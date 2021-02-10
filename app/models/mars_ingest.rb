@@ -4,8 +4,8 @@ class MarsIngest < ActiveRecord::Base
 
   after_create do
     manifest.rows.each do |row|
-      payload = ManifestToPayloadMapper.new(manifest.headers, row, submitter.user_key).payload
-      mars_ingest_item = MarsIngestItem.new(row_payload: payload)
+      payload, media_pim_id = ManifestToPayloadMapper.new(manifest.headers, row, submitter.user_key).payload
+      mars_ingest_item = MarsIngestItem.new(row_payload: payload, media_pim_id: media_pim_id)
       mars_ingest_item.mars_ingest_id = id
       mars_ingest_item.save!
     end

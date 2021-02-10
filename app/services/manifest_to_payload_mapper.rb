@@ -30,6 +30,14 @@ class ManifestToPayloadMapper
     pl = compact_hash(pl)
     zl = pl.clone
     @payload = deep_correct_encoding(zl)
+
+    return [@payload, extract_media_pim_id(@payload)]
+  end
+
+  def extract_media_pim_id(payload)
+    # these are paired together in order, cause thats what the ingest API desires
+    index = payload[:other_identifier_type].index("media_pim_id")
+    payload[:other_identifier][index]
   end
 
   def contains_truth?(ele)
