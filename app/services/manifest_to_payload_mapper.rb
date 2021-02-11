@@ -36,8 +36,11 @@ class ManifestToPayloadMapper
 
   def extract_media_pim_id(payload)
     # these are paired together in order, cause thats what the ingest API desires
-    index = payload[:other_identifier_type].index("media_pim_id")
-    payload[:other_identifier][index]
+    puts "eyyy here da payload"
+    puts payload
+    puts payload['fields']['other_identifier_type']
+    index = payload['fields']['other_identifier_type'].index('media pim id')
+    payload['fields']['other_identifier'][index]
   end
 
   def contains_truth?(ele)
