@@ -123,6 +123,7 @@ class MarsManifestFaker
         repeat(0..1) { "Table Of Contents" },
         repeat(0..1) { "Physical Description" },
         repeat(0..1) { "MLA Barcode" },
+        repeat(0..1) { "Media PIM ID" },
         
         repeat(0..3) { "Comment" },
         repeat(1..4) { [
@@ -208,6 +209,8 @@ class MarsManifestFaker
       when "file checksum"
         Digest::MD5.hexdigest rand.to_s
       when "mla barcode"
+        Avalon::ControlledVocabulary.vocabulary[:identifier_types].values.sample
+      when "media pim id"
         Avalon::ControlledVocabulary.vocabulary[:identifier_types].values.sample
       when "collection id", "format", "resource type", "bibliographic id",
            "table of contents", "file label", "file title", "instantiation label",
