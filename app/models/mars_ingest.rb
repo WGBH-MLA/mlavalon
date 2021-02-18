@@ -21,7 +21,7 @@ class MarsIngest < ActiveRecord::Base
   end
 
   def in_progress?
-    mars_ingest_items.present? && mars_ingest_items.any? { |mii| ['completed', 'failed'].exclude?(mii.status) }
+    mars_ingest_items.present? && mars_ingest_items.any? { |mii| ['succeeded', 'failed'].exclude?(mii.status) }
   end
 
   private
