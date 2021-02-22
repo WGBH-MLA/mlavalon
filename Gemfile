@@ -155,6 +155,7 @@ group :test do
   gem 'webmock', '~> 3.5.1'
 end
 
+# just to make sure they're the same
 group :production do
   gem 'google-analytics-rails', '1.1.0'
   gem 'lograge'
