@@ -156,7 +156,7 @@ group :test do
 end
 
 # just to make sure they're the same
-group :production do
+group :production, :qa do
   gem 'google-analytics-rails', '1.1.0'
   gem 'lograge'
 end
