@@ -25,3 +25,12 @@ production:
     - <%= Settings.initial_user %>
   group_manager:
     - <%= Settings.initial_user %>
+
+qa:
+  # Add roles for users here.
+  administrator:
+    - <%= Settings.initial_user %>
+  manager:
+    - <%= Settings.initial_user %>
+  group_manager:
+    - <%= Settings.initial_user %>
