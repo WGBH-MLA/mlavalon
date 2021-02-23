@@ -19,4 +19,4 @@
   - waveform
   - mars_ingest_item_job
 :max_retries: 14
-:concurrency: 8
+:concurrency: 4
