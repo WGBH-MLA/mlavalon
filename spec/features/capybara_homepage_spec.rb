@@ -23,7 +23,7 @@ describe 'homepage' do
     expect(page).to have_content('Featured Collection')
     expect(page).to have_content('Featured Video')
     expect(page).to have_content('Featured Audio')
-    expect(page).to have_link('WGBH MLA')
+    expect(page).to have_link('GBH Archives')
     expect(page).to have_link('Contact Us')
     expect(page).to have_content('Avalon Media System Release')
     expect(page).to have_content('Search')
@@ -51,7 +51,7 @@ describe 'checks navigation to external links' do
   # links in the same way.
   xit 'checks navigation to Avalon Website' do
     visit '/'
-    click_on('WGBH MLA')
+    click_on('GBH Archives')
     expect(page.status_code).to eq(200)
     expect(page.current_url).to eq('http://www.avalonmediasystem.org/')
   end
