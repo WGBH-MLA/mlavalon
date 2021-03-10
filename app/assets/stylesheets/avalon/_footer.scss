@@ -23,6 +23,16 @@
   color: #999999;
 }
 
+.footer-logo {
+  height: 1em;
+  overflow: hidden;
+}
+
+.footer-logo img {
+  height: 1em;
+  object-fit: contain;
+}
+
 footer {
   height: 5rem;
   line-height: 5rem;
