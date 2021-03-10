@@ -27,7 +27,7 @@ COPY        Gemfile ./Gemfile
 COPY        Gemfile.lock ./Gemfile.lock
 COPY        package.json ./package.json
 RUN         bundle config build.nokogiri --use-system-libraries \
-         && bundle install --with aws development test postgres --without production 
+         && bundle install --with aws development test postgres --without production qa
 # CMD export HOME=/home/app && rm -f tmp/pids/server.pid && bundle exec rake db:migrate && bin/rails server -b 0.0.0.0
 
 # Download stage takes advantage of parallel build

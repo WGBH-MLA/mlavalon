@@ -104,10 +104,8 @@ gem 'with_locking'
 
 gem 'aws-sdk', '~> 2.0'
 
-
 # Used for endpoint that generates sample CSV Mars Manifests.
 gem 'faker'
-
 
 gem 'pry-byebug'
 
