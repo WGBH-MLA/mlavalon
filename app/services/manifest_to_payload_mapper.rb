@@ -36,9 +36,7 @@ class ManifestToPayloadMapper
 
   def extract_media_pim_id(payload)
     # these are paired together in order, cause thats what the ingest API desires
-    puts "eyyy here da payload"
-    puts payload
-    puts payload['fields']['other_identifier_type']
+    raise "Did not receive Media PIM ID for record! #{payload.inspect}" unless payload['fields']['other_identifier_type']
     index = payload['fields']['other_identifier_type'].index('media pim id')
     payload['fields']['other_identifier'][index]
   end
