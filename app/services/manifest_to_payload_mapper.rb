@@ -251,7 +251,9 @@ class ManifestToPayloadMapper
     def encode_value(val)
       # sub out vertical tabs, they are expected in mars exports
       # for evil quotes, explicitly sub out the offending byte sequences themselves to non-hated characters
-      val.to_s.force_encoding('UTF-8').gsub(/[\t\v]/, " ").gsub(/\xE2\x80\x98/, %(')).gsub(/\xE2\x80\x99/, %(')).gsub(/\xE2\x80\x9C/, %(")).gsub(/\xE2\x80\x9D/, %("))
+      # VTS WILL BREAK SUMMARY_SSI FIELD AND IT WILL NOT DISPLAY IF THEY ARE INCLUDED, RATHER THAN STRIPPED OUT HERE YOU HAVE BEEN WARNED
+      val.to_s.force_encoding('UTF-8').gsub(/[\t]/, " ").gsub("\v", "<br>").gsub(/\xE2\x80\x98/, %(')).gsub(/\xE2\x80\x99/, %(')).gsub(/\xE2\x80\x9C/, %(")).gsub(/\xE2\x80\x9D/, %("))
+
     end
 
     # Checks for multivalued fields, turns them into arrays, and combines

@@ -210,6 +210,10 @@ class MediaObject < ActiveFedora::Base
     all_labels.flatten.uniq.compact
   end
 
+  def abstract_display
+    abstract ? abstract.html_safe : ""
+  end
+
   # Gets all physical descriptions from master files and returns a uniq array
   # @return [Array<String>] A unique list of all physical descriptions for the media object
   def section_physical_descriptions
