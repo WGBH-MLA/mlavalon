@@ -980,6 +980,7 @@ DEPENDENCIES
   mediaelement-track-scrubber!
   mediaelement_rails!
   mediainfo!
+  mimemagic (= 0.3.6)
   mini_magick (~> 4.9)
   mysql2
   net-ldap
