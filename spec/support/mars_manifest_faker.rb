@@ -123,7 +123,7 @@ class MarsManifestFaker
         repeat(0..1) { "Table Of Contents" },
         repeat(0..1) { "Physical Description" },
         repeat(0..1) { "MLA Barcode" },
-        repeat(0..1) { "Media PIM ID" },
+        repeat(1..1) { "Media PIM ID" },
         
         repeat(0..3) { "Comment" },
         repeat(1..4) { [

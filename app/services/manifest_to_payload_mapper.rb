@@ -38,7 +38,7 @@ class ManifestToPayloadMapper
     # these are paired together in order, cause thats what the ingest API desires
     raise "Did not receive Media PIM ID for record! #{payload.inspect}" unless payload['fields']['other_identifier_type']
     index = payload['fields']['other_identifier_type'].index('media pim id')
-    payload['fields']['other_identifier'][index]
+    payload['fields']['other_identifier'][index] if index
   end
 
   def contains_truth?(ele)
