@@ -65,8 +65,7 @@ RUN         apt-get update && apt-get install -y --no-install-recommends \
             imagemagick \
             dumb-init \
          && gem install bundler \
-         && curl https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /chrome.deb \
-         && dpkg -i /chrome.deb || apt-get install -yf \
+         && apt-get install -yf \
          && ln -s /usr/bin/lsof /usr/sbin/
 
 ARG         AVALON_BRANCH=develop
@@ -82,7 +81,11 @@ COPY        --from=download /usr/bin/dockerize /usr/bin/
 
 WORKDIR     /home/app/avalon
 
-RUN apt-get -y install git nodejs yarn libxslt1-dev libpq-dev build-essential ruby-dev libxml2-dev dumb-init
+RUN         apt-get -y install git nodejs yarn libxslt1-dev libpq-dev build-essential ruby-dev libxml2-dev dumb-init libappindicator1 fonts-liberation
+RUN         apt --fix-broken install -y
+RUN         curl https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /chrome.deb
+RUN         dpkg -i /chrome.deb || apt-get install -yf
+
 # RUN yarn install
 # RUN ls && bundle config build.nokogiri --use-system-libraries && bundle install
 # RUN cp config/controlled_vocabulary.yml.example config/controlled_vocabulary.yml
