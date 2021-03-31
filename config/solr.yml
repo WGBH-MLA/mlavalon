@@ -5,3 +5,5 @@ test:
   url: http://127.0.0.1:<%= ENV['SOLR_TEST_PORT'] || 8985 %>/solr/hydra-test
 production:
   url: http://127.0.0.1:8983/solr/avalon
+qa:
+  url: http://127.0.0.1:8983/solr/avalon

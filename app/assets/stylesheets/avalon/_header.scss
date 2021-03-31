@@ -28,6 +28,10 @@
   .header-logo {
     flex-grow: 1;
 
+    img {
+      max-height: 4.2em;
+    }
+
     @media screen and (max-width: $screen-sm-max) {
       img {
         max-width: 120px;
@@ -51,7 +55,7 @@
 .custom-header {
   @extend .mobile-hidden;
   /*too much height for wgbh logo*/
-  /*padding: 1rem 0 2rem;*/
+  padding: 1rem 0 1rem;
 }
 
 header div {

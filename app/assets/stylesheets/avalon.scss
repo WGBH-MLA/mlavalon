@@ -60,6 +60,28 @@ div.alert-danger {
   background-color: $danger !important;
 }
 
+.alert-info {
+  background-color: $info;
+  color: #000;
+}
+
+#sort-dropdown .dropdown-toggle, #per_page-dropdown .dropdown-toggle, .btn-default {
+  color: #000;
+}
+
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+  color: #fff;
+}
+
+.text-success, .facet-values li .selected {
+  color: #000;
+}
+
+.panel-success > .panel-heading, .facet_limit-active > .panel-heading {
+  background-color: #d9bfe4;
+  color: #000;
+}
+
 .block {
   display: block;
 }

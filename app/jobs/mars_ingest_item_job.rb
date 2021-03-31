@@ -23,6 +23,16 @@ class MarsIngestItemJob < ActiveJob::Base
     logger.info "started job, found #{ingest_item.inspect}"
     ingest_item.update(job_id: self.job_id) if ingest_item.job_id == nil
     logger.info "updated job with #{self.job_id}"
+
+
+    media_object_id = existing_record?(ingest_item.media_pim_id)
+    if(media_object_id)
+
+      # delete this whenveers convenient
+      BulkActionJobs::Delete.perform_later [media_object_id], nil
+    end
+
+    # create new record
     ingest_payload(ingest_item.row_payload)
   end
 
@@ -56,6 +66,11 @@ class MarsIngestItemJob < ActiveJob::Base
       }
       # Call the Avalon Ingest API with our payload.
       JSON.parse(RestClient::Request.execute(params))
+    end
+
+    def existing_record?(media_pim_id)
+      mo = MediaObject.where(media_pim_id: media_pim_id)
+      mo.first.id if mo.present?
     end
 
     # @return [JSON, String] if the exception has a JSON response body with an

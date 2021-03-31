@@ -32,10 +32,10 @@ Unless required by applicable law or agreed to in writing, software distributed
         <%= display_metadata(I18n.t('media_object.date'), combined_display_date(@media_object), 'Not provided') %>
         <%= display_metadata('Main contributor', @media_object.creator) %>
         <% unless @media_object.abstract.blank? %>
-        <dt>Summary</dt>
-        <dd>
-          <pre><%= @media_object.abstract %></pre>
-        </dd>
+          <dt>Summary</dt>
+          <dd>
+            <pre><%= @media_object.abstract_display %></pre>
+          </dd>
         <% end %>
         <%= display_metadata('Contributor', @media_object.contributor) %>
         <%= display_metadata('Publisher', @media_object.publisher) %>

@@ -210,6 +210,10 @@ class MediaObject < ActiveFedora::Base
     all_labels.flatten.uniq.compact
   end
 
+  def abstract_display
+    abstract ? abstract.html_safe : ""
+  end
+
   # Gets all physical descriptions from master files and returns a uniq array
   # @return [Array<String>] A unique list of all physical descriptions for the media object
   def section_physical_descriptions
@@ -245,11 +249,18 @@ class MediaObject < ActiveFedora::Base
 
       # WGBH MLAVAPATCH
       self.note.each do |nh|
+        # nh == note hash
         # whitelist our custom note types
         if ['content_type','item_type','technical'].include?(nh[:type])
           # turn all nonword characters in note type to _
           solr_doc["#{nh[:type].gsub(/\W/, '_')}_note"] = nh[:note]
         end
+      end
+
+      if other_identifier.present?
+        pim_id = other_identifier.find {|g| g[:source] }[:id]
+        # explicitly add media pim field as solr field, so we can search by it later
+        solr_doc['media_pim_id'] = pim_id if pim_id
       end
 
       #Add all searchable fields to the all_text_timv field

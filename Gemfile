@@ -31,6 +31,8 @@ gem 'hydra-head', '~> 10.6'
 gem 'noid-rails', '~> 3.0.1'
 gem 'rdf-rdfxml'
 
+gem 'mimemagic', '=0.3.7'
+gem 'nokogiri', '~> 1.11.2'
 # Samvera version pins
 gem 'blacklight', '< 7.0'
 gem 'rdf', '~> 2.2'
@@ -104,10 +106,8 @@ gem 'with_locking'
 
 gem 'aws-sdk', '~> 2.0'
 
-
 # Used for endpoint that generates sample CSV Mars Manifests.
 gem 'faker'
-
 
 gem 'pry-byebug'
 
@@ -155,7 +155,8 @@ group :test do
   gem 'webmock', '~> 3.5.1'
 end
 
-group :production do
+# just to make sure they're the same
+group :production, :qa do
   gem 'google-analytics-rails', '1.1.0'
   gem 'lograge'
 end

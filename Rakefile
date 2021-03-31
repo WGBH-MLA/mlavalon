@@ -3,7 +3,7 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-unless Rails.env.production?
+unless Rails.env.production? || Rails.env == 'qa'
   require 'solr_wrapper/rake_task'
 end
 

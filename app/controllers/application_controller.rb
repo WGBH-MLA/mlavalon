@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   def default_url_options
-    if Rails.env.production?
+    if Rails.env.production? || Rails.env == 'qa'
       {:host => ENV['SETTINGS__DOMAIN'] }
     else  
       {}

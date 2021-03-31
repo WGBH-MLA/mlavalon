@@ -8,8 +8,9 @@ identifier_types:
   issue number: Issue Number
   matrix number: Matrix Number
   music publisher: Music Publisher/Label
-  videorecording identifier: MLA Barcode
+  mla barcode: MLA Barcode
   other: Other
+  media pim id: Media PIM ID
 note_types:
   # general: General Note
   # awards: Awards

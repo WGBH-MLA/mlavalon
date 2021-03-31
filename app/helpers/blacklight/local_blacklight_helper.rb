@@ -42,7 +42,7 @@ module Blacklight::LocalBlacklightHelper
 
   def description_index_display args
     field = args[:document][args[:field]]
-    truncate(field, length: 200) unless field.blank?
+    truncate(field.gsub("<br>", " "), length: 200) unless field.blank?
   end
 
   def constraints_filters_string filters

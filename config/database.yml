@@ -20,8 +20,18 @@ test:
   <<: *default
   database: db/test.sqlite3
 
-production:
+
+qa:
   port: 5433
+  host: lsdocker.wgbh.org
+  adapter: postgresql
+  database: avalon
+  pool: 5
+  username: postgres
+  # password:
+
+production:
+  port: 5434
   host: lsdocker.wgbh.org
   adapter: postgresql
   database: avalon

@@ -246,6 +246,7 @@ class MarsManifest
         # "other identifier" => [],
         # "other identifier type" => [],
         "mla barcode" => [],
+        "media pim id" => [],
 
         "comment" => [],
         "file label" => [],
@@ -274,7 +275,8 @@ class MarsManifest
         "file other id" => [],
         "file comment" => [],
         "file thumbnail offset" => [],
-        "file poster offset" => []
+        "file poster offset" => [],
+
       }
     end
 
@@ -323,7 +325,7 @@ class MarsManifest
     end
 
     def other_id_headers
-      [ "mla barcode" ]
+      [ "mla barcode", "media pim id" ]
     end
 
     def file_header?(header)

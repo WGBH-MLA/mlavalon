@@ -30,15 +30,15 @@ $sansFontFamily: Arial, Helvetica, sans-serif;
 $museoSlab: 'MuseoSlab';
 
 // Primary colors
-$primary: #0260a8;
-$primaryDark: #135687;
-$dark: #001d53;
+$primary: #ad41d9;
+$primaryDark: #732487;
+$dark: #530467;
 
 // Secondary colors
-$yellow: #ec674e;
-$orange: #ec674e;
+$yellow: #8dbaff;
+$orange: #8dbaff;
 $white: rgb(255, 255, 255);
-$blueGreen: #135687;
+$blueGreen: #732487;
 
 // Generated palate colors from http://colormind.io/ for Avalon style guide
 // Add new HEX values below to match your organization's flavor of info/success/warning/danger
@@ -50,9 +50,9 @@ $danger: #f44336;
 // Colors not from the Styleguide
 $greenBG: scale-color($primary, $saturation: -40%, $lightness: 60%);
 $gray: #999;
-$lightgray: #f2f2f2;
+$lightgray: #f1f1f1;
 $red: #ec674e;
-$blue: #135687;
+$blue: #732487;
 $lightblue: #0260a8;
 
 /**
@@ -112,7 +112,7 @@ $navbar-default-toggle-hover-bg: $yellow;
 $navbar-default-link-color: $white;
 $navbar-default-link-hover-color: $primaryDark;
 $navbar-default-link-hover-bg: $yellow;
-$navbar-default-link-active-color: $primaryDark;
+$navbar-default-link-active-color: $white;
 $navbar-default-link-active-bg: $yellow;
 $navbar-border-radius: 0;
 $navbar-default-toggle-icon-bar-bg: $white;
@@ -135,7 +135,7 @@ $btn-default-color: $dark;
 $btn-default-bg: $white;
 $btn-default-border: $gray;
 $btn-primary-color: $white;
-$btn-primary-bg: $primaryDark;
+$btn-primary-bg: $primary;
 $btn-primary-border: $primaryDark;
 $btn-success-color: $white;
 $btn-success-bg: $success;

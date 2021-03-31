@@ -27,7 +27,7 @@ COPY        Gemfile ./Gemfile
 COPY        Gemfile.lock ./Gemfile.lock
 COPY        package.json ./package.json
 RUN         bundle config build.nokogiri --use-system-libraries \
-         && bundle install --with aws development test postgres --without production 
+         && bundle install --with aws development test postgres --without production qa
 # CMD export HOME=/home/app && rm -f tmp/pids/server.pid && bundle exec rake db:migrate && bin/rails server -b 0.0.0.0
 
 # Download stage takes advantage of parallel build
@@ -41,7 +41,7 @@ RUN         curl https://chromedriver.storage.googleapis.com/2.46/chromedriver_l
 
 
 # Dev stage for building dev image
-FROM        ruby:2.5.8-slim-stretch as dev
+FROM        ruby:2.5.8-stretch as dev
 ENV         BUNDLER_VERSION 2.0.2
 RUN         apt-get update && apt-get install -y --no-install-recommends curl gnupg2 \
          && curl -sL http://deb.nodesource.com/setup_8.x | bash - \
