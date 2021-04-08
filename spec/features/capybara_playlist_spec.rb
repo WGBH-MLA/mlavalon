@@ -89,7 +89,6 @@ describe 'Playlist' do
     visit '/playlists'
     click_link('Delete')
     click_link('Yes, Delete')
-    # visit '/playlists'
     expect(page).to have_content('Playlist was successfully destroyed')
     expect(page).to have_no_link('private_playlist')
   end
@@ -106,7 +105,6 @@ describe 'Playlist' do
     click_on('Edit')
     click_on('Delete Playlist')
     click_on('Yes, Delete')
-    # visit '/playlists'
     expect(page).to have_content('Playlist was successfully destroyed')
     expect(page).to have_no_link('private_playlist')
   end
