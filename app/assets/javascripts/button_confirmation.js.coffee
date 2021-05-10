@@ -29,7 +29,7 @@ $ ->
     content: ->
       button = undefined
       if typeof $(this).attr('form') == "undefined"
-        button = '<a href="' + $(this).attr('href') + '" class="btn btn-xs btn-danger btn-confirm" data-method="delete" rel="nofollow">Yes, Delete</a>'
+        button = '<a href="' + $(this).attr('href') + '" class="btn btn-xs btn-danger btn-confirm confirm-delete" rel="nofollow">Yes, Delete</a>'
       else
         button = '<input class="btn btn-xs btn-danger btn-confirm" form="' + $(this).attr('form') + '" type="submit">'
         $('#' + $(this).attr('form')).find('[name=\'_method\']').val 'delete'
@@ -40,4 +40,8 @@ $ ->
       this != t
     ).popover 'hide'
     $(this).popover 'show'
+    # Add the data-method here because its getting stripped out by Bootstrap's popover
+    $('.confirm-delete').each( ->
+      deleteButton = $(this)[0].setAttribute('data-method','delete');
+    )
     false

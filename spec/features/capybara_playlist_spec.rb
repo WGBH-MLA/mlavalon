@@ -78,9 +78,7 @@ describe 'Playlist' do
     expect(page).to have_content('This playlist currently has no playable items')
   end
 
-  # Failing for reasons unknown, but CJ Colvard advised not to worry about it
-  # as they are in the process of converting Capybara specs to Cypress specs.
-  xit 'deletes playlist permanently from playlists page', js: true do
+  it 'deletes playlist permanently from playlists page', js: true do
     user = FactoryBot.create(:administrator)
     login_as user, scope: :user
     visit '/playlists'
@@ -91,12 +89,11 @@ describe 'Playlist' do
     visit '/playlists'
     click_link('Delete')
     click_link('Yes, Delete')
-    visit '/playlists'
     expect(page).to have_content('Playlist was successfully destroyed')
     expect(page).to have_no_link('private_playlist')
   end
 
-  xit 'is able to delete playlist from edit playlist page', js: true do
+  it 'is able to delete playlist from edit playlist page', js: true do
     user = FactoryBot.create(:administrator)
     login_as user, scope: :user
     visit '/playlists'
@@ -108,7 +105,6 @@ describe 'Playlist' do
     click_on('Edit')
     click_on('Delete Playlist')
     click_on('Yes, Delete')
-    visit '/playlists'
     expect(page).to have_content('Playlist was successfully destroyed')
     expect(page).to have_no_link('private_playlist')
   end
