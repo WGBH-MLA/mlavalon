@@ -32,7 +32,7 @@ gem 'noid-rails', '~> 3.0.1'
 gem 'rdf-rdfxml'
 
 gem 'mimemagic', '=0.3.7'
-gem 'nokogiri', '~> 1.11.2'
+gem 'nokogiri', '~> 1.11.4'
 # Samvera version pins
 gem 'blacklight', '< 7.0'
 gem 'rdf', '~> 2.2'
