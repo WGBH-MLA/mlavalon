@@ -33,7 +33,14 @@
 require 'capybara/rspec'
 require 'rspec/retry'
 
+Capybara.register_driver :chrome do |app|
+  Capybara::Selenium::Driver.new app, browser: :chrome,
+    options: Selenium::WebDriver::Chrome::Options.new(args: %w[headless disable-gpu])
+end
+Capybara.javascript_driver = :chrome
+
 RSpec.configure do |config|
+  
   # show retry status in spec process
   config.verbose_retry = true
   # show exception that triggers a retry if verbose_retry is set to true
