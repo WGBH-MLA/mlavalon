@@ -290,14 +290,13 @@ GEM
       sidekiq (>= 3.4)
     capistrano-yarn (2.0.2)
       capistrano (~> 3.0)
-    capybara (3.19.1)
+    capybara (3.0.2)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
       rack (>= 1.6.0)
       rack-test (>= 0.6.3)
-      regexp_parser (~> 1.2)
-      xpath (~> 3.2)
+      xpath (~> 3.0)
     childprocess (1.0.1)
       rake (< 13.0)
     chronic (0.10.2)
@@ -612,7 +611,7 @@ GEM
       pry (>= 0.10.4)
     public_suffix (3.0.3)
     racc (1.5.2)
-    rack (2.0.8)
+    rack (2.2.3)
     rack-cors (1.1.0)
       rack (>= 2.0.0)
     rack-protection (2.0.7)
@@ -707,7 +706,6 @@ GEM
     redis-store (1.6.0)
       redis (>= 2.2, < 5)
     ref (2.0.0)
-    regexp_parser (1.4.0)
     representable (3.0.4)
       declarative (< 0.1.0)
       declarative-option (< 0.2.0)
@@ -941,7 +939,7 @@ DEPENDENCIES
   capistrano-rvm
   capistrano-sidekiq
   capistrano-yarn
-  capybara
+  capybara (= 3.0.2)
   cloudfront-signer
   codeclimate-test-reporter
   coffee-rails (~> 4.2.0)
@@ -996,6 +994,7 @@ DEPENDENCIES
   pg
   pry-byebug
   pry-rails
+  rack (= 2.2.3)
   rack-cors
   rails (= 5.2.3)
   rails-controller-testing
