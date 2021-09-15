@@ -2,7 +2,7 @@ class MarsIngestsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @mars_ingests = MarsIngest.all
+    @mars_ingests = MarsIngest.order(created_at: :desc).all
 
     respond_to do |format|
       format.html
