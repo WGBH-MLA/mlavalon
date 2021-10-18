@@ -15,4 +15,4 @@ jobs:
         run: docker-compose up -d test
 
       - name: Run Rspec specs
-        run: docker-compose exec test bash -c "bundle exec rspec"
+        run: docker-compose exec -T test bash -c "bundle exec rspec"
