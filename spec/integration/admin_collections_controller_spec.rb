@@ -16,7 +16,7 @@ require 'rails_helper.rb'
 
 describe 'Admin::CollectionsController' do
   describe 'resize_uploaded_poster' do
-    let(:uploaded_file) { fixture_file_upload('/collection_poster.jpg', 'image/jpeg') }
+    let(:uploaded_file) { File.open(Rails.root.join('spec/fixtures/collection_poster.jpg')) }
     let(:controller) { Admin::CollectionsController.new }
 
     it 'successfully runs mini_magick' do

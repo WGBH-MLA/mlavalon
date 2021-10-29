@@ -1,7 +1,8 @@
 # Base stage for building gems
-FROM        ruby:2.5.8-stretch as base
+FROM        ruby:2.6.8-buster as base
 ENV         BUNDLER_VERSION 2.0.2
-RUN         echo "deb http://deb.debian.org/debian stretch-backports main" >> /etc/apt/sources.list \
+RUN         echo "deb http://deb.debian.org/debian buster main" >> /etc/apt/sources.list \
+         && curl -O https://mediaarea.net/repo/deb/repo-mediaarea_1.0-19_all.deb && dpkg -i repo-mediaarea_1.0-19_all.deb \
          && apt-get update && apt-get upgrade -y build-essential \
          && apt-get install -y --no-install-recommends \
             cmake \
@@ -31,7 +32,7 @@ RUN         bundle config build.nokogiri --use-system-libraries \
 # CMD export HOME=/home/app && rm -f tmp/pids/server.pid && bundle exec rake db:migrate && bin/rails server -b 0.0.0.0
 
 # Download stage takes advantage of parallel build
-FROM        ruby:2.5.8-stretch as download
+FROM        ruby:2.6.8-buster as download
 RUN         curl https://chromedriver.storage.googleapis.com/2.46/chromedriver_linux64.zip -o /usr/local/bin/chromedriver \
          && chmod +x /usr/local/bin/chromedriver \
          && curl -L https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz | tar xvz -C /usr/bin/ \
@@ -41,11 +42,11 @@ RUN         curl https://chromedriver.storage.googleapis.com/2.46/chromedriver_l
 
 
 # Dev stage for building dev image
-FROM        ruby:2.5.8-stretch as dev
+FROM        ruby:2.6.8-buster as dev
 ENV         BUNDLER_VERSION 2.0.2
 RUN         apt-get update && apt-get install -y --no-install-recommends curl gnupg2 \
          && curl -sL http://deb.nodesource.com/setup_8.x | bash - \
-         && curl -O https://mediaarea.net/repo/deb/repo-mediaarea_1.0-6_all.deb && dpkg -i repo-mediaarea_1.0-6_all.deb \
+         && curl -O https://mediaarea.net/repo/deb/repo-mediaarea_1.0-19_all.deb && dpkg -i repo-mediaarea_1.0-19_all.deb \
          && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
          && echo "deb http://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
