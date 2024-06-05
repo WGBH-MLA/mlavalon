@@ -1,5 +1,5 @@
-class RecordMediaPimId < ActiveRecord::Migration[5.2]
+class AddIngestStatus < ActiveRecord::Migration[5.2]
   def change
-    add_column :mars_ingest_items, :media_pim_id, :string
+    add_column :mars_ingests, :status, :integer
   end
 end
