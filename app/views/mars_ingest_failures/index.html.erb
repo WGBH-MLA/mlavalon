@@ -1,0 +1,15 @@
+<% @page_title = t('mars_ingests.title', :application_name => application_name) %>
+
+<div class="page-title-wrapper">
+  <h1 class="page-title">Mars Ingests</h1>
+  <% @mars_ingests_failures.each do |mif| %>
+
+    <div class="row">
+      <div class="col-md-12 collection-btn">
+        Manifest URL: <%= mif.manifest_url %><br>
+        Attempted At: <%= mif.created_at %><br>
+        <a href="/mars_ingest_failures/<%= mif.id %>">Error</a><br>
+      </div>
+    </div>
+  <% end %>
+</div>
