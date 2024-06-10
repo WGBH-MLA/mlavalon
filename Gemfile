@@ -111,78 +111,80 @@ gem 'faker'
 
 gem 'pry-byebug'
 
-group :development do
-  gem 'capistrano', '~>3.6'
-  gem 'capistrano-passenger', require: false
-  gem 'capistrano-rails', require: false
-  gem 'capistrano-rvm', require: false
-  gem 'capistrano-sidekiq', require: false
-  gem 'capistrano-yarn', require: false
+# group :development do
+#   gem 'capistrano', '~>3.6'
+#   gem 'capistrano-passenger', require: false
+#   gem 'capistrano-rails', require: false
+#   gem 'capistrano-rvm', require: false
+#   gem 'capistrano-sidekiq', require: false
+#   gem 'capistrano-yarn', require: false
 
-  # Use Bixby instead of rubocop directly
-  gem 'bixby', require: false
-  gem 'web-console'
-  gem 'xray-rails'
-end
+#   # Use Bixby instead of rubocop directly
+#   gem 'bixby', require: false
+#   gem 'web-console'
+#   gem 'xray-rails'
+# end
 
-group :development, :test do
-  gem 'byebug'
-  gem 'dotenv-rails'
-  gem 'equivalent-xml'
-  gem 'fcrepo_wrapper'
-  gem 'pry-byebug'
-  gem 'pry-rails'
-  gem 'rb-readline'
-  gem 'rspec-rails'
-  gem 'solr_wrapper', '>= 0.16'
-end
+# group :development, :test do
+#   gem 'byebug'
+#   gem 'dotenv-rails'
+#   gem 'equivalent-xml'
+#   gem 'fcrepo_wrapper'
+#   gem 'pry-byebug'
+#   gem 'pry-rails'
+#   gem 'rb-readline'
+#   gem 'rspec-rails'
+#   gem 'solr_wrapper', '>= 0.16'
+# end
 
-group :test do
-  gem 'capybara'
-  gem 'codeclimate-test-reporter'
-  gem 'database_cleaner'
-  gem 'email_spec'
-  gem 'factory_bot_rails'
-  gem 'fakefs', require: 'fakefs/safe'
-  gem 'hashdiff'
-  gem 'rails-controller-testing'
-  gem 'rspec-retry'
-  gem 'rspec_junit_formatter'
-  gem 'selenium-webdriver'
-  gem 'shoulda-matchers'
-  gem 'simplecov'
-  gem 'webdrivers', '~> 3.0'
-  gem 'webmock', '~> 3.5.1'
-end
+# group :test do
+#   gem 'capybara'
+#   gem 'codeclimate-test-reporter'
+#   gem 'database_cleaner'
+#   gem 'email_spec'
+#   gem 'factory_bot_rails'
+#   gem 'fakefs', require: 'fakefs/safe'
+#   gem 'hashdiff'
+#   gem 'rails-controller-testing'
+#   gem 'rspec-retry'
+#   gem 'rspec_junit_formatter'
+#   gem 'selenium-webdriver'
+#   gem 'shoulda-matchers'
+#   gem 'simplecov'
+#   gem 'webdrivers', '~> 3.0'
+#   gem 'webmock', '~> 3.5.1'
+# end
 
 # just to make sure they're the same
-group :production, :qa do
-  gem 'google-analytics-rails', '1.1.0'
-  gem 'lograge'
-end
+# group :production, :qa do
+#   gem 'google-analytics-rails', '1.1.0'
+#   gem 'lograge'
+# end
 
 # Install the bundle --with aws when running on Amazon Elastic Beanstalk
-group :aws, optional: true do
-  gem 'active_elastic_job', '~> 2.0'
-  gem 'aws-sdk-rails'
-  gem 'cloudfront-signer'
-  gem 'zk'
-end
+# group :aws, optional: true do
+#   gem 'active_elastic_job', '~> 2.0'
+#   gem 'aws-sdk-rails'
+#   gem 'cloudfront-signer'
+#   gem 'zk'
+# end
 
 # Install the bundle --with zoom to use the Z39.50 bib retriever
-group :zoom, optional: true do
-  gem 'zoom'
-end
+# group :zoom, optional: true do
+#   gem 'zoom'
+# end
 
 # Install the bundle --with postgres if using postgresql as the database backend
-group :postgres, optional: true do
+# group :postgres, optional: true do
+
+# just include regular
   gem 'pg'
-end
+# end
 
 # Install the bundle --with mysql if using mysql as the database backend
-group :mysql, optional: true do
-  gem 'mysql2'
-end
+# group :mysql, optional: true do
+#   gem 'mysql2'
+# end
 
 # no thanks
 # extra_gems = File.expand_path("../Gemfile.local", __FILE__)
