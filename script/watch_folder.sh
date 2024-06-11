@@ -7,7 +7,9 @@ vars=$(echo $all | tr "\0" "\n")
 for var in $vars
 do
   # export em
-  export $(echo $var)
+  piece1 =  $(echo $var | tr "=", "\n")[0]
+  piece2 =  $(echo $var | tr "=", "\n")[1]
+  export `${piece1}=${piece2}`
 done
 
 # ooh ah so nice
