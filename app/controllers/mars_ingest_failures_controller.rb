@@ -7,6 +7,6 @@ class MarsIngestFailuresController < ApplicationController
 
   def show
     @mars_ingest_failure = MarsIngestFailure.find(params[:id])
-    render @mars_ingest_failure.error_text, layout: false, content_type: 'text/plain'
+    render 'show', layout: false, content_type: 'text/plain'
   end
 end

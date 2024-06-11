@@ -34,7 +34,7 @@ class MarsIngestsController < ApplicationController
       render json: { id: @mars_ingest.id }, status: 200
     else
       Rails.logger.info "MarsIngest could not be saved: (#{ @mars_ingest.errors.messages.values.flatten })"
-      # save error text!
+      # save error text! this is only for ingests manually created through the UI
       MarsIngestFailure.create(manifest_url: @mars_ingest.manifest_url, error_text: @mars_ingest.errors.messages.values.flatten)
       render json: { errors: @mars_ingest.errors.messages.values.flatten }, status: 422
     end

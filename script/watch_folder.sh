@@ -1,6 +1,14 @@
-#!/usr/bin/env ruby
+#!/bin/bash
 
-# include it all
-require_relative '../config/environment'
-puts "what up yo!"
-MarsIngestWatcher.run
+# get em
+all=$(cat /proc/1/environ)
+# split em
+vars=$(echo $all | tr "\0" "\n")
+for var in $vars
+do
+  # export em
+  export $(echo $var)
+done
+
+# ooh ah so nice
+bundle exec ruby watch_folder.rb
