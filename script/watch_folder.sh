@@ -11,4 +11,4 @@ do
 done
 
 # ooh ah so nice
-bundle exec ruby watch_folder.rb
+bundle exec ruby script/watch_folder.rb
