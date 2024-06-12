@@ -79,6 +79,7 @@ class MarsIngestWatcher
       end
     else
       puts "Darn! Manifest invalid! #{mi.errors.messages.values.flatten}"
+      MarsIngestFailure.create(manifest_url: mi.manifest_url, error_text: mi.errors.messages.values.flatten)
     end
   end
 

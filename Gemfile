@@ -156,10 +156,10 @@ group :test do
 end
 
 # just to make sure they're the same
-group :production, :qa do
+# group :production, :qa do
   gem 'google-analytics-rails', '1.1.0'
   gem 'lograge'
-end
+# end
 
 # Install the bundle --with aws when running on Amazon Elastic Beanstalk
 group :aws, optional: true do
@@ -175,14 +175,15 @@ group :zoom, optional: true do
 end
 
 # Install the bundle --with postgres if using postgresql as the database backend
-group :postgres, optional: true do
+# group :postgres, optional: true do
   gem 'pg'
-end
+# end
 
 # Install the bundle --with mysql if using mysql as the database backend
 group :mysql, optional: true do
   gem 'mysql2'
 end
 
-extra_gems = File.expand_path("../Gemfile.local", __FILE__)
-eval File.read(extra_gems) if File.exist?(extra_gems)
+# no thanks
+# extra_gems = File.expand_path("../Gemfile.local", __FILE__)
+# eval File.read(extra_gems) if File.exist?(extra_gems)
