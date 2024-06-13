@@ -37,4 +37,5 @@ production:
   database: avalon
   pool: 5
   username: postgres
-  # password:
+  variables:
+    statement_timeout: 30000

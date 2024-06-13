@@ -49,7 +49,7 @@ class MarsIngestItemJob < ActiveJob::Base
 
     def ingest_payload(payload)
       logger.info "Trying to Ingest Payload"
-      host = Rails.env.development? ? 'mlavalon_avalon_1:3000' : '127.0.0.1:80'
+      host = Rails.env.development? ? 'mlavalon_avalon_1:3000' : 'localhost:3000'
 
       params = {
         method: :post,
