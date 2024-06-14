@@ -49,7 +49,7 @@ class MarsIngestItemJob < ActiveJob::Base
 
     def ingest_payload(payload)
       logger.info "Trying to Ingest Payload"
-      host = Rails.env.development? ? 'mlavalon_avalon_1:3000' : 'localhost:3000'
+      host = Rails.env.development? ? 'mlavalon_avalon_1:3000' : '127.0.0.1:3000'
 
       params = {
         method: :post,
@@ -65,7 +65,8 @@ class MarsIngestItemJob < ActiveJob::Base
         timeout: -1
       }
       # Call the Avalon Ingest API with our payload.
-      JSON.parse(RestClient::Request.execute(params))
+      resp = RestClient::Request.execute(params)
+      JSON.parse(resp)
     end
 
     def existing_record?(media_pim_id)
