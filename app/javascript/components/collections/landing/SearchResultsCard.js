@@ -101,7 +101,7 @@ const SearchResultsCard = props => {
             <CardMetaData doc={doc} fieldLabel="Date" fieldName="date_ssi" />
             <CardMetaData
               doc={doc}
-              fieldLabel="Main Contributors"
+              fieldLabel="Creator(s)"
               fieldName="creator_ssim"
             />
             <CardMetaData
