@@ -19,7 +19,10 @@ do
   echo $var >> v.txt
 done
 
-export $(grep -v '^#' v.txt | xargs -d '\n')
+# export $(cat v.txt | xargs)
+# export $(grep -v '^#' v.txt | xargs -d '\n')
+# still doesnt handle JAVA_OPTIONS correctly, but thats ok, since the env vars are correctly loaded in MarsIngestItemJob
+export $(grep -v '^#' v.txt | xargs -0)
 
 # ooh ah so nice
 
