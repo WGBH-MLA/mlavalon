@@ -246,7 +246,8 @@ class MarsManifest
         # "other identifier" => [],
         # "other identifier type" => [],
         "mla barcode" => [],
-        "media pim id" => [],
+        # required for detecting existing records and overwriting on subsequent ingests
+        "media pim id" => [:validate_presence],
 
         "comment" => [],
         "file label" => [],
