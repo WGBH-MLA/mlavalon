@@ -10,7 +10,6 @@ class MarsManifest
 
   attr_reader :url
 
-
   validate :validate_manifest
 
   delegate :normalize_header, :required_headers, :allowed_headers,
