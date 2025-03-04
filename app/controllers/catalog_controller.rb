@@ -80,7 +80,7 @@ class CatalogController < ApplicationController
 
     # Date Created
     config.add_facet_field 'date_created_ssi', label: 'Date Created', limit: 5, sort: 'index'
-    
+
     # Catch-all multidate field - hide this because it emcompasses multiple date fields in a way that isnt useful
     # config.add_facet_field 'date_sim', label: 'Date', limit: 5, sort: 'index'
 
@@ -102,7 +102,7 @@ class CatalogController < ApplicationController
     config.add_facet_field 'language_sim', label: 'Language', limit: 5, sort: 'index'
 
     config.add_facet_field "publisher_sim", label: 'Publishers', limit: 10, sort: 'index'
-    
+
     # hide this because its a mash-up of other "x subjects" fields
     # config.add_facet_field "subject_sim", label: "Subjects", limit: 10, sort: 'index'
 
@@ -136,7 +136,7 @@ class CatalogController < ApplicationController
     # solr fields to be displayed in the index (search results) view
     #   The ordering of the field names is the order of the display
     config.add_index_field 'date_ssi', label: 'Date', helper_method: :combined_display_date
-    config.add_index_field 'creator_ssim', label: 'Main contributors', helper_method: :contributor_index_display
+    config.add_index_field 'creator_ssim', label: 'Creator(s)', helper_method: :contributor_index_display
     config.add_index_field 'summary_ssi', label: 'Summary', helper_method: :description_index_display
 
     # solr fields to be displayed in the show (single result) view
