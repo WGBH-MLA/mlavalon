@@ -70,8 +70,10 @@ class MarsIngestItemJob < ActiveJob::Base
     end
 
     def existing_record?(media_pim_id)
-      mo = MediaObject.where(media_pim_id: media_pim_id)
-      mo.first.id if mo.present?
+      # mo = MediaObject.where(media_pim_id: media_pim_id)
+      solr = RSolr.connect(url: ENV['SOLR_URL'])
+      searchy = solr.get('select', params: { q: "media_pim_id:#{media_pim_id}"})
+      searchy["response"]["docs"][0]["id"] if searchy && searchy["response"] && searchy["response"]["docs"] && searchy["response"]["docs"][0] && searchy["response"]["docs"][0]["id"]
     end
 
     # @return [JSON, String] if the exception has a JSON response body with an
