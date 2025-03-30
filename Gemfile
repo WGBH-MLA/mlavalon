@@ -48,6 +48,7 @@ gem 'avalon-about', git: 'https://github.com/avalonmediasystem/avalon-about.git'
 gem 'bootstrap-toggle-rails'
 gem 'bootstrap_form'
 gem 'iiif_manifest', '~> 0.6'
+gem 'rack', '2.2.3'
 gem 'rack-cors', require: 'rack/cors'
 gem 'recaptcha', require: 'recaptcha/rails'
 gem 'samvera-persona', '~> 0.1.7'
@@ -138,7 +139,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'capybara'
+  gem 'capybara', '3.0.2'
   gem 'codeclimate-test-reporter'
   gem 'database_cleaner'
   gem 'email_spec'
